@@ -89,7 +89,7 @@
               </q-item-section>
 
               <q-item-section>
-                Reorts
+                Reports
               </q-item-section>
             </q-item>
 
