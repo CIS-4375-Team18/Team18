@@ -129,7 +129,7 @@ export default {
           this.$router.replace('/')
         })
         .onCancel(() => {
-
+          // Do nothing
         })
     }
 
