@@ -2,11 +2,24 @@
     <div class="signin-container">
 
         <div class="signin-content">
+            <div class="signin-options-title">
+                Sign-In Options
+            </div>
             <q-btn
-                label="Sign in with Google"
                 class="gmail-signin-button"
                 @click="signInWithGoogle"
-            />
+                inline 
+                no-caps
+            >
+                <div class="q-gutter-sm row items-center">
+                    <div>
+                        <q-icon name="email" />
+                    </div>
+                    <div>
+                        Sign in with Gmail
+                    </div>
+                </div>
+            </q-btn>
         </div>   
     </div>
 </template>
@@ -52,6 +65,16 @@ export default {
 </script>
 
 <style scoped>
+
+.signin-options-title {
+    text-align: center;
+    font-weight: bold;
+    margin-bottom: 250px;
+    font-size: large;
+    color: #fff;
+
+}
+
 .signin-container {
     display: flex;
     justify-content: center;
@@ -77,6 +100,7 @@ export default {
     padding: 10px 20px;
     border: none;
     cursor: pointer;
+    position: absolute;
 }
 
 .gmail-signin-button:hover {
