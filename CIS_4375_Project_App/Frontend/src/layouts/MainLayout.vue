@@ -15,14 +15,50 @@
         <q-space />
 
         <div class="q-gutter-sm row items-center no-wrap">
+          <div v-if="!userSignedIn">
+            <q-btn style="margin-right: 20px;"
+              @click="openSignInDialog"
+              label="Sign In"
+              color="primary"
+              icon="account_circle"
+            />
+          </div>
+            
 
-          <q-btn round flat style="margin-right: 10px;">
-            <q-avatar size="46px">
-              <img src="https://cdn.quasar.dev/img/boy-avatar.png">
-            </q-avatar>
-            <q-tooltip>Account</q-tooltip>
-          </q-btn>
+            <!-- <q-btn round flat style="margin-right: 10px;">
+              <q-avatar size="46px">
+                <img src="https://cdn.quasar.dev/img/boy-avatar.png">
+              </q-avatar>
+              <q-tooltip>Account</q-tooltip>
+            </q-btn> -->
+            <div v-else>
+              <q-btn
+                round flat style="margin-right: 20px;"
+                color="primary"
+                :icon="userAvatar"
+                @click="showUserProfileMenu = !showUserProfileMenu"
+              >
+              </q-btn>
+            </div>
+
+            <q-menu v-if="showUserProfileMenu" anchor="bottom-right">
+              <q-list>
+                <q-item clickable @click="showUserProfile">
+                  <q-item-section> User Profile </q-item-section>
+                </q-item>
+                <q-item clickable @click="signOut">
+                  <q-item-section> Logout </q-item-section>
+                </q-item>
+              </q-list>
+
+            </q-menu>
+          
         </div>
+
+        <q-dialog v-model="showSignInDialog">
+          <SignIn @close="closeSignInDialog" />
+        </q-dialog>
+
       </q-toolbar>
     </q-header>
 
@@ -143,12 +179,43 @@
 <script>
 import { route } from 'quasar/wrappers'
 import { ref } from 'vue'
+import SignIn from 'pages/SignIn.vue'
+import { QDialog } from 'quasar'
 
 export default {
   name: 'MyLayout',
 
+  components: {
+    SignIn
+  },
+
+  data() {
+    return {
+      userSignedIn: false,
+      userAvatar: '',
+      showUserProfileMenu: false,
+    }
+  },
+
+  methods: {
+    signOut() {
+      this.userSignedIn = false;
+      this.$router.push('/');
+
+    } 
+  },
+
   setup() {
     const miniState = ref(false)
+    const showSignInDialog = ref(false)
+
+    const openSignInDialog = () => {
+      showSignInDialog.value = true;
+    }
+
+    const closeSignInDialog = () => {
+      showSignInDialog.value = false;
+    }
 
 
     function toggleLeftDrawer() {
@@ -158,6 +225,9 @@ export default {
     return {
       drawer: ref(false),
       miniState,
+      openSignInDialog,
+      showSignInDialog,
+      closeSignInDialog,
 
 
 
