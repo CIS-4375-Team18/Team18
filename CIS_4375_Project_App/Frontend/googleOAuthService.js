@@ -1,6 +1,7 @@
 import axios from 'axios';
 import qs from 'qs';
 
+
 const CLIENT_ID = '384735290750-5cqotls1m9j11iaholnisrcgb4gr5d2t.apps.googleusercontent.com';
 const REDIRECT_URI = 'http://localhost:9000';
 const AUTH_URL = 'https://accounts.google.com/o/oauth2/v2/auth';
@@ -23,7 +24,7 @@ export async function exchangeCodeForToken(code) {
     const data = {
         code,
         client_id: CLIENT_ID,
-        client_secret: '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',
+        client_secret: process.env.GOOGLE_CLIENT_SECRET,
         redirect_uri: REDIRECT_URI,
         grant_type: 'authorization_code',
     };
