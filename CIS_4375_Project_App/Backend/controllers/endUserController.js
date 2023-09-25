@@ -35,6 +35,17 @@ const addEndUser = async (req, res, next) => {
     }
 }
 
+const loginEndUser = async (req, res, next) => {
+    try {
+        const END_USER_EMAIL = req.params.email;
+        const END_USER_PASSWORD = req.params.password;
+        const tryLogin = await endUserData.endUserLogin(END_USER_EMAIL, END_USER_PASSWORD);
+        res.send(tryLogin);
+    } catch (error) {
+        res.status(400).send(error.message);
+    }
+}
+
 const updateEndUser = async (req, res, next) => {
     try {
         const END_USER_ID =  req.params.id;

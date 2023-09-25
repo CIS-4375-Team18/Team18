@@ -51,6 +51,22 @@ const createEndUser = async (endUserData) => {
     }
 }
 
+const endUserLogin = async (userEmail, userPassword) => {
+    try {
+        let pool = await sql.connect(config.sql);
+        const loginQuery = "SELECT EXISTS (SELECT * FROM [dbo].[END_USER] WHERE"+
+            "END_USER_EMAIL=@userEmail and END_USER_PASSWORD=@userPassword)"
+
+        const loginUser = await pool.request()
+            .input('END_USER_EMAIL', sql.NVarChar(40), userEmail.END_USER_EMAIL)
+            .input('END_USER_PASSWORD', sql.NVarChar(255), userPassword.END_USER_PASSWORD)
+            .query(loginQuery);
+        return loginUser.recordset;
+    } catch (error) {
+        return error.message
+    }
+}
+
 const updateEndUser = async (END_USER_ID, data) => {
     try {
         let pool = await sql.connect(config.sql);
