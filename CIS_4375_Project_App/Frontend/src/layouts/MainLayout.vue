@@ -15,14 +15,30 @@
         <q-space />
 
         <div class="q-gutter-sm row items-center no-wrap">
+          <div v-if="!userSignedIn">
+            <q-btn style="margin-right: 20px;"
+              @click="openSignInDialog"
+              label="Sign-In"
+              color="blue"
+              icon="account_circle"
+            >
+            </q-btn>
+          </div>
 
-          <q-btn round flat style="margin-right: 10px;">
-            <q-avatar size="46px">
-              <img src="https://cdn.quasar.dev/img/boy-avatar.png">
-            </q-avatar>
-            <q-tooltip>Account</q-tooltip>
-          </q-btn>
+          <div v-else>
+            <q-btn round flat style="margin-right: 10px;">
+              <q-avatar size="46px">
+                <img src="https://cdn.quasar.dev/img/boy-avatar.png">
+              </q-avatar>
+              <q-tooltip>Account</q-tooltip>
+            </q-btn>
+          </div>
         </div>
+
+        <q-dialog v-model="signInDialogVisible">
+          <SignIn @close="closeSignInDialog" />
+        </q-dialog>
+
       </q-toolbar>
     </q-header>
 
@@ -89,7 +105,7 @@
               </q-item-section>
 
               <q-item-section>
-                Reorts
+                Reports
               </q-item-section>
             </q-item>
 
@@ -143,9 +159,27 @@
 <script>
 import { route } from 'quasar/wrappers'
 import { ref } from 'vue'
+import { QDialog } from 'quasar'
+import SignIn from 'pages/SignIn.vue'
 
 export default {
   name: 'MyLayout',
+
+  components: {
+    SignIn,
+  },
+
+  data() {
+    return {
+      signInDialogVisible: false,
+    }
+  }, 
+
+  methods: {
+    openSignInDialog() {
+      this.signInDialogVisible = true;
+    }
+  },
 
   setup() {
     const miniState = ref(false)
