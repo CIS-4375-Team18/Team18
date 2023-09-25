@@ -20,6 +20,7 @@
     "quasar": "^2.6.0",
     "vue": "^3.0.0",
     "vue-router": "^4.0.0",
+    "vuefire": "^3.1.17",
     "vuex": "^4.1.0"
   },
   "devDependencies": {

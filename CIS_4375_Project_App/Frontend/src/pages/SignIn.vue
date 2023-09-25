@@ -25,42 +25,26 @@
 </template>
 
 <script>
-import { initiateOAuth, exchangeCodeForToken, getUserProfile } from '../../googleOAuthService.js';
+import { getAuth, GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
 
 export default {
-    data() {
-        return {
-            userSignedIn: false,
-            userAvatar: ''
-        }
-    },
 
     methods: {
-        signInWithGoogle() {
-            initiateOAuth();
-        },
+        async signInWithGoogle() {
+            const auth = getAuth();
+            const provider = new GoogleAuthProvider();
 
-        handleOAuthCallback() {
-            const code = this.$route.query.code;
-            if (code) {
-                exchangeCodeForToken(code)
-                    .then((accessToken) => {
-                        getUserProfile(accessToken)
-                            .then((profile) => {
-                                this.userSignedIn = true;
-                                this.userAvatar = profile.picture;
-                            })
-                    })
-                    .catch((error) => {
-                        console.error('OAuth error: ', error);
-                    });
+            try {
+                const result = await signInWithPopup(auth, provider)
+                console.log('result', result)
+                this.$q.notify({message: 'Sign in Successful.'})
+                this.$router.push('/')
+            } catch (error) {
+                console.error('error', error)
             }
         },
-    },
 
-    created() {
-        this.handleOAuthCallback();
-    }
+    },
 }
 </script>
 

@@ -43,6 +43,10 @@
 
             <q-menu v-if="showUserProfileMenu" anchor="bottom-right">
               <q-list>
+                <q-item>
+                  <q-item-section> {{ user }} </q-item-section>
+                  <q-item-section> {{ email }} </q-item-section>
+                </q-item>
                 <q-item clickable @click="showUserProfile">
                   <q-item-section> User Profile </q-item-section>
                 </q-item>
@@ -182,6 +186,7 @@ import { ref } from 'vue'
 import SignIn from 'pages/SignIn.vue'
 import { QDialog } from 'quasar'
 
+
 export default {
   name: 'MyLayout',
 
@@ -192,6 +197,8 @@ export default {
   data() {
     return {
       userSignedIn: false,
+      user: '',
+      email: '',
       userAvatar: '',
       showUserProfileMenu: false,
     }
@@ -204,6 +211,19 @@ export default {
 
     } 
   },
+
+  // created() {
+  //   firebase.auth().onAuthStateChanged((auth) => {
+  //     if (auth) {
+  //       this.user = auth.displayName
+  //       this.email = auth.email
+  //       this.userAvatar = auth.profile
+  //       this.userSignedIn = true
+  //     } else {
+  //       console.log('User name is null')
+  //     }
+  //   })
+  // },
 
   setup() {
     const miniState = ref(false)
