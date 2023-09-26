@@ -39,13 +39,13 @@ const GetAll = async () => {
         " ,[SUPPORT_TICKET_TIMELINE] "+
         " ,[SUPPORT_TICKET_DATE_CREATED] "+
         " ,[SUPPORT_TICKET_RESOLUTION_TIME] "+
-        " ,[END_USER_ID] "+
         " ,[SUPPORT_TICKET_STATUS_ID] "+
         " ,[TICKET_CATEGORY_ID] "+
         " ,[TICKET_SUB_CATEGORY_ID] "+
         " ,[TICKET_PRIORITY_ID] "+
         " ,[SUPPORT_AGENT_ID] "+
         " ,[RESOLUTION_DATE] "+
+        " ,[END_USER_ID] "
         " FROM [dbo].[SUPPORT_TICKET] "
         const supportTicketsList = await pool.request().query(selectAllTicketsQ);
         return supportTicketsList.recordset;
@@ -92,13 +92,13 @@ const getById = async(SUPPORT_TICKET_ID) => {
         " ,[SUPPORT_TICKET_TIMELINE] "+
         " ,[SUPPORT_TICKET_DATE_CREATED] "+
         " ,[SUPPORT_TICKET_RESOLUTION_TIME] "+
-        " ,[END_USER_ID] "+
         " ,[SUPPORT_TICKET_STATUS_ID] "+
         " ,[TICKET_CATEGORY_ID] "+
         " ,[TICKET_SUB_CATEGORY_ID] "+
         " ,[TICKET_PRIORITY_ID] "+
         " ,[SUPPORT_AGENT_ID] "+
         " ,[RESOLUTION_DATE] "+
+        " ,[END_USER_ID] "
         " FROM [dbo].[SUPPORT_TICKET] WHERE SUPPORT_TICKET_ID=@SUPPORT_TICKET_ID  "
         const supportTicket = await pool.request()
                             .input('SUPPORT_TICKET_ID', sql.Int, SUPPORT_TICKET_ID)
@@ -120,13 +120,13 @@ const insertNew = async (supportTicketData) => {
        " ,[SUPPORT_TICKET_TIMELINE] "+
        " ,[SUPPORT_TICKET_DATE_CREATED] "+
        " ,[SUPPORT_TICKET_RESOLUTION_TIME] "+
-       " ,[END_USER_ID] "+
        " ,[SUPPORT_TICKET_STATUS_ID] "+
        " ,[TICKET_CATEGORY_ID] "+
        " ,[TICKET_SUB_CATEGORY_ID] "+
        " ,[TICKET_PRIORITY_ID] "+
        " ,[SUPPORT_AGENT_ID] "+
-       " ,[RESOLUTION_DATE]) "+
+       " ,[RESOLUTION_DATE] "+
+       " ,[END_USER_ID]) "
        " VALUES "+
        " (@SUPPORT_TICKET_SUBJECT, "+
        " @SUPPORT_TICKET_NOTE, "+
@@ -135,13 +135,14 @@ const insertNew = async (supportTicketData) => {
        " @SUPPORT_TICKET_TIMELINE, "+
        " @SUPPORT_TICKET_DATE_CREATED, "+
        " @SUPPORT_TICKET_RESOLUTION_TIME, "+
-       " @END_USER_ID, "+
        " @SUPPORT_TICKET_STATUS_ID, "+
        " @TICKET_CATEGORY_ID, "+
        " @TICKET_SUB_CATEGORY_ID, "+
        " @TICKET_PRIORITY_ID, "+
        " @SUPPORT_AGENT_ID, "+
-       " @RESOLUTION_DATE) "
+       " @RESOLUTION_DATE, "+
+       " @END_USER_ID) "
+
         const insertSuppTicket = await pool.request()
                             .input('SUPPORT_TICKET_SUBJECT', sql.NVarChar(500), supportTicketData.SUPPORT_TICKET_SUBJECT)
                             .input('SUPPORT_TICKET_NOTE', sql.NVarChar('max'), supportTicketData.SUPPORT_TICKET_NOTE)
@@ -150,13 +151,13 @@ const insertNew = async (supportTicketData) => {
                             .input('SUPPORT_TICKET_TIMELINE', sql.NVarChar(20), supportTicketData.SUPPORT_TICKET_TIMELINE)
                             .input('SUPPORT_TICKET_DATE_CREATED', sql.Date, supportTicketData.SUPPORT_TICKET_DATE_CREATED)
                             .input('SUPPORT_TICKET_RESOLUTION_TIME', sql.Int, supportTicketData.SUPPORT_TICKET_RESOLUTION_TIME)
-                            .input('END_USER_ID', sql.SmallInt, supportTicketData.END_USER_ID)
                             .input('SUPPORT_TICKET_STATUS_ID', sql.SmallInt, supportTicketData.SUPPORT_TICKET_STATUS_ID)
                             .input('TICKET_CATEGORY_ID', sql.SmallInt, supportTicketData.TICKET_CATEGORY_ID)
                             .input('TICKET_SUB_CATEGORY_ID', sql.SmallInt, supportTicketData.TICKET_SUB_CATEGORY_ID)        
                             .input('TICKET_PRIORITY_ID', sql.SmallInt, supportTicketData.TICKET_PRIORITY_ID)        
                             .input('SUPPORT_AGENT_ID', sql.SmallInt, supportTicketData.SUPPORT_AGENT_ID)        
-                            .input('RESOLUTION_DATE', sql.Date, supportTicketData.RESOLUTION_DATE)        
+                            .input('RESOLUTION_DATE', sql.Date, supportTicketData.RESOLUTION_DATE)  
+                            .input('END_USER_ID', sql.SmallInt, supportTicketData.END_USER_ID)      
                             .query(createSupportTicket);                            
         return insertSuppTicket.recordset;
     } catch (error) {
@@ -175,13 +176,13 @@ const update = async (SUPPORT_TICKET_ID, data) => {
         " [SUPPORT_TICKET_TIMELINE] = @SUPPORT_TICKET_TIMELINE, "+
         " [SUPPORT_TICKET_DATE_CREATED] = @SUPPORT_TICKET_DATE_CREATED, "+
         " [SUPPORT_TICKET_RESOLUTION_TIME] = @SUPPORT_TICKET_RESOLUTION_TIME, "+
-        " [END_USER_ID] = @END_USER_ID, "+
         " [SUPPORT_TICKET_STATUS_ID] = @SUPPORT_TICKET_STATUS_ID, "+
         " [TICKET_CATEGORY_ID] = @TICKET_CATEGORY_ID, "+
         " [TICKET_SUB_CATEGORY_ID] = @TICKET_SUB_CATEGORY_ID,  "+
         " [TICKET_PRIORITY_ID] = @TICKET_PRIORITY_ID, "+
         " [SUPPORT_AGENT_ID] = @SUPPORT_AGENT_ID,  "+
-        " [RESOLUTION_DATE] = @RESOLUTION_DATE "+
+        " [RESOLUTION_DATE] = @RESOLUTION_DATE, "+
+        " [END_USER_ID] = @END_USER_ID, "
         " WHERE SUPPORT_TICKET_ID=@SUPPORT_TICKET_ID"
      
         const update = await pool.request()
@@ -193,13 +194,13 @@ const update = async (SUPPORT_TICKET_ID, data) => {
             .input('SUPPORT_TICKET_TIMELINE', sql.NVarChar(20), data.SUPPORT_TICKET_TIMELINE)
             .input('SUPPORT_TICKET_DATE_CREATED', sql.Date, data.SUPPORT_TICKET_DATE_CREATED)
             .input('SUPPORT_TICKET_RESOLUTION_TIME', sql.Int, data.SUPPORT_TICKET_RESOLUTION_TIME)
-            .input('END_USER_ID', sql.SmallInt, data.END_USER_ID)
             .input('SUPPORT_TICKET_STATUS_ID', sql.SmallInt, data.SUPPORT_TICKET_STATUS_ID)
             .input('TICKET_CATEGORY_ID', sql.SmallInt, data.TICKET_CATEGORY_ID)
             .input('TICKET_SUB_CATEGORY_ID', sql.SmallInt, data.TICKET_SUB_CATEGORY_ID)        
             .input('TICKET_PRIORITY_ID', sql.SmallInt, data.TICKET_PRIORITY_ID)        
             .input('SUPPORT_AGENT_ID', sql.SmallInt, data.SUPPORT_AGENT_ID)        
-            .input('RESOLUTION_DATE', sql.Date, data.RESOLUTION_DATE)        
+            .input('RESOLUTION_DATE', sql.Date, data.RESOLUTION_DATE)
+            .input('END_USER_ID', sql.SmallInt, data.END_USER_ID)        
                                 
             .query(updateSubCatQ);
         return update.recordset;

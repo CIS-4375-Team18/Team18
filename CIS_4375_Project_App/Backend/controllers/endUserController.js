@@ -1,5 +1,6 @@
 'use strict';
 
+const bcrypt = require('bcrypt');
 const endUserData = require('../data/endusers');
 
 const getAllEndUsers= async (req, res, next) => {
@@ -37,10 +38,20 @@ const addEndUser = async (req, res, next) => {
 
 const loginEndUser = async (req, res, next) => {
     try {
-        const END_USER_EMAIL = req.params.email;
-        const END_USER_PASSWORD = req.params.password;
-        const tryLogin = await endUserData.endUserLogin(END_USER_EMAIL, END_USER_PASSWORD);
-        res.send(tryLogin);
+        const { END_USER_EMAIL, END_USER_PASSWORD} = req.body;
+
+        const storedHashedPassword = await endUserData.getHashedPassword(END_USER_EMAIL);
+
+        if (!storedHashedPassword) {
+            res.status(401).send('User not found')
+        }
+        const passwordMatch = await bcrypt.compare(END_USER_PASSWORD, storedHashedPassword);
+
+        if (passwordMatch) {
+            res.status(200).send('Login Successful')
+        } else {
+            res.status(401).send('Login Failed')
+        }
     } catch (error) {
         res.status(400).send(error.message);
     }
@@ -72,6 +83,7 @@ module.exports = {
     getAllEndUsers,
     getEndUser,
     addEndUser,
+    loginEndUser,
     updateEndUser,
     deleteEndUser
 }
