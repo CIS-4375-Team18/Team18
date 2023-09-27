@@ -43,6 +43,20 @@ const routes = [
     ]
   },
   {
+    path: '/users',
+    component: () => import('layouts/MainLayout.vue'),
+    children: [
+      { path: '', component: () => import('pages/ManageUserPage.vue') } 
+    ]
+  },
+  {
+    path: '/createuser',
+    component: () => import('layouts/MainLayout.vue'),
+    children: [
+      { path: '', component: () => import('pages/CreateUserPage.vue') }
+    ]
+  },
+  {
     path: '/settings',
     component: () => import('layouts/MainLayout.vue'),
     children: [
