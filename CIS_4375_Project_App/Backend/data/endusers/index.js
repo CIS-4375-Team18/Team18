@@ -44,9 +44,9 @@ const createEndUser = async (endUserData) => {
             .input('END_USER_LAST_NAME', sql.NVarChar(40), endUserData.END_USER_LAST_NAME)
             .input('END_USER_EMAIL', sql.NVarChar(255), endUserData.END_USER_EMAIL)
             .input('END_USER_PASSWORD', sql.NVarChar(255), endUserData.END_USER_PASSWORD)
-            .input('END_USER_PERIOD', sql.SmallInt, endUserData.END_USER_PERIOD)
-            .input('USER_ROLE_ID', sql.SmallInt, endUserData.USER_ROLE_ID)
-            .input('ACTIVE_STATUS_ID', sql.SmallInt, endUserData.ACTIVE_STATUS_ID)
+            .input('END_USER_PERIOD', sql.Int, endUserData.END_USER_PERIOD)
+            .input('USER_ROLE_ID', sql.Int, endUserData.USER_ROLE_ID)
+            .input('ACTIVE_STATUS_ID', sql.Int, endUserData.ACTIVE_STATUS_ID)
             .query(createQuery);
         return insertEndUser.recordset;
     } catch (error) {

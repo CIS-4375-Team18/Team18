@@ -29,6 +29,9 @@ const getEndUser = async (req, res, next) => {
 const addEndUser = async (req, res, next) => {
     try {
         const data = req.body;
+        const saltRounds = 10;
+        const hashedPassword = await bcrypt.hash(data.END_USER_PASSWORD, saltRounds);
+        data.END_USER_PASSWORD = hashedPassword;
         const insert = await endUserData.createEndUser(data);
         res.send(insert);
     } catch (error) {
