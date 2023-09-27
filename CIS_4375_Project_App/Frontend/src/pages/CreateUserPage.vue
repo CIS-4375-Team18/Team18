@@ -18,7 +18,7 @@
             </div>
             <div style="padding-top: 30px;">
                 <q-input v-model="user.email" label="Email" 
-                required>
+                type="email" required>
                 </q-input>
             </div>
             <div style="padding-top: 30px;">
@@ -87,7 +87,16 @@ export default {
     methods: {
         async createUser() {
             try {
-            // Create an object with user data to send to the API
+
+                const isEmailValid = this.validateEmail(this.user.email);
+                const isPasswordValid = this.validatePassword(this.user.password);
+
+                console.log(isEmailValid)
+                console.log(isPasswordValid)
+
+                if (!this.validateEmail(this.user.email) || !this.validatePassword(this.user.password)) {
+                    return;
+                }
                 const userData = {
                     END_USER_FIRST_NAME: this.user.firstName,
                     END_USER_LAST_NAME: this.user.lastName,
@@ -97,10 +106,9 @@ export default {
                     USER_ROLE_ID: this.user.role.USER_ROLE_ID,
                     ACTIVE_STATUS_ID: 1,
                 };
-                    // Make a POST request to the API endpoint
+
                 const response = await axios.post(`http://localhost:8001/api/enduser`, userData);
 
-                    // Handle the API response (e.g., show a success message)
                 if (response.status === 200) {
                     this.$q.notify({ color: 'positive', message: 'User registered successfully' });
                     this.$router.push('/users');
@@ -111,7 +119,6 @@ export default {
                 console.log(userData.USER_ROLE_ID)
                 console.log('Sending data.')
             } catch (error) {
-                // Handle any network errors or API request failures
                 console.error('API request failed:', error);
                 this.$q.notify({ color: 'negative', message: 'An error occurred during registration' });
             }
@@ -119,16 +126,23 @@ export default {
 
         validateEmail(email) {
             const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            if (!emailRegex.test(email)) {
+            const isValidEmail = emailRegex.test(email);
+
+            if (!isValidEmail) {
                 this.$q.notify({ color: 'negative', message: 'Invalid email format' });
             }
+
+            return isValidEmail
         },
 
         validatePassword(password) {
             const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!#%*?&])[A-Za-z\d@$!#%*?&]{8,}$/;
-            if (!passwordRegex.test(password)) {
+            const isValidPassword = passwordRegex.test(password)
+            if (!isValidPassword) {
                 this.$q.notify({ color: 'negative', message: 'Invalid password format' });
             }
+
+            return isValidPassword
         },
     
   },
