@@ -36,11 +36,17 @@
                 <q-list>
                   <q-item>
                     <q-item-section>
+                      {{ userFirstName }}
+                    </q-item-section>
+                  </q-item>
+                  <q-item>
+                    <q-item-section style="text-align: right;">
                       {{ userEmail }}
                     </q-item-section>
                   </q-item>
-                  <q-item clickable @click="performLogout">
-                    <q-item-section>
+                  <q-separator />
+                  <q-item clickable @click="performLogout" style="text-align: right;">
+                    <q-item-section >
                       Logout
                     </q-item-section>
                   </q-item>
@@ -233,7 +239,7 @@ export default {
     },
 
     computed: {
-      ...mapGetters('auth', ['isAuthenticated', 'userEmail']),
+      ...mapGetters('auth', ['isAuthenticated', 'userEmail', 'userFirstName']),
 
     }
 
