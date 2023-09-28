@@ -2,6 +2,8 @@
 
 const bcrypt = require('bcrypt');
 const endUserData = require('../data/endusers');
+const config = require('../config');
+const sql = require('mssql');
 
 const getAllEndUsers= async (req, res, next) => {
     try {
@@ -41,22 +43,42 @@ const addEndUser = async (req, res, next) => {
 
 const loginEndUser = async (req, res, next) => {
     try {
-        const { END_USER_EMAIL, END_USER_PASSWORD} = req.body;
+        const { END_USER_EMAIL, END_USER_PASSWORD } = req.body;
 
+        const pool = await sql.connect(config.sql);
+
+        const result = await pool.request()
+            .input('END_USER_EMAIL', sql.NVarChar, END_USER_EMAIL)
+            .query("SELECT END_USER_ID, END_USER_FIRST_NAME, END_USER_EMAIL, USER_ROLE_ID " +
+                "FROM [dbo].[END_USER] " +
+                "WHERE END_USER_EMAIL=@END_USER_EMAIL");
+
+        await pool.close();
+
+        if (result.recordset.length === 0) {
+            return res.status(401).json({ message: 'User not found' });
+        }
+
+        const user = result.recordset[0];
         const storedHashedPassword = await endUserData.getHashedPassword(END_USER_EMAIL);
 
-        if (!storedHashedPassword) {
-            res.status(401).send('User not found')
-        }
         const passwordMatch = await bcrypt.compare(END_USER_PASSWORD, storedHashedPassword);
 
         if (passwordMatch) {
-            res.status(200).send('Login Successful')
+            const userData = {
+                END_USER_ID: user.END_USER_ID,
+                END_USER_FIRST_NAME: user.END_USER_FIRST_NAME,
+                END_USER_EMAIL: user.END_USER_EMAIL,
+                USER_ROLE_ID: user.USER_ROLE_ID
+            };
+
+            return res.status(200).send(userData);
         } else {
-            res.status(401).send('Login Failed')
+            res.status(401).json({ message: 'Login Failed' });
         }
     } catch (error) {
-        res.status(400).send(error.message);
+        console.error('Error in loginEndUser:', error);
+        return res.status(400).json({ message: 'An error occurred during login' });
     }
 }
 
@@ -88,5 +110,5 @@ module.exports = {
     addEndUser,
     loginEndUser,
     updateEndUser,
-    deleteEndUser
+    deleteEndUser,
 }

@@ -2,6 +2,8 @@
 const utils = require('../utils');
 const config = require('../../config');
 const sql = require('mssql');
+const bcrypt = require('bcrypt');
+
 
 const getEndUsers = async () => {
 
@@ -54,28 +56,39 @@ const createEndUser = async (endUserData) => {
     }
 }
 
-const endUserLogin = async (userEmail, userPassword) => {
+const endUserLogin = async (END_USER_EMAIL, END_USER_PASSWORD) => {
     try {
         let pool = await sql.connect(config.sql);
-        const loginQuery = "SELECT EXISTS (SELECT * FROM [dbo].[END_USER] WHERE"+
-            "END_USER_EMAIL=@userEmail and END_USER_PASSWORD=@userPassword)"
+        const loginQuery = "SELECT END_USER_ID, END_USER_FIRST_NAME, END_USER_EMAIL, USER_ROLE_ID " +
+        "FROM [dbo].[END_USER] " +
+        "WHERE END_USER_EMAIL=@END_USER_EMAIL";
 
         const loginUser = await pool.request()
-            .input('END_USER_EMAIL', sql.NVarChar(40), userEmail)
-            .input('END_USER_PASSWORD', sql.NVarChar(255), userPassword)
-            .query(loginQuery);
-        return loginUser.recordset[0][''] === 1;
+            .input('END_USER_EMAIL', sql.NVarChar(255), END_USER_EMAIL)
+            .query(loginQuery)
+        if (loginUser.recordset.length > 1) {
+            const userData = loginUser.recordset[0]
+            const storedHashedPassword = userData.END_USER_PASSWORD
+
+            const passwordMatch = await bcrypt.compare(END_USER_PASSWORD, storedHashedPassword)
+
+            if (passwordMatch) {
+                return userData
+            }
+        }
+
+        return null
     } catch (error) {
         return error.message
     }
 }
 
-const getHashedPassword = async (userEmail) => {
+const getHashedPassword = async (END_USER_EMAIL) => {
     try {
         let pool = await sql.connect(config.sql);
-        const query = "SELECT END_USER_PASSWORD FROM [dbo].[END_USER] WHERE END_USER_EMAIL=@userEmail"
+        const query = "SELECT END_USER_PASSWORD FROM [dbo].[END_USER] WHERE END_USER_EMAIL=@END_USER_EMAIL"
         const passwordRetrieved = await pool.request()
-            .input('END_USER_EMAIL', sql.NVarChar(40), userEmail)
+            .input('END_USER_EMAIL', sql.NVarChar(255), END_USER_EMAIL)
             .query(query);
 
         if (passwordRetrieved.recordset.length > 0) {
