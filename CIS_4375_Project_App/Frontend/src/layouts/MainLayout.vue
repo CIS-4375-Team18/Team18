@@ -26,12 +26,27 @@
           </div>
 
           <div v-else>
-            <q-btn round flat style="margin-right: 10px;">
+            <q-btn round flat style="margin-right: 10px;" @click="toggleDropDown">
               <q-avatar size="46px">
                 <img src="https://cdn.quasar.dev/img/boy-avatar.png">
               </q-avatar>
               <q-tooltip>Account</q-tooltip>
             </q-btn>
+              <q-menu auto-close>
+                <q-list>
+                  <q-item>
+                    <q-item-section>
+                      {{ userEmail }}
+                    </q-item-section>
+                  </q-item>
+                  <q-item clickable @click="performLogout">
+                    <q-item-section>
+                      Logout
+                    </q-item-section>
+                  </q-item>
+                </q-list>
+              </q-menu>
+
           </div>
         </div>
 
@@ -61,7 +76,7 @@
             </q-item>
 
 
-          <q-list>
+          <q-list v-if="isAuthenticated">
             <q-expansion-item
             expand-separator
             icon="support_agent"
@@ -172,15 +187,21 @@ import { mapGetters } from 'vuex'
 export default {
   name: 'MyLayout',
 
-  data() {
-    return {
-      signInDialogVisible: false,
-    }
-  }, 
-
   methods: {
     redirectToSignIn() {
       this.$router.push('/login')
+    },
+
+    toggleDropDown() {
+      const dropdown = this.$refs.dropdown
+      if(dropdown) {
+        dropdown.toggle()
+      }
+    },
+
+    performLogout() {
+      this.$store.dispatch('auth/logout')
+      this.$router.push('/dashboard')
     }
   },
 
@@ -212,7 +233,8 @@ export default {
     },
 
     computed: {
-      ...mapGetters('auth', ['isAuthenticated'])
+      ...mapGetters('auth', ['isAuthenticated', 'userEmail']),
+
     }
 
 

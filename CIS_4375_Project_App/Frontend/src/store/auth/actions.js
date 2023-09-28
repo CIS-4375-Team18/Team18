@@ -23,3 +23,7 @@ export const login = async ({ commit }, { email, password }) => {
     }
 }
 
+export const logout = ({ commit }) => {
+    commit('LOGOUT')
+}
+

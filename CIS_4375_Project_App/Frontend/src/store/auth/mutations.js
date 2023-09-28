@@ -6,3 +6,7 @@ export const SET_STATE = (state, payload)  => {
     state.userRole = payload.userRole;
 }
 
+export const LOGOUT = (state) => {
+    state.isAuthenticated = false;
+}
+
