@@ -15,7 +15,7 @@
         <q-space />
 
         <div class="q-gutter-sm row items-center no-wrap">
-          <div v-if="!userSignedIn">
+          <div v-if="!isSignedIn">
             <q-btn style="margin-right: 20px;"
               @click="openSignInDialog"
               label="Sign-In"
@@ -122,7 +122,7 @@
             <q-separator  style="margin-top: 10px;"/>
 
             <q-item clickable v-ripple style="margin-top: 10px;"
-            @click="$router.push('/users')" >
+            @click="$router.push('/users')"  v-if="authStore.isAuthenticated">
               <q-item-section avatar>
                 <q-icon name="edit" />
               </q-item-section>
@@ -133,7 +133,7 @@
             </q-item>
             
             <q-item clickable v-ripple style="margin-top: 10px;"
-            @click="$router.push('/settings')" >
+            @click="$router.push('/settings')"  v-if="authStore.isAuthenticated">
               <q-item-section avatar>
                 <q-icon name="settings" />
               </q-item-section>
@@ -172,6 +172,10 @@ import { route } from 'quasar/wrappers'
 import { ref } from 'vue'
 import { QDialog } from 'quasar'
 import SignIn from 'pages/SignIn.vue'
+import { createPinia } from 'pinia'
+import { useMyStore } from '../stores/loginStore'
+
+const pinia = createPinia()
 
 export default {
   name: 'MyLayout',
@@ -195,7 +199,6 @@ export default {
   setup() {
     const miniState = ref(false)
 
-
     function toggleLeftDrawer() {
       drawer.value = !drawer.value
     }
@@ -204,10 +207,7 @@ export default {
       drawer: ref(false),
       miniState,
 
-
-
     toggleLeftDrawer,
-
 
       drawerClick (e) {
         // if in "mini" state and user
@@ -222,7 +222,14 @@ export default {
         }
       }}
 
-    }
+    },
+
+    computed: {
+      authStore() {
+        return useMyStore(pinia)
+      }
+    },
+
   }
 
 </script>
@@ -250,4 +257,4 @@ export default {
 
     &:hover
       color: #000
-</style>
+</style>src/pinia/loginStore
