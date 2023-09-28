@@ -15,9 +15,9 @@
         <q-space />
 
         <div class="q-gutter-sm row items-center no-wrap">
-          <div v-if="!isSignedIn">
+          <div v-if="!isAuthenticated">
             <q-btn style="margin-right: 20px;"
-              @click="openSignInDialog"
+              @click="redirectToSignIn"
               label="Sign-In"
               color="blue"
               icon="account_circle"
@@ -34,10 +34,6 @@
             </q-btn>
           </div>
         </div>
-
-        <q-dialog v-model="signInDialogVisible">
-          <SignIn @close="closeSignInDialog" />
-        </q-dialog>
 
       </q-toolbar>
     </q-header>
@@ -122,7 +118,7 @@
             <q-separator  style="margin-top: 10px;"/>
 
             <q-item clickable v-ripple style="margin-top: 10px;"
-            @click="$router.push('/users')"  v-if="authStore.isAuthenticated">
+            @click="$router.push('/users')"  v-if="isAuthenticated">
               <q-item-section avatar>
                 <q-icon name="edit" />
               </q-item-section>
@@ -133,7 +129,7 @@
             </q-item>
             
             <q-item clickable v-ripple style="margin-top: 10px;"
-            @click="$router.push('/settings')"  v-if="authStore.isAuthenticated">
+            @click="$router.push('/settings')"  v-if="isAuthenticated">
               <q-item-section avatar>
                 <q-icon name="settings" />
               </q-item-section>
@@ -171,18 +167,10 @@
 import { route } from 'quasar/wrappers'
 import { ref } from 'vue'
 import { QDialog } from 'quasar'
-import SignIn from 'pages/SignIn.vue'
-import { createPinia } from 'pinia'
-import { useMyStore } from '../stores/loginStore'
-
-const pinia = createPinia()
+import { mapGetters } from 'vuex'
 
 export default {
   name: 'MyLayout',
-
-  components: {
-    SignIn,
-  },
 
   data() {
     return {
@@ -191,10 +179,11 @@ export default {
   }, 
 
   methods: {
-    openSignInDialog() {
-      this.signInDialogVisible = true;
+    redirectToSignIn() {
+      this.$router.push('/login')
     }
   },
+
 
   setup() {
     const miniState = ref(false)
@@ -206,9 +195,7 @@ export default {
     return {
       drawer: ref(false),
       miniState,
-
-    toggleLeftDrawer,
-
+      toggleLeftDrawer,
       drawerClick (e) {
         // if in "mini" state and user
         // click on drawer, we switch it to "normal" mode
@@ -225,10 +212,9 @@ export default {
     },
 
     computed: {
-      authStore() {
-        return useMyStore(pinia)
-      }
-    },
+      ...mapGetters('auth', ['isAuthenticated'])
+    }
+
 
   }
 

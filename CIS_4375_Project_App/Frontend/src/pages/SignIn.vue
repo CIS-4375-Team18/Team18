@@ -1,7 +1,7 @@
 <template>
     <div class="signin-container">
         <div class="signin-form">
-            <form @submit.prevent="login">
+            <form>
                 <div class="form-header">
                     <q-icon name="person" size="2em" class="q-mr-sm" />
                     Sign In
@@ -16,7 +16,7 @@
                 </div>
                 <div class="button-group">
                     <q-btn
-                        @click="login"
+                        @click="performLogin"
                         label="Login"
                         color="blue"
                     ></q-btn>
@@ -27,6 +27,8 @@
 </template>
 
 <script>
+import { mapActions } from 'vuex'
+
 export default {
     data() {
         return {
@@ -36,14 +38,18 @@ export default {
     },
 
     methods: {
-        login() {
-            console.log('Login Clicked')
-        },
-        register() {
-            console.log('Register Clicked')
-        }
+        ...mapActions('auth', ['login']),
 
+        async performLogin() {
+            try{
+                await this.login({ email: this.email, password: this.password })
+                this.$router.push('/dashboard')
+            } catch (error) {
+                console.error(error)
+            }
+        },
     }
+
 }
 </script>
 
@@ -52,8 +58,7 @@ export default {
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 400px; 
-  width: 450px;
+  min-height: 80vh;
   background-color: gray;
 }
 
