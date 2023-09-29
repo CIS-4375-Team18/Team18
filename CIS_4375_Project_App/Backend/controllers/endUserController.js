@@ -49,8 +49,9 @@ const loginEndUser = async (req, res, next) => {
 
         const result = await pool.request()
             .input('END_USER_EMAIL', sql.NVarChar, END_USER_EMAIL)
-            .query("SELECT END_USER_ID, END_USER_FIRST_NAME, END_USER_EMAIL, USER_ROLE_ID " +
-                "FROM [dbo].[END_USER] " +
+            .query("SELECT END_USER_ID, END_USER_FIRST_NAME, END_USER_EMAIL, USER_ROLE_NAME " +
+                "FROM [dbo].[END_USER] as es " +
+                "JOIN [dbo].[USER_ROLE] as ur ON es.USER_ROLE_ID = ur.USER_ROLE_ID " +
                 "WHERE END_USER_EMAIL=@END_USER_EMAIL");
 
         await pool.close();
@@ -69,7 +70,7 @@ const loginEndUser = async (req, res, next) => {
                 END_USER_ID: user.END_USER_ID,
                 END_USER_FIRST_NAME: user.END_USER_FIRST_NAME,
                 END_USER_EMAIL: user.END_USER_EMAIL,
-                USER_ROLE_ID: user.USER_ROLE_ID
+                USER_ROLE_NAME: user.USER_ROLE_NAME
             };
 
             return res.status(200).send(userData);
