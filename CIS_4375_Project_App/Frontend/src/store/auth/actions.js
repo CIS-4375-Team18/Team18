@@ -12,7 +12,7 @@ export const login = async ({ commit }, { email, password }) => {
                 isAuthenticated: true,
                 userFirstName: response.data.END_USER_FIRST_NAME,
                 userEmail: response.data.END_USER_EMAIL,
-                userRole: response.data.USER_ROLE_ID,
+                userRole: response.data.USER_ROLE_NAME,
             };
 
             commit('SET_STATE', userData)
