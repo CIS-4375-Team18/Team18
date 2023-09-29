@@ -18,6 +18,18 @@ const getCategories = async () => {
     }
 }
 
+const getAllRoles = async () => {
+
+    try {
+        let pool = await sql.connect(config.sql);
+        const getQuery = "SELECT * FROM dbo.USER_ROLE"
+        const roleList = await pool.request().query(getQuery);
+        return roleList.recordset;
+    } catch (error) {
+        console.log(error.message)
+    } 
+}
+
 const getActiveCategories = async () => {
     try {
         let pool = await sql.connect(config.sql);
@@ -101,5 +113,6 @@ module.exports = {
     createCategory,
     updateCategory,
     getActiveCategories,
-    deleteCategory
+    deleteCategory,
+    getAllRoles
 }

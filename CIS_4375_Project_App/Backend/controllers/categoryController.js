@@ -13,6 +13,16 @@ const getAllCategories = async (req, res, next) => {
     }
 }
 
+const getAllRoles = async (req, res, next) => {
+    try {
+        const roleList = await categoryData.getAllRoles();
+        res.send(roleList)
+        console.log(roleList)
+    } catch (error) {
+        res.status(400).send(error.message)
+    }
+}
+
 const getActiveCategories = async (req, res, next) => {
     try {
 
@@ -72,5 +82,6 @@ module.exports = {
     addCategory,
     updateCategory,
     getActiveCategories,
-    deleteCategory
+    deleteCategory,
+    getAllRoles
 }

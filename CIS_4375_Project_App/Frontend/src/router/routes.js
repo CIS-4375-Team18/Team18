@@ -22,6 +22,13 @@ const routes = [
     ]
   },
   {
+    path: '/login',
+    component: () => import('layouts/MainLayout.vue'),
+    children: [
+      { path: '', component: () => import('pages/SignIn.vue') }
+    ]
+  },
+  {
     path: '/dashboard',
     component: () => import('layouts/MainLayout.vue'),
     children: [
@@ -40,6 +47,20 @@ const routes = [
     component: () => import('layouts/MainLayout.vue'),
     children: [
       { path: '', component: () => import('pages/KnowledgePage.vue') }
+    ]
+  },
+  {
+    path: '/users',
+    component: () => import('layouts/MainLayout.vue'),
+    children: [
+      { path: '', component: () => import('pages/ManageUserPage.vue') } 
+    ]
+  },
+  {
+    path: '/createuser',
+    component: () => import('layouts/MainLayout.vue'),
+    children: [
+      { path: '', component: () => import('pages/CreateUserPage.vue') }
     ]
   },
   {

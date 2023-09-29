@@ -15,14 +15,47 @@
         <q-space />
 
         <div class="q-gutter-sm row items-center no-wrap">
+          <div v-if="!isAuthenticated">
+            <q-btn style="margin-right: 20px;"
+              @click="redirectToSignIn"
+              label="Sign-In"
+              color="blue"
+              icon="account_circle"
+            >
+            </q-btn>
+          </div>
 
-          <q-btn round flat style="margin-right: 10px;">
-            <q-avatar size="46px">
-              <img src="https://cdn.quasar.dev/img/boy-avatar.png">
-            </q-avatar>
-            <q-tooltip>Account</q-tooltip>
-          </q-btn>
+          <div v-else>
+            <q-btn round flat style="margin-right: 10px;" @click="toggleDropDown">
+              <q-avatar size="46px">
+                <img src="https://cdn.quasar.dev/img/boy-avatar.png">
+              </q-avatar>
+              <q-tooltip>Account</q-tooltip>
+            </q-btn>
+              <q-menu auto-close>
+                <q-list>
+                  <q-item>
+                    <q-item-section>
+                      {{ userFirstName }}
+                    </q-item-section>
+                  </q-item>
+                  <q-item>
+                    <q-item-section style="text-align: right;">
+                      {{ userEmail }}
+                    </q-item-section>
+                  </q-item>
+                  <q-separator />
+                  <q-item clickable @click="performLogout" style="text-align: right;">
+                    <q-item-section >
+                      Logout
+                    </q-item-section>
+                  </q-item>
+                </q-list>
+              </q-menu>
+
+          </div>
         </div>
+
       </q-toolbar>
     </q-header>
 
@@ -49,7 +82,7 @@
             </q-item>
 
 
-          <q-list>
+          <q-list v-if="isAuthenticated">
             <q-expansion-item
             expand-separator
             icon="support_agent"
@@ -89,7 +122,7 @@
               </q-item-section>
 
               <q-item-section>
-                Reorts
+                Reports
               </q-item-section>
             </q-item>
 
@@ -105,10 +138,19 @@
             </q-item>
             <q-separator  style="margin-top: 10px;"/>
 
+            <q-item clickable v-ripple style="margin-top: 10px;"
+            @click="$router.push('/users')"  v-if="isAuthenticated">
+              <q-item-section avatar>
+                <q-icon name="edit" />
+              </q-item-section>
 
+              <q-item-section>
+                Manage Users
+              </q-item-section>
+            </q-item>
             
             <q-item clickable v-ripple style="margin-top: 10px;"
-            @click="$router.push('/settings')" >
+            @click="$router.push('/settings')"  v-if="isAuthenticated">
               <q-item-section avatar>
                 <q-icon name="settings" />
               </q-item-section>
@@ -117,6 +159,8 @@
                 Settings
               </q-item-section>
             </q-item>
+
+
           </q-list>
         </q-scroll-area>
 
@@ -143,13 +187,33 @@
 <script>
 import { route } from 'quasar/wrappers'
 import { ref } from 'vue'
+import { QDialog } from 'quasar'
+import { mapGetters } from 'vuex'
 
 export default {
   name: 'MyLayout',
 
+  methods: {
+    redirectToSignIn() {
+      this.$router.push('/login')
+    },
+
+    toggleDropDown() {
+      const dropdown = this.$refs.dropdown
+      if(dropdown) {
+        dropdown.toggle()
+      }
+    },
+
+    performLogout() {
+      this.$store.dispatch('auth/logout')
+      this.$router.push('/dashboard')
+    }
+  },
+
+
   setup() {
     const miniState = ref(false)
-
 
     function toggleLeftDrawer() {
       drawer.value = !drawer.value
@@ -158,12 +222,7 @@ export default {
     return {
       drawer: ref(false),
       miniState,
-
-
-
-    toggleLeftDrawer,
-
-
+      toggleLeftDrawer,
       drawerClick (e) {
         // if in "mini" state and user
         // click on drawer, we switch it to "normal" mode
@@ -177,7 +236,14 @@ export default {
         }
       }}
 
+    },
+
+    computed: {
+      ...mapGetters('auth', ['isAuthenticated', 'userEmail', 'userFirstName']),
+
     }
+
+
   }
 
 </script>
@@ -205,4 +271,4 @@ export default {
 
     &:hover
       color: #000
-</style>
+</style>src/pinia/loginStore
