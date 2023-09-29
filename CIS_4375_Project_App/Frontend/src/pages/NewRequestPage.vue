@@ -60,7 +60,7 @@
       <div class="row flex justify-center" style="margin: 20px; align-content: center;">
         <q-btn outline icon="send" text-color="primary" label="Submit"
           style="margin-bottom: 30px; margin-right: 40px;  min-width: 130px; background-color: #03521c;" />
-        <q-btn outline icon="cancel"  color="negative" text-color="secondary" label="Cancel"
+        <q-btn @click="confirmCancel" outline icon="cancel"  color="negative" text-color="secondary" label="Cancel"
           style="margin-bottom: 30px; margin-left: 40px; min-width: 130px;" />
 
       </div>
@@ -70,7 +70,7 @@
 <script>
 //import axios from 'src/boot/axios'
 import { ref } from 'vue'
-
+import {Dialog} from 'quasar'
 import axios from "axios";
 
 const apiURL = import.meta.env.VITE_ROOT_API;
@@ -116,7 +116,23 @@ export default {
     findHardwareId() {
       this.hardwCatId = this.categoryData.find(o => o.TICKET_CATEGORY_DESC === 'HARDWARE');
       console.log(hardwCatId)
+    },
+    
+    confirmCancel() {
+      Dialog.create({
+        title: 'Cancel Ticket Creation',
+        message: 'Are you sure you want to cancel ticket creation?',
+        cancel: true,
+        persistent: true
+      })
+        .onOk(() => {
+          this.$router.replace('/')
+        })
+        .onCancel(() => {
+          // Do nothing
+        })
     }
+
 
   }
 
