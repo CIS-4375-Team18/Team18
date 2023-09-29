@@ -58,14 +58,38 @@
                     </q-tab-panel>
                 </q-tab-panels>
             </q-card>
-            <!-- q-dialo -->
-            <template>
-  <div class="q-pa-md q-gutter-sm">
-    <q-btn label="Show HTML Dialog" color="primary" @click="showDialog" />
-  </div>
-</template>
+
+            <!-- q-dialog -->
+            <q-dialog v-model="showCategoryPrompt" persistent>
+                <q-card style="min-width: 350px">
+                    <q-card-section>
+                    <div class="text-h6">Update Category</div>
+                    </q-card-section>
+
+                    <q-card-section class="q-pt-none">
+                        <q-input label="Category Name" dense v-model="category" autofocus />
+                    </q-card-section>
+
+                    <q-card-section class="q-pt-none">
+                        <q-toggle
+                            label="Status"
+                            v-model="isCategoryActive"
+                            checked-icon="check"
+                            color="green"
+                            unchecked-icon="clear"
+                            left-label
+                        />
+                        <span v-if="isCategoryActive">ACTIVE</span>
+                        <span v-if="!isCategoryActive">INACTIVE</span>
+                    </q-card-section>
+
+                    <q-card-actions align="right" class="text-primary">
+                    <q-btn flat label="Cancel" v-close-popup />
+                    <q-btn flat label="Save" v-close-popup />
+                    </q-card-actions>
+                </q-card>
+            </q-dialog>
         </div>
-       
     </div>
 </template>
   
@@ -76,6 +100,9 @@ import axios from "axios";
 export default {
     data() {
         return {
+            showCategoryPrompt: false,
+            category: '',
+            isCategoryActive: true,
             categoryData: [],
             priorityData: [],
         }
@@ -91,7 +118,11 @@ export default {
     },
 
     methods:{
-
+        editRow(props) {
+            this.showCategoryPrompt = true;
+            this.category = props.row.TICKET_CATEGORY_DESC;
+            this.isCategoryActive = props.row.ACTIVE_STATUS_ID === 1;
+        }
     },
 
     setup() {
