@@ -13,7 +13,8 @@
 
                     </q-table>
 
-                    <q-btn @click="createNewUser" outline icon="add" text-color="primary" label="Create New User" 
+                    <q-btn v-if="userRole==='System Administrator' || userRole==='IT Teacher'" 
+                        @click="createNewUser" outline icon="add" text-color="primary" label="Create New User" 
                         style="margin-top: 30px ; min-width: 140px; background-color: #03521c;"
                     />
                 </div>
@@ -23,6 +24,7 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex';
 import axios from 'axios'
 
 export default {
@@ -45,6 +47,11 @@ export default {
             {name: 'Role', label: 'Role', field: 'USER_ROLE_ID', align: 'left'},
             {name: 'Status', label: 'Status', field: 'ACTIVE_STATUS_ID', align: 'left'}
         ]
+    },
+
+    computed: {
+      ...mapGetters('auth', ['userRole']),
+
     }
 }
 </script>

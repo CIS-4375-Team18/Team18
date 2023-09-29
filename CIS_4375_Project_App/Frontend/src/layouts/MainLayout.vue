@@ -26,7 +26,7 @@
           </div>
 
           <div v-else>
-            <q-btn round flat style="margin-right: 10px;" @click="toggleDropDown">
+            <q-btn round flat style="margin-right: 10px;">
               <q-avatar size="46px">
                 <img src="https://cdn.quasar.dev/img/boy-avatar.png">
               </q-avatar>
@@ -139,7 +139,8 @@
             <q-separator  style="margin-top: 10px;"/>
 
             <q-item clickable v-ripple style="margin-top: 10px;"
-            @click="$router.push('/users')"  v-if="isAuthenticated">
+            @click="$router.push('/users')"  v-if="isAuthenticated 
+            && userRole != 'Staff'">
               <q-item-section avatar>
                 <q-icon name="edit" />
               </q-item-section>
@@ -150,7 +151,8 @@
             </q-item>
             
             <q-item clickable v-ripple style="margin-top: 10px;"
-            @click="$router.push('/settings')"  v-if="isAuthenticated">
+            @click="$router.push('/settings')"  v-if="isAuthenticated 
+            && (userRole==='System Administrator' || userRole==='IT Teacher')">
               <q-item-section avatar>
                 <q-icon name="settings" />
               </q-item-section>
@@ -198,13 +200,6 @@ export default {
       this.$router.push('/login')
     },
 
-    toggleDropDown() {
-      const dropdown = this.$refs.dropdown
-      if(dropdown) {
-        dropdown.toggle()
-      }
-    },
-
     performLogout() {
       this.$store.dispatch('auth/logout')
       this.$router.push('/dashboard')
@@ -239,7 +234,7 @@ export default {
     },
 
     computed: {
-      ...mapGetters('auth', ['isAuthenticated', 'userEmail', 'userFirstName']),
+      ...mapGetters('auth', ['isAuthenticated', 'userEmail', 'userFirstName', 'userRole']),
 
     }
 

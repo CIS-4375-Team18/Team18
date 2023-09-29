@@ -11,3 +11,7 @@ export function userFirstName (state) {
     return state.userFirstName
 }
 
+export function userRole (state) {
+    return state.userRole
+}
+
