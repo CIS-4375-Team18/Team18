@@ -42,8 +42,23 @@ export default {
 
         async performLogin() {
             try{
-                await this.login({ email: this.email, password: this.password })
-                this.$router.push('/dashboard')
+                const tryLogin = await this.login({ email: this.email, password: this.password })
+                
+                if(tryLogin) {
+                    if(tryLogin.isAuthenticated) {
+                        this.$router.push('/dashboard')
+                        this.$q.notify({color: 'positive', message:'Login Success' })
+                    } else {
+                        this.$q.notify({ color: 'negative', message: 'Login Failed'})
+                        this.email = '';
+                        this.password = ''
+                    }
+                } else {
+                    this.$q.notify({ color: 'negative', message: 'Login Failed'})
+                    this.email = '';
+                    this.password = ''
+                }
+                               
             } catch (error) {
                 console.error(error)
             }
