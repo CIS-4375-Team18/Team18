@@ -8,5 +8,8 @@ export const SET_STATE = (state, payload)  => {
 
 export const LOGOUT = (state) => {
     state.isAuthenticated = false;
+    state.userFirstName = '';
+    state.userEmail ='';
+    state.userRole = '';
 }
 
