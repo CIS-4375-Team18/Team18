@@ -30,11 +30,20 @@
                                             style="color: #ad0000;"></q-btn>
                                     </q-td>
                                 </template>
+                                
                             </q-table>
 
+                            
+
                         </div>
+                        <q-btn v-if="userRole==='System Administrator' || userRole==='IT Teacher'"
+                        outline icon="person_add" text-color="primary" label="Add New Category"
+                        style="min-width: 140px; background-color: #03521c;" 
+                        class="text-left"
+                        />
 
                     </q-tab-panel>
+    
                     <!-- 
                     Ticket Priorities panel
                     -->
@@ -72,6 +81,7 @@
 <script>
 import { ref } from 'vue'
 import axios from "axios";
+import { mapGetters } from 'vuex';
 
 export default {
     data() {
@@ -120,11 +130,15 @@ export default {
 
         }
         function editItem(item) {
-      fd.editedIndex = fd.currencyData.findIndex((v, i) =>v.__index === item.__index)
-      fd.editedItem = Object.assign({}, item);
-      fd.show_dialog = true;
-    }
+            fd.editedIndex = fd.currencyData.findIndex((v, i) =>v.__index === item.__index)
+            fd.editedItem = Object.assign({}, item);
+            fd.show_dialog = true;
+        }
     },
+
+    computed : {
+        ...mapGetters('auth', ['userRole'])
+    }
 
 
 

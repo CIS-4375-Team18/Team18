@@ -14,7 +14,7 @@
                     </q-table>
 
                     <q-btn v-if="userRole==='System Administrator' || userRole==='IT Teacher'" 
-                        @click="createNewUser" outline icon="add" text-color="primary" label="Create New User" 
+                        @click="createNewUser" outline icon="person_add" text-color="primary" label="Create New User" 
                         style="margin-top: 30px ; min-width: 140px; background-color: #03521c;"
                     />
                 </div>
