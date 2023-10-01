@@ -59,36 +59,16 @@
                 </q-tab-panels>
             </q-card>
 
-            <!-- q-dialog -->
-            <q-dialog v-model="showCategoryPrompt" persistent>
-                <q-card style="min-width: 350px">
-                    <q-card-section>
-                    <div class="text-h6">Update Category</div>
-                    </q-card-section>
-
-                    <q-card-section class="q-pt-none">
-                        <q-input label="Category Name" dense v-model="category" autofocus />
-                    </q-card-section>
-
-                    <q-card-section class="q-pt-none">
-                        <q-toggle
-                            label="Status"
-                            v-model="isCategoryActive"
-                            checked-icon="check"
-                            color="green"
-                            unchecked-icon="clear"
-                            left-label
-                        />
-                        <span v-if="isCategoryActive">ACTIVE</span>
-                        <span v-if="!isCategoryActive">INACTIVE</span>
-                    </q-card-section>
-
-                    <q-card-actions align="right" class="text-primary">
-                    <q-btn flat label="Cancel" v-close-popup />
-                    <q-btn flat label="Save" v-close-popup />
-                    </q-card-actions>
-                </q-card>
-            </q-dialog>
+            <!-- Edit Category Dialog -->
+            <template v-if="category.showCategoryDialog">
+                <EditCategoryDialog 
+                    :id="category.categoryId"
+                    :name="category.categoryName"
+                    :isActive="category.isCategoryActive"
+                    @close-dialog="handleCategoryDialogClosed"
+                    @save-dialog="handleCategoryChangesSaved"
+                />
+            </template>
         </div>
     </div>
 </template>
@@ -96,13 +76,20 @@
 <script>
 import { ref } from 'vue'
 import axios from "axios";
+import EditCategoryDialog from "../components/EditCategoryDialog.vue";
 
 export default {
+    components: {
+        EditCategoryDialog,
+    },
     data() {
         return {
-            showCategoryPrompt: false,
-            category: '',
-            isCategoryActive: true,
+            category: {
+                showCategoryDialog: false,
+                categoryId: '',
+                categoryName: '',
+                isCategoryActive: true,
+            },
             categoryData: [],
             priorityData: [],
         }
@@ -117,12 +104,39 @@ export default {
         })
     },
 
-    methods:{
+    methods: {
         editRow(props) {
-            this.showCategoryPrompt = true;
-            this.category = props.row.TICKET_CATEGORY_DESC;
-            this.isCategoryActive = props.row.ACTIVE_STATUS_ID === 1;
-        }
+            // destruct from props to get row properties as variables
+            const {
+                row: {
+                    TICKET_CATEGORY_ID,
+                    TICKET_CATEGORY_DESC,
+                    ACTIVE_STATUS_ID,
+                }
+            } = props;
+            // update component data variables
+            this.category.categoryId = TICKET_CATEGORY_ID;
+            this.category.categoryName = TICKET_CATEGORY_DESC;
+            this.category.isCategoryActive = ACTIVE_STATUS_ID === 1;
+            // show category dialog
+            this.category.showCategoryDialog = true;
+        },
+        handleCategoryDialogClosed() {
+            // close category dialog
+            this.category.showCategoryDialog = false;
+        },
+        handleCategoryChangesSaved(updatedCategory) {
+            // get category id to use in the put api for category
+            const categoryId = updatedCategory.TICKET_CATEGORY_ID;
+            // find category from categoryData
+            const categoryIndex = this.categoryData.findIndex((category) => (category.TICKET_CATEGORY_ID === updatedCategory.TICKET_CATEGORY_ID));
+            // update category at index 
+            this.categoryData[categoryIndex] = updatedCategory;
+            // call save api for category
+            axios.put(`http://localhost:8001/api/category/${categoryId}`, updatedCategory);
+            // close category dialog
+            this.category.showCategoryDialog = false;
+        },
     },
 
     setup() {
