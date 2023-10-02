@@ -82,6 +82,7 @@
 import { ref } from 'vue'
 import axios from "axios";
 import { mapGetters } from 'vuex';
+const apiURL = import.meta.env.VITE_API_URL
 
 export default {
     data() {
@@ -91,11 +92,11 @@ export default {
         }
     },
     created() {
-        axios.get(`http://localhost:8001/api/categories`).then((res) => {
+        axios.get(`${apiURL}/categories`).then((res) => {
             this.categoryData = res.data
             this.loading = false
         })
-        axios.get(`http://localhost:8001/api/priorities`).then((res) => {
+        axios.get(`${apiURL}/priorities`).then((res) => {
             this.priorityData = res.data
         })
     },

@@ -68,6 +68,7 @@
 <script>
 import { ref } from 'vue'
 import axios from 'axios';
+const apiURL = import.meta.env.VITE_API_URL
 
 export default {
 
@@ -97,7 +98,7 @@ export default {
     },
 
     created() {
-        axios.get(`http://localhost:8001/api/roles`).then((res) => {
+        axios.get(`${apiURL}/roles`).then((res) => {
             this.user_roles = res.data
         })
     },
@@ -129,7 +130,7 @@ export default {
                         ACTIVE_STATUS_ID: 1,
                     };
 
-                    const response = await axios.post(`http://localhost:8001/api/enduser`, userData);
+                    const response = await axios.post(`${apiURL}/enduser`, userData);
 
                     if (response.status === 200) {
                         this.$q.notify({ color: 'positive', message: 'User registered successfully' });

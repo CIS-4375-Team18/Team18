@@ -73,6 +73,30 @@
                         (281) 592-8717
                     </div>
                 </div>
+
+                <q-space />
+
+                <div>
+                    <div class="text-h6" style="font-style: italic;">
+                        Links and Resources
+                    </div>
+                    <div class="q-mt-sm">
+                        <a href="https://www.clevelandisd.org/privacy-policy" class="custom-link-2">
+                            Privacy Policy
+                        </a>
+                        <a href="https://www.clevelandisd.org/accessibility-statement" class="custom-link-2">
+                            Accessibility
+                        </a>
+                    </div>
+                    <div class="q-mt-sm">
+                        <a href="https://www.clevelandisd.org/site-map" class="custom-link-2">
+                            Site Map
+                        </a>
+                    </div>
+
+                </div>
+
+                <q-space />
                     
             </q-toolbar>
         </q-footer>
@@ -160,10 +184,20 @@ export default {
 .custom-link{
     color: white;
     text-decoration: none;
+    font-style: italic;
 }
 
 .custom-link:hover {
     text-decoration: underline;
+}
+
+.custom-link-2 {
+    color: white;
+    text-decoration: none;
+}
+
+.custom-link-2:nth-child(1) {
+    margin-right: 60px;
 }
 
 label {
