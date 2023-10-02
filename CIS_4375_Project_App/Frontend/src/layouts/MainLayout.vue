@@ -17,7 +17,7 @@
         <div class="q-gutter-sm row items-center no-wrap">
           <div v-if="!isAuthenticated">
             <q-btn style="margin-right: 20px;"
-              @click="redirectToSignIn"
+              to="/login"
               label="Sign-In"
               color="blue"
               icon="account_circle"
@@ -196,9 +196,9 @@ export default {
   name: 'MyLayout',
 
   methods: {
-    redirectToSignIn() {
-      this.$router.push('/login')
-    },
+    // redirectToSignIn() {
+    //   this.$router.push('/login')
+    // },
 
     performLogout() {
       this.$store.dispatch('auth/logout')
