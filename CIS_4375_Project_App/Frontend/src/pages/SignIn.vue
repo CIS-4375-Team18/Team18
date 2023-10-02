@@ -1,32 +1,86 @@
 <template>
-    <div class="signin-container">
-        <div class="signin-form">
-            <form>
-                <div class="form-header">
-                    <q-icon name="person" size="2em" class="q-mr-sm" />
-                    Sign In
+    <q-layout view="hHh lpR fFf" class="">
+        <q-header class="q-py-xs shadow-2" height-hint="58" style="background-color: #666262;">
+            <q-toolbar>
+
+                <q-btn flat no-caps no-wrap class="q-ml-xs" v-if="$q.screen.gt.xs" to="/">
+                    <img src="src/assets/CISD_Logo.png" style="margin-left: 8px; margin-top: 10px; height: 70px;">
+                </q-btn>
+
+                <q-space />
+                
+                <div>
+                    <h5 style="font-weight: bold;"> IT Helpdesk</h5>
                 </div>
-                <div class="form-group">
-                    <label for="email"> Email: </label>
-                    <input type="email" id="email" v-model="email" required>
+
+                <q-space />
+
+                <div>
+                    <h5 style="color: #666262;"> IT Helpdesk</h5>
                 </div>
-                <div class="form-group">
-                    <label for="password"> Password: </label>
-                    <input type="password" id="password" v-model="password" required>
-                </div>
-                <div class="button-group">
-                    <q-btn
-                        @click="performLogin"
-                        label="Login"
-                        color="blue"
-                    ></q-btn>
-                </div>
-            </form>
+
+            </q-toolbar>
+        </q-header>
+    
+        <div class="signin-container">
+            <div class="signin-form">
+                <form>
+                    <div class="form-header">
+                        <q-icon name="person" size="2em" class="q-mr-sm" />
+                        Sign In
+                    </div>
+                    <div class="form-group">
+                        <q-input v-model="email" label="Email" 
+                        type="email" required>
+                        </q-input>
+                    </div>
+                    <div class="form-group">
+                        <q-input v-model="password" label="Password" 
+                        :type="isPwd ? 'password' : 'text'" required>
+                            <template v-slot:append>
+                                <q-icon :name="isPwd ? 'visibility_off' : 'visibility'" 
+                                class="cursor-pointer"
+                                @click="isPwd = !isPwd">
+                                </q-icon>
+                            </template>
+                        </q-input>
+                    </div>
+                    <div class="button-group">
+                        <q-btn
+                            @click="performLogin"
+                            label="Login"
+                            color="blue"
+                        ></q-btn>
+                    </div>
+                </form>
+            </div>
         </div>
-    </div>
+
+        <q-footer style="background-color: #666262; height: 200px;">
+            <q-toolbar>
+
+                <div class="q-ml-xl q-mt-xl">
+                    <a  href="https://www.clevelandisd.org/" class="text-h6 custom-link">
+                        Cleveland ISD
+                    </a>
+                    <div class="q-mt-sm">
+                        316 East Dallas
+                    </div>
+                    <div class="q-mt-sm">
+                        Cleveland, TX 77327 
+                    </div>
+                    <div class="q-mt-sm">
+                        (281) 592-8717
+                    </div>
+                </div>
+                    
+            </q-toolbar>
+        </q-footer>
+    </q-layout>
 </template>
 
 <script>
+import { ref } from 'vue'
 import { mapActions } from 'vuex'
 
 export default {
@@ -63,6 +117,12 @@ export default {
                 console.error(error)
             }
         },
+    },
+
+    setup () {
+        return {
+            isPwd: ref(true),
+        }
     }
 
 }
@@ -74,11 +134,10 @@ export default {
   justify-content: center;
   align-items: center;
   min-height: 80vh;
-  background-color: gray;
 }
 
 .signin-form {
-  width: 350px;
+  width:350px;
   padding: 20px;
   border: 1px solid #ccc;
   border-radius: 10px;
@@ -95,7 +154,16 @@ export default {
 }
 
 .form-group {
-  margin-bottom: 15px;
+  margin-bottom: 30px;
+}
+
+.custom-link{
+    color: white;
+    text-decoration: none;
+}
+
+.custom-link:hover {
+    text-decoration: underline;
 }
 
 label {

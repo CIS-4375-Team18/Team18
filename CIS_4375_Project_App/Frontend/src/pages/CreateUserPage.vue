@@ -23,7 +23,24 @@
             </div>
             <div style="padding-top: 30px;">
                 <q-input v-model="user.password" label="Password" 
-                type="password" required >
+                    :type="isPwd ? 'password' : 'text'" required>
+                    <template v-slot:append>
+                        <q-icon :name="isPwd ? 'visibility_off' : 'visibility'" 
+                            class="cursor-pointer"
+                            @click="isPwd = !isPwd">
+                        </q-icon>
+                    </template>
+                </q-input>
+            </div>
+            <div style="padding-top: 30px;">
+                <q-input v-model="user.confirmPassword" label="Confirm Password" 
+                    :type="isPwd ? 'password' : 'text'" required>
+                    <template v-slot:append>
+                        <q-icon :name="isPwd ? 'visibility_off' : 'visibility'" 
+                            class="cursor-pointer"
+                            @click="isPwd = !isPwd">
+                        </q-icon>
+                    </template>
                 </q-input>
             </div>
             <div style="padding-top: 30px;">
@@ -61,6 +78,7 @@ export default {
                 lastName: '',
                 email: '',
                 password: '',
+                confirmPassword: '',
                 role: null,
                 period: null,   
             },
@@ -95,29 +113,35 @@ export default {
                 console.log(isPasswordValid)
 
                 if (!this.validateEmail(this.user.email) || !this.validatePassword(this.user.password)) {
+                    this.user.password = '';
+                    this.user.confirmPassword = '';
                     return;
                 }
-                const userData = {
-                    END_USER_FIRST_NAME: this.user.firstName,
-                    END_USER_LAST_NAME: this.user.lastName,
-                    END_USER_EMAIL: this.user.email,
-                    END_USER_PASSWORD: this.user.password,
-                    END_USER_PERIOD: this.user.period.value,
-                    USER_ROLE_ID: this.user.role.USER_ROLE_ID,
-                    ACTIVE_STATUS_ID: 1,
-                };
 
-                const response = await axios.post(`http://localhost:8001/api/enduser`, userData);
+                if (this.user.password === this.user.confirmPassword) {
+                    const userData = {
+                        END_USER_FIRST_NAME: this.user.firstName,
+                        END_USER_LAST_NAME: this.user.lastName,
+                        END_USER_EMAIL: this.user.email,
+                        END_USER_PASSWORD: this.user.password,
+                        END_USER_PERIOD: this.user.period.value,
+                        USER_ROLE_ID: this.user.role.USER_ROLE_ID,
+                        ACTIVE_STATUS_ID: 1,
+                    };
 
-                if (response.status === 200) {
-                    this.$q.notify({ color: 'positive', message: 'User registered successfully' });
-                    this.$router.push('/users');
+                    const response = await axios.post(`http://localhost:8001/api/enduser`, userData);
+
+                    if (response.status === 200) {
+                        this.$q.notify({ color: 'positive', message: 'User registered successfully' });
+                        this.$router.push('/users');
+                    } else {
+                        this.$q.notify({ color: 'negative', message: 'Registration failed' });
+                    }
                 } else {
-                    this.$q.notify({ color: 'negative', message: 'Registration failed' });
+                    this.$q.notify({ color: 'negative', message: 'Password do not match' });
+                    this.user.password = '';
+                    this.user.confirmPassword = '';
                 }
-
-                console.log(userData.USER_ROLE_ID)
-                console.log('Sending data.')
             } catch (error) {
                 console.error('API request failed:', error);
                 this.$q.notify({ color: 'negative', message: 'An error occurred during registration' });
@@ -146,6 +170,12 @@ export default {
         },
     
   },
+
+  setup () {
+    return {
+        isPwd: ref(true),
+    }
+  }
 }
 
 </script>
