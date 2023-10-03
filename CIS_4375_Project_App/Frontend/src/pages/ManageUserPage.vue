@@ -28,6 +28,13 @@ import { mapGetters } from 'vuex';
 import axios from 'axios'
 
 export default {
+    created() {
+        axios.get(`http://localhost:8001/api/endusers`).then((res) => {
+            this.userData = res.data
+            console.log('Received in front end')
+        })
+    },
+
     data () {
         return {
             userData: [],
