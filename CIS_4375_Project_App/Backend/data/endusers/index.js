@@ -10,7 +10,9 @@ const getEndUsers = async () => {
     try {
         let pool = await sql.connect(config.sql);
         const getAllQuery = "SELECT [END_USER_ID] ,[END_USER_FIRST_NAME],[END_USER_LAST_NAME] "+
-        " ,[END_USER_EMAIL], [USER_ROLE_ID], [ACTIVE_STATUS_ID]  FROM [dbo].[END_USER]";
+        " ,[END_USER_EMAIL], [USER_ROLE_NAME], [ACTIVE_STATUS_DESC]  FROM [dbo].[END_USER] AS eu" +
+        " JOIN [dbo].[USER_ROLE] AS ur ON eu.[USER_ROLE_ID] = ur.[USER_ROLE_ID] " +
+        " JOIN [dbo].[ACTIVE_STATUS] AS acs ON eu.[ACTIVE_STATUS_ID] = acs.[ACTIVE_STATUS_ID]" ;
         const endUsersList = await pool.request().query(getAllQuery);
         return endUsersList.recordset;
     } catch (error) {
