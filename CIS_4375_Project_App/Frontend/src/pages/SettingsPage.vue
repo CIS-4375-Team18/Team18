@@ -6,6 +6,7 @@
                     style="background-color: #ad0000;">
                     <q-tab name="categories" label="Categories" />
                     <q-tab name="priorities" label="Priorities" />
+                    <q-tab name="status" label="Status" />
                 </q-tabs>
                 <q-separator />
                 <!-- 
@@ -56,6 +57,27 @@
                             </template>
                         </q-table>
                     </q-tab-panel>
+                    <!-- 
+                    Ticket Status Type panel
+                    -->
+                    <q-tab-panel name="status">
+                       <!-- Status Table -->
+                       <q-table title="Status Types" color="secondary" :align="left" :loading="loading" 
+                           :rows="statusData" :columns="statusColumns" style="width: 80%;">
+                           <template #body-cell-status="props">
+                               <q-td :props="props">
+                                   <q-chip :color="props.row.ACTIVE_STATUS_ID === 1 ? 'green' : 'red'" text-color="white" 
+                                       dense class="text-weight-bolder" square>{{ props.row.ACTIVE_STATUS_DESC }}</q-chip>
+                                </q-td>
+                            </template>
+                            <template v-slot:body-cell-actions="props">
+                                <q-td :props="props">
+                                    <q-btn dense round flat @click="editStatus(props)" icon="edit" 
+                                        style="color: #ad0000;"></q-btn>
+                                </q-td>
+                            </template>
+                        </q-table>
+                    </q-tab-panel>
                 </q-tab-panels>
             </q-card>
             <!-- q-dialo -->
@@ -88,6 +110,9 @@ export default {
         axios.get(`http://localhost:8001/api/priorities`).then((res) => {
             this.priorityData = res.data
         })
+        axios.get(`http://localhost:8001/api/status`).then((res) => {
+            this.statusData = res.data
+        })
     },
 
     methods:{
@@ -106,6 +131,11 @@ export default {
             { name: "status", align: "center", label: "Status", field: "ACTIVE_STATUS_DESC", sortable: true },
             { name: 'actions', label: 'Edit', field: '', align: 'left' },
         ]
+        const statusColumns = [
+            { name: 'status_type', label: 'Status', field: 'TICKET_STATUS_DESC', align: 'left' },
+            { name: "status", align: "center", label: "Status", field: "ACTIVE_STATUS_DESC", sortable: true },
+            { name: 'actions', label: 'Edit', field: '', align: 'left' },
+        ]
         const statuses = [
             'Active', 'Inactive']
         return {
@@ -114,9 +144,10 @@ export default {
             loading: ref(true),
             catColumns,
             prioritiesColumns,
+            statusColumns,
             selected: ref([]),
             redModel: ref(true),
-            
+
 
         }
         function editItem(item) {
@@ -124,6 +155,9 @@ export default {
       fd.editedItem = Object.assign({}, item);
       fd.show_dialog = true;
     }
+        editStatus(props) {
+            // code needed to be discussed
+    }  
     },
 
 
