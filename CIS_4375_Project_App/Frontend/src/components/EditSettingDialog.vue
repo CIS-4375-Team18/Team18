@@ -5,9 +5,17 @@
                 <div class="text-h6">{{title}}</div>
             </q-card-section>
 
-            <q-card-section class="q-pt-none">
-                <q-input label="Name" dense v-model="itemName" autofocus />
-            </q-card-section>
+            <template v-if="isAuthenticated && userRole==='System Administrator'">
+                <q-card-section class="q-pt-none">
+                    <q-input label="Name" dense v-model="itemName" autofocus />
+                </q-card-section>
+            </template>
+
+            <template v-if="isAuthenticated && userRole==='IT Teacher'">
+                <q-card-section class="q-pt-none">
+                    <q-input label="Name" dense v-model="itemName" readonly />
+                </q-card-section>
+            </template>
 
             <q-card-section class="q-pt-none">
                 <q-toggle
@@ -31,6 +39,7 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex'
 export default {
     data() {
         return {
@@ -86,6 +95,9 @@ export default {
                 idPropertyName,
             });
         },
-  },
+    },
+    computed: {
+      ...mapGetters('auth', ['isAuthenticated', 'userEmail', 'userFirstName', 'userRole']),
+    }
 };
 </script>
