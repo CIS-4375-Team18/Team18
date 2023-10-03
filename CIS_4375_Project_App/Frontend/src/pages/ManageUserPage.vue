@@ -6,10 +6,10 @@
             </q-card-section>
             <q-separator />
 
-            <div style="margin-left: 16%;">
+            <div style="margin-left: 2%;">
                 <div class="q-pa-md" style="margin: 0 auto;">
                     <q-table title="Users" color="secondary" :align="left" :loading="loading"
-                        :rows="userData" :columns="userColumns" style="width: 80%;"> <!-- Puts table with user data -->
+                        :rows="userData" :columns="userColumns" style="width: 98%;"> <!-- Puts table with user data -->
 
                     </q-table>
 
@@ -38,22 +38,20 @@ export default {
     data () {
         return {
             userData: [],
+
+            userColumns : [ //Table template
+            {name: 'First Name', required: true, label: 'First Name', field: 'END_USER_FIRST_NAME', align: 'left'}, 
+            {name: 'Last Name', label: 'Last Name', field: 'END_USER_LAST_NAME', align: 'left'},
+            {name: 'Email', label: 'Email', field: 'END_USER_EMAIL', align: 'left'},
+            {name: 'Role', label: 'Role', field: 'USER_ROLE_NAME', align: 'left'},
+            {name: 'Status', label: 'Status', field: 'ACTIVE_STATUS_DESC', align: 'left'}
+        ],
         }
     },
     methods: {
         createNewUser () {
             this.$router.push('/createUser');
         }
-    },
-
-    setup() {
-        const userColumns = [ //Table template
-            {name: 'First Name', label: 'First Name', field: 'END_USER_FIRST_NAME', align: 'left'},
-            {name: 'Last Name', label: 'Last Name', field: 'END_USER_LAST_NAME', align: 'left'},
-            {name: 'Email', label: 'Email', field: 'END_USER_EMAIL', align: 'left'},
-            {name: 'Role', label: 'Role', field: 'USER_ROLE_ID', align: 'left'},
-            {name: 'Status', label: 'Status', field: 'ACTIVE_STATUS_ID', align: 'left'}
-        ]
     },
 
     computed: {
