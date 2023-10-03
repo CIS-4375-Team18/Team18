@@ -10,7 +10,7 @@ const getEndUsers = async () => {
     try {
         let pool = await sql.connect(config.sql);
         const getAllQuery = "SELECT [END_USER_ID] ,[END_USER_FIRST_NAME],[END_USER_LAST_NAME] "+
-        " ,[END_USER_EMAIL] ,[END_USER_PRIMARY_PHONE]  ,[END_USER_CLASS]  FROM [dbo].[END_USER]";
+        " ,[END_USER_EMAIL], [USER_ROLE_ID], [ACTIVE_STATUS_ID]  FROM [dbo].[END_USER]";
         const endUsersList = await pool.request().query(getAllQuery);
         return endUsersList.recordset;
     } catch (error) {
