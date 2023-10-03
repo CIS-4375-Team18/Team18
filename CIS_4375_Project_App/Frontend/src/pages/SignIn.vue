@@ -27,16 +27,18 @@
                 <form>
                     <div class="form-header">
                         <q-icon name="person" size="2em" class="q-mr-sm" />
-                        Sign In
+                        Login
                     </div>
                     <div class="form-group">
                         <q-input v-model="email" label="Email" 
-                        type="email" required>
+                        type="email"
+                        :rules="[val => !!val || 'Field is required']">
                         </q-input>
                     </div>
                     <div class="form-group">
                         <q-input v-model="password" label="Password" 
-                        :type="isPwd ? 'password' : 'text'" required>
+                        :type="isPwd ? 'password' : 'text'"
+                        :rules="[val => !!val || 'Field is required']">
                             <template v-slot:append>
                                 <q-icon :name="isPwd ? 'visibility_off' : 'visibility'" 
                                 class="cursor-pointer"
@@ -50,6 +52,7 @@
                             @click="performLogin"
                             label="Login"
                             color="blue"
+                            style="width: 40%;"
                         ></q-btn>
                     </div>
                 </form>
@@ -172,9 +175,10 @@ export default {
     display: flex;
     justify-content: center;
     align-items: center;
-    font-size: medium;
+    font-size: large;
     font-weight: bold;
     padding: 10px;
+    color: #666262;
 }
 
 .form-group {

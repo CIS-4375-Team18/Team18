@@ -8,22 +8,24 @@
         <div class="q-pa-md" style="width: 30%; margin-left: 35%;">
             <div style="padding-top: 20px;">
                 <q-input v-model="user.firstName" label="First Name" 
-                required>
+                :rules="[val => !!val || 'Field is required']">
                 </q-input>
             </div>
             <div style="padding-top: 30px;">
                 <q-input v-model="user.lastName" label="Last Name" 
-                required>
+                :rules="[val => !!val || 'Field is required']">
                 </q-input>
             </div>
             <div style="padding-top: 30px;">
                 <q-input v-model="user.email" label="Email" 
-                type="email" required>
+                type="email" 
+                :rules="[val => !!val || 'Field is required']">
                 </q-input>
             </div>
             <div style="padding-top: 30px;">
                 <q-input v-model="user.password" label="Password" 
-                    :type="isPwd ? 'password' : 'text'" required>
+                    :type="isPwd ? 'password' : 'text'" 
+                    :rules="[val => !!val || 'Field is required']">
                     <template v-slot:append>
                         <q-icon :name="isPwd ? 'visibility_off' : 'visibility'" 
                             class="cursor-pointer"
@@ -34,7 +36,8 @@
             </div>
             <div style="padding-top: 30px;">
                 <q-input v-model="user.confirmPassword" label="Confirm Password" 
-                    :type="isPwd ? 'password' : 'text'" required>
+                    :type="isPwd ? 'password' : 'text'" 
+                    :rules="[val => !!val || 'Field is required']">
                     <template v-slot:append>
                         <q-icon :name="isPwd ? 'visibility_off' : 'visibility'" 
                             class="cursor-pointer"
@@ -45,14 +48,16 @@
             </div>
             <div style="padding-top: 30px;">
                 <q-select v-model="user.role" label="Role"
-                required :options="user_roles" option-value="USER_ROLE_ID" 
-                option-label="USER_ROLE_NAME">
+                :options="user_roles" option-value="USER_ROLE_ID" 
+                option-label="USER_ROLE_NAME"
+                :rules="[val => !!val || 'Field is required']">
                 </q-select>
             </div>
             <div style="padding-top: 30px;">
                 <q-select v-model="user.period" label="Class Period"
-                required :options="period_options" option-value="value" 
-                option-label="label">
+                :options="period_options" option-value="value" 
+                option-label="label"
+                :rules="[val => !!val || 'Field is required']">
                 </q-select>
             </div>
 
