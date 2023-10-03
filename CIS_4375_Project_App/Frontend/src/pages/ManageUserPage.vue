@@ -8,11 +8,12 @@
 
             <div style="margin-left: 16%;">
                 <div class="q-pa-md" style="margin: 0 auto;">
-                    <q-table title="Users" color="secondary" :align="left" :loading="loading" 
-                        :rows="userData" :columns="userColumns" style="width: 80%;">
+                    <q-table title="Users" color="secondary" :align="left" :loading="loading"
+                        :rows="userData" :columns="userColumns" style="width: 80%;"> <!-- Puts table with user data -->
 
                     </q-table>
 
+                    <!-- Only valid users are able to select this role-->
                     <q-btn v-if="userRole==='System Administrator' || userRole==='IT Teacher'" 
                         @click="createNewUser" outline icon="add" text-color="primary" label="Create New User" 
                         style="margin-top: 30px ; min-width: 140px; background-color: #03521c;"
@@ -29,9 +30,8 @@ import axios from 'axios'
 
 export default {
     created() {
-        axios.get(`http://localhost:8001/api/endusers`).then((res) => {
+        axios.get(`http://localhost:8001/api/endusers`).then((res) => { //Loads data when creating the page
             this.userData = res.data
-            console.log('Received in front end')
         })
     },
 
@@ -47,7 +47,7 @@ export default {
     },
 
     setup() {
-        const userColumns = [
+        const userColumns = [ //Table template
             {name: 'First Name', label: 'First Name', field: 'END_USER_FIRST_NAME', align: 'left'},
             {name: 'Last Name', label: 'Last Name', field: 'END_USER_LAST_NAME', align: 'left'},
             {name: 'Email', label: 'Email', field: 'END_USER_EMAIL', align: 'left'},
