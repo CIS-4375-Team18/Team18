@@ -5,13 +5,15 @@
     <div class="flex-container">
       <div class="main">
 
-        <div class="row flex q-mt-xl">
+        <div class="row flex q-mt-xl justify-around">
 
-          <div class="col-md-5 q-ml-xl shadow-up-20">
+          <div class="col-5 q-ml-lg shadow-up-20">
             <barChart> </barChart>
           </div>
-          <div class="col-md-4 q-ml-xl shadow-up-20" >
-            <pieChart class="q-mt-xl"> </pieChart>
+          <div class="col-5 q-ml-lg shadow-up-20" >
+            <div class="center-content q-mt-xl">
+              <pieChart> </pieChart>
+            </div>
           </div>
 
         </div>
@@ -24,16 +26,9 @@
 </template>
 
 <script>
-import { defineAsyncComponent } from 'vue';
+import barChart from 'components/charts/BarChart.vue';
+import pieChart from 'components/charts/PieChart.vue';
 import axios from 'axios'
-
-const barChart = defineAsyncComponent(() =>
-  import('components/charts/BarChart.vue')
-)
-
-const pieChart = defineAsyncComponent(() => 
-  import('components/charts/PieChart.vue')
-)
 
 export default {
 
@@ -50,6 +45,12 @@ export default {
 .flex-container {
   max-width: 1280px;
   margin: 0 auto;
+}
+
+.center-content{
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 </style>

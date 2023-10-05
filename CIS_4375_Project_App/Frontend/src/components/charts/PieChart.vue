@@ -29,7 +29,10 @@ export default {
                             position: 'bottom'
                         }
                     }
-                }]
+                }],
+                title: {
+                    text: "Pie Chart Example"
+                },
             },
         }
     }
