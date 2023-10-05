@@ -1,10 +1,12 @@
 <template>
 
-    <apexchart type="pie" 
-    width="380" 
-    :options="chartOptions" 
-    :series="series">
-    </apexchart>
+    <div class="pie-chart-container">
+        <apexchart type="pie" 
+        height="300"
+        :options="chartOptions" 
+        :series="series">
+        </apexchart>
+    </div>
 
 </template>
 
@@ -15,7 +17,7 @@ export default {
             series: [44, 55, 13, 43, 22],
             chartOptions: {
                 chart: {
-                    width: 380,
+                    width: 300,
                     type: 'pie',
                 },
                 labels: ['Team A', 'Team B', 'Team C', 'Team D', 'Team E'],
@@ -23,11 +25,12 @@ export default {
                     breakpoint: 480,
                     options: {
                         chart: {
-                            width: 200
+                            width: 300
                         },
-                        legend: {
-                            position: 'bottom'
-                        }
+                        parentHeightOffset: 0,
+                    },
+                    legend: {
+                        position: 'right'
                     }
                 }],
                 title: {
@@ -39,3 +42,10 @@ export default {
 }
 
 </script>
+
+<style>
+.pie-chart-container {
+    width: 100%;
+}
+
+</style>
