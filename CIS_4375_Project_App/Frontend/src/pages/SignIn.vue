@@ -24,7 +24,7 @@
     
         <div class="signin-container">
             <div class="signin-form">
-                <form>
+                <q-form @submit="performLogin">
                     <div class="form-header">
                         <q-icon name="person" size="2em" class="q-mr-sm" />
                         Login
@@ -49,13 +49,13 @@
                     </div>
                     <div class="button-group">
                         <q-btn
-                            @click="performLogin"
+                            type="submit"
                             label="Login"
                             color="blue"
                             style="width: 40%;"
                         ></q-btn>
                     </div>
-                </form>
+                </q-form>
             </div>
         </div>
 
