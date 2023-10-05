@@ -28,7 +28,7 @@
         </div>
 
         <!-- If Hardware category is selected these additional fields appear  -->
-        <div v-if="categoryModel === hardwCatId.TICKET_CATEGORY_ID" class="row flex " style="margin-top: 20px;">
+        <div v-if="categoryModel" class="row flex " style="margin-top: 20px;">
           <div class="col-md-3">
             <p style="font-weight: bold; color: #666262; margin-bottom: 4px; min-width: 150px;">Select Sub Category: </p>
             <q-select filled stack-label :dense="dense" :options-dense="denseOpts" label="Sub Category" v-model="subCatList"
