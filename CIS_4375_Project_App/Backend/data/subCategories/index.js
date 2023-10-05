@@ -44,6 +44,20 @@ const getById = async(TICKET_SUB_CATEGORY_ID) => {
     }
 }
 
+const getByCatID = async(TICKET_CATEGORY_ID) => {
+    try {
+        let pool = await sql.connect(config.sql)
+        const subCatByCat = "SELECT * FROM [dbo].[TICKET_SUB_CATEGORY] "+
+            "WHERE TICKET_CATEGORY_ID = @TICKET_CATEGORY_ID"
+        const subCatByCatQ = await pool.request()
+            .input('TICKET_CATEGORY_ID', sql.Int, TICKET_CATEGORY_ID)
+            .query(subCatByCat);
+        return subCatByCatQ.recordset;
+    } catch(error) {
+        return error.message;
+    }
+}
+ 
 const insertNew = async (subCatData) => {
     try {
         let pool = await sql.connect(config.sql);
@@ -97,6 +111,7 @@ module.exports = {
    GetAll,
    GetActive,
    getById,
+   getByCatID,
    update,
    insertNew,
    del

@@ -37,6 +37,16 @@ const getSubCagtbyId = async (req, res, next) => {
     }
 }
 
+const getSubCatByCategory = async (req, res, next) => {
+    try {
+        const TICKET_CATEGORY_ID = req.params.id;
+        const associatedSubcategory = await subCategoryData.getByCatID(TICKET_CATEGORY_ID);
+        res.send(associatedSubcategory);
+    } catch(error) {
+        res.status(400).send(error.message);
+    }
+}
+
 const addSubCat = async (req, res, next) => {
     try {
         const data = req.body;
@@ -73,6 +83,7 @@ module.exports = {
    getAllSubCategories,
    getSubCagtbyId,
    getActiveSubCat,
+   getSubCatByCategory,
    addSubCat,
    updateSubCat,
    deleteSubCat
