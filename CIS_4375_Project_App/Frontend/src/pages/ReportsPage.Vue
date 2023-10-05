@@ -5,12 +5,12 @@
     <div class="flex-container">
       <div class="main">
 
-        <div class="row flex q-mt-lg">
+        <div class="row flex q-mt-xl">
 
-          <div class="col-md-5 q-ml-xl" style="border: 1px solid black">
+          <div class="col-md-5 q-ml-xl shadow-up-20">
             <barChart> </barChart>
           </div>
-          <div class="col-md-4 q-ml-xl" style="border: 1px solid black">
+          <div class="col-md-4 q-ml-xl shadow-up-20" >
             <pieChart class="q-mt-xl"> </pieChart>
           </div>
 
@@ -50,7 +50,6 @@ export default {
 .flex-container {
   max-width: 1280px;
   margin: 0 auto;
-  border: 1px solid black;
 }
 
 </style>
