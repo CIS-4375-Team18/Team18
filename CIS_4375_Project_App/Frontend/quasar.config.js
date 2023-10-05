@@ -32,6 +32,7 @@ module.exports = configure(function (/* ctx */) {
     boot: [
       
       'axios',
+      'apexcharts',
     ],
 
     // https://v2.quasar.dev/quasar-cli-vite/quasar-config-js#css
