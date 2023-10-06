@@ -20,6 +20,18 @@ export default {
                 chart: {
                     height: 350,
                     type: 'bar',
+                    toolbar: {
+                        show: true,
+                        offsetX: 0,
+                        offsetY: 0,
+                        tools: {
+                            zoom: true,
+                            zoomin: true,
+                            zoomout: true,
+                            pan: true,
+                            reset: true
+                        }
+                    }
                 },
                 plotOptions: {
                     bar: {
@@ -47,6 +59,7 @@ export default {
                     axisBorder: {
                         show: false
                     },
+                    tickPlacement: "on",
                     axisTicks: {
                         show: false
                     },
