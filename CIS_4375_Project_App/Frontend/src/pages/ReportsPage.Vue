@@ -1,6 +1,6 @@
 <template>
 
-  <q-page padding>
+  <q-page padding style="background-color: #666262">
 
     <div class="row q-col-gutter-md">
 
