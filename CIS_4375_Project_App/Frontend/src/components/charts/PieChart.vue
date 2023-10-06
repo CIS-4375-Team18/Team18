@@ -3,7 +3,7 @@
     <div class="pie-chart-container">
         <apexchart type="pie" 
         height="300"
-        :options="chartOptions" 
+        :options="options" 
         :series="series">
         </apexchart>
     </div>
@@ -11,16 +11,22 @@
 </template>
 
 <script>
+import axios from 'src/boot/axios';
+
 export default {
+    props: {
+        options: Object,
+        series: Array,
+    },
+
     data() {
         return {
-            series: [44, 55, 13, 43, 22],
             chartOptions: {
                 chart: {
                     width: 300,
                     type: 'pie',
                 },
-                labels: ['Team A', 'Team B', 'Team C', 'Team D', 'Team E'],
+                labels: [],
                 responsive: [{
                     breakpoint: 480,
                     options: {
@@ -34,11 +40,12 @@ export default {
                     }
                 }],
                 title: {
-                    text: "Pie Chart Example"
+                    text: ''
                 },
             },
         }
-    }
+    },
+
 }
 
 </script>

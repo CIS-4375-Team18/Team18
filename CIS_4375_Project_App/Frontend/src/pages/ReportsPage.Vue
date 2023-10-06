@@ -11,7 +11,12 @@
       </div>
       <div class="col-md-6 col-xs-12">
         <q-card class="fit">
-          <pieChart> </pieChart>
+          <pieChart
+            v-if="pieLoading"
+            :series="pieSeries"
+            :options="chartOptions"
+          >
+          </pieChart>
         </q-card>
       </div>
 
@@ -40,10 +45,41 @@ export default {
     pieChart,
   },
 
+  data() {
+    return {
+      pieSeries: [],
+      chartOptions: {
+        labels: [],
+        title: {
+          text: ''
+        },
+      },
+      pieLoading: false,
+    }
+  },
+
+  methods: {
+    async getCount() {
+      try {
+        const res = await axios.get(`http://localhost:8001/api/countsubcat`)
+
+        const filterData = res.data.filter(sub => sub.NUMBER_OF_SUBCATEGORIES >= 0)
+        if (filterData.length > 0) {
+          this.pieSeries = filterData.map((sub) => sub.NUMBER_OF_SUBCATEGORIES)
+          this.chartOptions.labels = filterData.map((sub) => sub.TICKET_CATEGORY_DESC)
+          this.chartOptions.title.text = 'Pie Chart Example'
+          this.pieLoading = true
+        }
+      } catch(err) {
+        console.log(err)
+      }
+    }
+  },
+
+  mounted() {
+    this.getCount();
+  },
+
 }
 
 </script>
-
-<style scoped>
-
-</style>
