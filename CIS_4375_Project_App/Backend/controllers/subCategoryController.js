@@ -13,6 +13,16 @@ const getAllSubCategories = async (req, res, next) => {
     }
 }
 
+const getCountSubcat = async (req, res, next) => {
+    try{
+        const getCount = await subCategoryData.testSubcat();
+        res.send(getCount);
+        console.log(getCount);
+    } catch(error) {
+        res.status(400).send(error.message)
+    }
+}
+
 
 const getActiveSubCat = async (req, res, next) => {
     try {
@@ -75,5 +85,6 @@ module.exports = {
    getActiveSubCat,
    addSubCat,
    updateSubCat,
-   deleteSubCat
+   deleteSubCat,
+   getCountSubcat
 }
