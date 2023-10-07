@@ -126,7 +126,8 @@ const insertNew = async (supportTicketData) => {
        " ,[TICKET_PRIORITY_ID] "+
        " ,[SUPPORT_AGENT_ID] "+
        " ,[RESOLUTION_DATE] "+
-       " ,[END_USER_ID]) "
+       " ,[END_USER_ID] "+
+       " ,[SUPPORT_TICKET_ASSET_TAG]) "
        " VALUES "+
        " (@SUPPORT_TICKET_SUBJECT, "+
        " @SUPPORT_TICKET_NOTE, "+
@@ -141,7 +142,8 @@ const insertNew = async (supportTicketData) => {
        " @TICKET_PRIORITY_ID, "+
        " @SUPPORT_AGENT_ID, "+
        " @RESOLUTION_DATE, "+
-       " @END_USER_ID) "
+       " @END_USER_ID, "+
+       " @SUPPORT_TICKET_ASSET_TAG)"
 
         const insertSuppTicket = await pool.request()
                             .input('SUPPORT_TICKET_SUBJECT', sql.NVarChar(500), supportTicketData.SUPPORT_TICKET_SUBJECT)
@@ -157,7 +159,8 @@ const insertNew = async (supportTicketData) => {
                             .input('TICKET_PRIORITY_ID', sql.SmallInt, supportTicketData.TICKET_PRIORITY_ID)        
                             .input('SUPPORT_AGENT_ID', sql.SmallInt, supportTicketData.SUPPORT_AGENT_ID)        
                             .input('RESOLUTION_DATE', sql.Date, supportTicketData.RESOLUTION_DATE)  
-                            .input('END_USER_ID', sql.SmallInt, supportTicketData.END_USER_ID)      
+                            .input('END_USER_ID', sql.SmallInt, supportTicketData.END_USER_ID)
+                            .input('SUPPORT_TICKET_ASSET_TAG', sql.NVarChar(40), supportTicketData.SUPPORT_TICKET_ASSET_TAG)      
                             .query(createSupportTicket);                            
         return insertSuppTicket.recordset;
     } catch (error) {
