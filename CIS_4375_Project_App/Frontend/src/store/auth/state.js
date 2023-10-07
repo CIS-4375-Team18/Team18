@@ -4,5 +4,6 @@ export default function () {
     userFirstName: '',
     userEmail: '',
     userRole: '',
+    userId: -1
   }
 }
