@@ -127,7 +127,7 @@ const insertNew = async (supportTicketData) => {
        " ,[SUPPORT_AGENT_ID] "+
        " ,[RESOLUTION_DATE] "+
        " ,[END_USER_ID] "+
-       " ,[SUPPORT_TICKET_ASSET_TAG]) "
+       " ,[SUPPORT_TICKET_ASSET_TAG]) "+
        " VALUES "+
        " (@SUPPORT_TICKET_SUBJECT, "+
        " @SUPPORT_TICKET_NOTE, "+
