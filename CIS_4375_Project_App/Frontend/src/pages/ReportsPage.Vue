@@ -11,12 +11,17 @@
       </div>
       <div class="col-md-6 col-xs-12">
         <q-card class="fit">
-          <pieChart
-            v-if="pieLoading"
-            :series="pieSeries"
-            :options="chartOptions"
-          >
-          </pieChart>
+          <div v-if="!pieLoading">
+            <q-inner-loading :showing="visible" size="100px" color="primary" label="Please Wait..."></q-inner-loading>
+          </div>
+          <div v-else>
+            <pieChart
+              v-if="pieLoading"
+              :series="pieSeries"
+              :options="chartOptions"
+            >
+            </pieChart>
+          </div>
         </q-card>
       </div>
 
@@ -55,6 +60,7 @@ export default {
         },
       },
       pieLoading: false,
+      visible: true,
     }
   },
 
@@ -69,16 +75,26 @@ export default {
           this.chartOptions.labels = filterData.map((sub) => sub.TICKET_CATEGORY_DESC)
           this.chartOptions.title.text = 'Pie Chart Example'
           this.pieLoading = true
+
+          setTimeout(() => {
+            this.visible = false;
+          }, 4000);
+        } else {
+          this.visible = true;
         }
       } catch(err) {
         console.log(err)
       }
-    }
+    },
+
+
   },
 
   mounted() {
     this.getCount();
   },
+
+
 
 }
 
