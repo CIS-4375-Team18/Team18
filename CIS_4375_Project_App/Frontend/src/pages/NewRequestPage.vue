@@ -58,7 +58,7 @@
           style="margin-bottom: 20px; outline-color: #e6e6e6;" />
       </div>
       <div class="row flex justify-center" style="margin: 20px; align-content: center;">
-        <q-btn outline icon="send" text-color="primary" label="Submit"
+        <q-btn @click="saveRequest(userId)" outline icon="send" text-color="primary" label="Submit"
           style="margin-bottom: 30px; margin-right: 40px;  min-width: 130px; background-color: #03521c;" />
         <q-btn @click="confirmCancel" outline icon="cancel"  color="negative" text-color="secondary" label="Cancel"
           style="margin-bottom: 30px; margin-left: 40px; min-width: 130px;" />
@@ -70,7 +70,8 @@
 <script>
 //import axios from 'src/boot/axios'
 import { ref } from 'vue'
-import {Dialog} from 'quasar'
+import { mapGetters } from 'vuex'
+import { Dialog } from 'quasar'
 import axios from "axios";
 
 const apiURL = import.meta.env.VITE_ROOT_API;
@@ -82,6 +83,7 @@ export default {
       priorityData: [],
       subCategoryData: [],
       hardwCatId: [],
+      openTicketStatusId: null
     }
   },
 
@@ -96,10 +98,21 @@ export default {
     axios.get(`http://localhost:8001/api/activesubcategories`).then((res) => {
       this.subCategoryData = res.data
     })
+    axios.get(`http://localhost:8001/api/activeticketstatuses`).then((res) => {
+      // query for all the active ticket statuses
+      for(let i = 0; i < res.data.length; i++) {
+        const currentStatus = res.data[i];
+        // find the `OPEN` ticket status
+        if (currentStatus.SUPPORT_TICKET_STATUS_DESC === 'OPEN') {
+          // get the id of the open ticket status and save that in a variable for us to use in the save api later
+          this.openTicketStatusId = currentStatus.SUPPORT_TICKET_STATUS_ID;
+          break;
+        }
+      }
+    });
   },
   setup() {
     return {
-
       categoryModel: ref(null),
       PriorityList: ref(null),
       textareaModel: ref(null),
@@ -117,7 +130,59 @@ export default {
       this.hardwCatId = this.categoryData.find(o => o.TICKET_CATEGORY_DESC === 'HARDWARE');
       console.log(hardwCatId)
     },
-    
+    async saveRequest(userId) {
+      try {
+        // if we have a subcategory, store it into this variable
+        // otherwise subcategory will be null
+        let subCategory = null;
+        if (this.subCatList !== null) {
+          subCategory = this.subCatList;
+        }
+
+        // today's date in ISO format - which is the same format we will save in the database
+        const dateCreated = new Date().toISOString();
+
+        // create the support ticket to be saved in the database
+        const supportticket = {
+          SUPPORT_TICKET_SUBJECT: this.subjectModel, // subject
+          SUPPORT_TICKET_NOTE: this.textareaModel, // description
+          DEVICE_MAKE: null,
+          DEVICE_MODEL: null, 
+          SUPPORT_TICKET_TIMELINE: null,
+          SUPPORT_TICKET_DATE_CREATED: dateCreated,
+          SUPPORT_TICKET_RESOLUTION_TIME: null,
+          SUPPORT_TICKET_STATUS_ID: this.openTicketStatusId, // open ticket status
+          TICKET_CATEGORY_ID: this.categoryModel, // category
+          TICKET_SUB_CATEGORY_ID: subCategory, // sub category
+          TICKET_PRIORITY_ID: this.PriorityList, // priority
+          SUPPORT_AGENT_ID: null,
+          RESOLUTION_DATE: null,
+          END_USER_ID: userId
+        };
+
+        // call the save api for support ticket
+        const response = await axios.post('http://localhost:8001/api/supportticket', supportticket);
+        // if the save is successful for the support ticket
+        if(response && response.data.ACTIVE_STATUS_ID === 1) {
+          // then we will redirect to the list of requests
+          this.$router.push({ path: '/requests' });
+        } else {
+          // if an error happens, we don't redirect the user to the list of requests and show them an error dialog
+          Dialog.create({
+            title: 'An error occurred',
+            message: 'Please try again later.',
+          });
+          console.error('Failed to save request.')
+        };
+      } catch (error) {
+        // if an error happens, we don't redirect the user to the list of requests and show them an error dialog
+        Dialog.create({
+          title: 'An error occurred',
+          message: 'Please try again later.',
+        });
+        console.error('Save API request failed:', error);
+      }
+    },
     confirmCancel() {
       Dialog.create({
         title: 'Cancel Ticket Creation',
@@ -132,13 +197,9 @@ export default {
           // Do nothing
         })
     }
-
-
+  },
+  computed: {
+    ...mapGetters('auth', ['userId']),
   }
-
-
-
-
-
 }
 </script>
