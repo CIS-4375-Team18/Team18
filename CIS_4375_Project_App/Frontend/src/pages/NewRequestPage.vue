@@ -73,7 +73,7 @@ import { ref } from 'vue'
 import {Dialog} from 'quasar'
 import axios from "axios";
 
-const apiURL = import.meta.env.VITE_ROOT_API;
+const apiURL = import.meta.env.VITE_API_URL;
 
 export default {
   data() {
@@ -86,14 +86,14 @@ export default {
   },
 
   created() {
-    axios.get(`http://localhost:8001/api/activecategories`).then((res) => {
+    axios.get(`${apiURL}/activecategories`).then((res) => {
       this.categoryData = res.data
       this.findHardwareId()
     })
-    axios.get(`http://localhost:8001/api/activepriorities`).then((res) => {
+    axios.get(`${apiURL}/activepriorities`).then((res) => {
       this.priorityData = res.data
     })
-    axios.get(`http://localhost:8001/api/activesubcategories`).then((res) => {
+    axios.get(`${apiURL}/activesubcategories`).then((res) => {
       this.subCategoryData = res.data
     })
   },
