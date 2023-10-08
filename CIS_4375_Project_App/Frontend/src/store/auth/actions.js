@@ -1,8 +1,9 @@
 import axios from 'axios'
+const apiURL = import.meta.env.VITE_API_URL
 
 export const login = async ({ commit }, { email, password }) => {
     try {
-        const response = await axios.post(`http://localhost:8001/api/login`, 
+        const response = await axios.post(`${apiURL}/login`, 
         { END_USER_EMAIL: email, 
         END_USER_PASSWORD: password });
 
