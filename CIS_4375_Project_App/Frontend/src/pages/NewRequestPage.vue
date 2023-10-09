@@ -98,7 +98,7 @@ export default {
     axios.get(`${apiURL}/activesubcategories`).then((res) => {
       this.subCategoryData = res.data
     })
-    axios.get(`http://localhost:8001/api/activeticketstatuses`).then((res) => {
+    axios.get(`${apiURL}/activeticketstatuses`).then((res) => {
       // query for all the active ticket statuses
       for(let i = 0; i < res.data.length; i++) {
         const currentStatus = res.data[i];
@@ -162,7 +162,7 @@ export default {
         };
 
         // call the save api for support ticket
-        const response = await axios.post('http://localhost:8001/api/supportticket', supportticket);
+        const response = await axios.post(`${apiURL}/supportticket`, supportticket);
         // if the save is successful for the support ticket
         if(response.status === 200) {
           // then we will redirect to the list of requests
