@@ -157,13 +157,14 @@ export default {
           TICKET_PRIORITY_ID: this.PriorityList, // priority
           SUPPORT_AGENT_ID: null,
           RESOLUTION_DATE: null,
-          END_USER_ID: userId
+          END_USER_ID: userId,
+          SUPPORT_TICKET_ASSET_TAG: this.assetTagModel // asset tag
         };
 
         // call the save api for support ticket
         const response = await axios.post('http://localhost:8001/api/supportticket', supportticket);
         // if the save is successful for the support ticket
-        if(response && response.data.ACTIVE_STATUS_ID === 1) {
+        if(response.status === 200) {
           // then we will redirect to the list of requests
           this.$router.push({ path: '/requests' });
         } else {
