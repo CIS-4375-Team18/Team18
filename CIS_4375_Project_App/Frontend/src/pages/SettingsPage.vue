@@ -30,11 +30,20 @@
                                             style="color: #ad0000;"></q-btn>
                                     </q-td>
                                 </template>
+                                
                             </q-table>
 
+                            
+
                         </div>
+                        <q-btn v-if="userRole==='System Administrator' || userRole==='IT Teacher'"
+                        outline icon="person_add" text-color="primary" label="Add New Category"
+                        style="min-width: 140px; background-color: #03521c;" 
+                        class="text-left"
+                        />
 
                     </q-tab-panel>
+    
                     <!-- 
                     Ticket Priorities panel
                     -->
@@ -78,6 +87,8 @@
 import { ref } from 'vue'
 import axios from "axios";
 import EditSettingDialog from "../components/EditSettingDialog.vue";
+import { mapGetters } from 'vuex';
+const apiURL = import.meta.env.VITE_API_URL
 
 export default {
     components: {
@@ -97,11 +108,11 @@ export default {
         }
     },
     created() {
-        axios.get(`http://localhost:8001/api/categories`).then((res) => {
+        axios.get(`${apiURL}/categories`).then((res) => {
             this.categoryData = res.data
             this.loading = false
         })
-        axios.get(`http://localhost:8001/api/priorities`).then((res) => {
+        axios.get(`${apiURL}/priorities`).then((res) => {
             this.priorityData = res.data
         })
     },

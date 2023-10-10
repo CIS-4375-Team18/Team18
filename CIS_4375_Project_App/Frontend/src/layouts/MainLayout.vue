@@ -17,7 +17,7 @@
         <div class="q-gutter-sm row items-center no-wrap">
           <div v-if="!isAuthenticated">
             <q-btn style="margin-right: 20px;"
-              @click="redirectToSignIn"
+              to="/login"
               label="Sign-In"
               color="blue"
               icon="account_circle"
@@ -33,7 +33,7 @@
               <q-tooltip>Account</q-tooltip>
             </q-btn>
               <q-menu auto-close>
-                <q-list>
+                <q-list style="min-width: 100px;">
                   <q-item>
                     <q-item-section>
                       {{ userFirstName }}
@@ -45,7 +45,7 @@
                     </q-item-section>
                   </q-item>
                   <q-separator />
-                  <q-item clickable @click="performLogout" style="text-align: right;">
+                  <q-item clickable @click="performLogout">
                     <q-item-section >
                       Logout
                     </q-item-section>
@@ -142,7 +142,7 @@
             @click="$router.push('/users')"  v-if="isAuthenticated 
             && userRole != 'Staff'">
               <q-item-section avatar>
-                <q-icon name="edit" />
+                <q-icon name="people_alt" />
               </q-item-section>
 
               <q-item-section>
@@ -152,7 +152,7 @@
             
             <q-item clickable v-ripple style="margin-top: 10px;"
             @click="$router.push('/settings')"  v-if="isAuthenticated 
-            && (userRole==='System Administrator' || userRole==='IT Teacher')">
+            && (userRole !='Staff')">
               <q-item-section avatar>
                 <q-icon name="settings" />
               </q-item-section>
@@ -196,9 +196,9 @@ export default {
   name: 'MyLayout',
 
   methods: {
-    redirectToSignIn() {
-      this.$router.push('/login')
-    },
+    // redirectToSignIn() {
+    //   this.$router.push('/login')
+    // },
 
     performLogout() {
       this.$store.dispatch('auth/logout')
