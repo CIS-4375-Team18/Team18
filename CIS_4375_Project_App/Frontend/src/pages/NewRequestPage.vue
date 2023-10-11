@@ -43,6 +43,20 @@
             <q-input filled   v-model="assetTagModel" :dense="dense" :options-dense="denseOpts" />
           </div>
         </div>
+        <!-- If sub category is selected these additional fields appear  -->
+        <div v-if="categoryModel === hardwCatId.TICKET_CATEGORY_ID && subCatList !== null" class="row flex " style="margin-top: 20px;">
+          <!-- Device Make -->
+          <div class="col-md-3">
+            <p style="font-weight: bold; color: #666262; margin-bottom: 4px; min-width: 150px;">Device Make: </p>
+            <q-input filled   v-model="deviceMake" :dense="dense" :options-dense="denseOpts" />
+          </div>
+          <div class="col-4"></div>
+          <!-- Device Model -->
+          <div class="col-md-3" style="margin-left: 10px;">
+            <p style="font-weight: bold; color: #666262; margin-bottom: 4px; min-width: 150px;">Device Model: </p>
+            <q-input filled   v-model="deviceModel" :dense="dense" :options-dense="denseOpts" />
+          </div>
+        </div>
         <div class="row flex " style="margin-top: 20px;">
           <p style="font-weight: bold; color: #666262; margin-bottom: 4px;">Subject: </p>
         </div>
@@ -118,6 +132,8 @@ export default {
       textareaModel: ref(null),
       subjectModel: ref(null),
       assetTagModel: ref(null),
+      deviceMake: ref(null),
+      deviceModel: ref(null),
       subCatList: ref(null),
       dense: ref(true),
       denseOpts: ref(true)
@@ -128,15 +144,30 @@ export default {
     //Get ID of category Type Hardware
     findHardwareId() {
       this.hardwCatId = this.categoryData.find(o => o.TICKET_CATEGORY_DESC === 'HARDWARE');
-      console.log(hardwCatId)
     },
     async saveRequest(userId) {
       try {
-        // if we have a subcategory, store it into this variable
+        const hardwareCategoryId = this.hardwCatId.TICKET_CATEGORY_ID;
+        // if the category is hardware and if we have a subcategory, store it into this variable
         // otherwise subcategory will be null
         let subCategory = null;
-        if (this.subCatList !== null) {
+        if (this.categoryModel == hardwareCategoryId && this.subCatList !== null) {
           subCategory = this.subCatList;
+        }
+
+        // if the category is hardware and if we have a device make, store it into this variable
+        // otherwise device make will be null
+        let deviceMake = null;
+        if (this.categoryModel == hardwareCategoryId && this.deviceMake !== null) {
+          deviceMake = this.deviceMake;
+        }
+
+
+        // if the category is hardware and if we have a device model, store it into this variable
+        // otherwise device model will be null
+        let deviceModel = null;
+        if (this.categoryModel == hardwareCategoryId && this.deviceModel !== null) {
+          deviceModel = this.deviceModel;
         }
 
         // today's date in ISO format - which is the same format we will save in the database
@@ -146,8 +177,8 @@ export default {
         const supportticket = {
           SUPPORT_TICKET_SUBJECT: this.subjectModel, // subject
           SUPPORT_TICKET_NOTE: this.textareaModel, // description
-          DEVICE_MAKE: null,
-          DEVICE_MODEL: null, 
+          DEVICE_MAKE: deviceMake,
+          DEVICE_MODEL: deviceModel, 
           SUPPORT_TICKET_TIMELINE: null,
           SUPPORT_TICKET_DATE_CREATED: dateCreated,
           SUPPORT_TICKET_RESOLUTION_TIME: null,
