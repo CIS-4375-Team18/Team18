@@ -45,7 +45,8 @@ const GetAll = async () => {
         " ,[TICKET_PRIORITY_ID] "+
         " ,[SUPPORT_AGENT_ID] "+
         " ,[RESOLUTION_DATE] "+
-        " ,[END_USER_ID] "
+        " ,[END_USER_ID] "+
+        " ,[SUPPORT_TICKET_ASSET_TAG] "+
         " FROM [dbo].[SUPPORT_TICKET] "
         const supportTicketsList = await pool.request().query(selectAllTicketsQ);
         return supportTicketsList.recordset;
@@ -58,19 +59,19 @@ const GetAll = async () => {
 const getByIdJoin = async(SUPPORT_TICKET_ID) => {
     try {
         let pool = await sql.connect(config.sql);
-        const selectAllTicketsQ = "SELECT dbo.SUPPORT_TICKET.SUPPORT_TICKET_ID, dbo.SUPPORT_TICKET.SUPPORT_TICKET_SUBJECT, dbo.SUPPORT_TICKET.SUPPORT_TICKET_NOTE, dbo.SUPPORT_TICKET.DEVICE_MAKE, "+
-        " dbo.SUPPORT_TICKET.DEVICE_MODEL, dbo.SUPPORT_TICKET.SUPPORT_TICKET_TIMELINE, dbo.SUPPORT_TICKET.SUPPORT_TICKET_DATE_CREATED, dbo.SUPPORT_TICKET.SUPPORT_TICKET_RESOLUTION_TIME, "+
-        " dbo.END_USER.END_USER_ID, dbo.END_USER.END_USER_FIRST_NAME, dbo.END_USER.END_USER_LAST_NAME, dbo.SUPPORT_TICKET_STATUS.SUPPORT_TICKET_STATUS_ID, "+
-        " dbo.SUPPORT_TICKET_STATUS.SUPPORT_TICKET_STATUS_DESC, dbo.TICKET_CATEGORY.TICKET_CATEGORY_ID, dbo.TICKET_CATEGORY.TICKET_CATEGORY_DESC, dbo.TICKET_PRIORITY.TICKET_PRIORITY_ID, "+
-        " dbo.TICKET_PRIORITY.TICKET_PRIORITY_DESC, dbo.SUPPORT_TICKET.RESOLUTION_DATE, dbo.SUPPORT_AGENT.SUPPORT_AGENT_ID, dbo.SUPPORT_AGENT.SUPPORT_AGENT_FIRST_NAME, "+
-        " dbo.SUPPORT_AGENT.SUPPORT_AGENT_LAST_NAME, dbo.TICKET_SUB_CATEGORY.TICKET_SUB_CATEGORY_ID, dbo.TICKET_SUB_CATEGORY.TICKET_SUB_CATEGORY_DESC "+
-        " FROM dbo.SUPPORT_TICKET INNER JOIN "+
-        " dbo.END_USER ON dbo.SUPPORT_TICKET.END_USER_ID = dbo.END_USER.END_USER_ID INNER JOIN "+
-        " dbo.SUPPORT_TICKET_STATUS ON dbo.SUPPORT_TICKET.SUPPORT_TICKET_STATUS_ID = dbo.SUPPORT_TICKET_STATUS.SUPPORT_TICKET_STATUS_ID INNER JOIN " +
-        " dbo.TICKET_CATEGORY ON dbo.SUPPORT_TICKET.TICKET_CATEGORY_ID = dbo.TICKET_CATEGORY.TICKET_CATEGORY_ID INNER JOIN "+
-        " dbo.TICKET_PRIORITY ON dbo.SUPPORT_TICKET.TICKET_PRIORITY_ID = dbo.TICKET_PRIORITY.TICKET_PRIORITY_ID LEFT OUTER JOIN "+
-        " dbo.SUPPORT_AGENT ON dbo.SUPPORT_TICKET.SUPPORT_AGENT_ID = dbo.SUPPORT_AGENT.SUPPORT_AGENT_ID LEFT OUTER JOIN "+
-        " dbo.TICKET_SUB_CATEGORY ON dbo.SUPPORT_TICKET.TICKET_SUB_CATEGORY_ID = dbo.TICKET_SUB_CATEGORY.TICKET_SUB_CATEGORY_ID "+
+        const selectAllTicketsQ = "SELECT ST.SUPPORT_TICKET_ID, ST.SUPPORT_TICKET_SUBJECT, ST.SUPPORT_TICKET_NOTE, ST.DEVICE_MAKE, "+
+        " ST.DEVICE_MODEL, ST.SUPPORT_TICKET_TIMELINE, ST.SUPPORT_TICKET_DATE_CREATED, ST.SUPPORT_TICKET_RESOLUTION_TIME, "+
+        " ES.END_USER_ID, ES.END_USER_FIRST_NAME, ES.END_USER_LAST_NAME, STS.SUPPORT_TICKET_STATUS_ID, "+
+        " STS.SUPPORT_TICKET_STATUS_DESC, TC.TICKET_CATEGORY_ID, TC.TICKET_CATEGORY_DESC, TP.TICKET_PRIORITY_ID, "+
+        " TP.TICKET_PRIORITY_DESC, ST.RESOLUTION_DATE, SA.SUPPORT_AGENT_ID, SA.SUPPORT_AGENT_FIRST_NAME, "+
+        " SA.SUPPORT_AGENT_LAST_NAME, TSC.TICKET_SUB_CATEGORY_ID, TSC.TICKET_SUB_CATEGORY_DESC "+
+        " FROM dbo.SUPPORT_TICKET as ST INNER JOIN "+
+        " dbo.END_USER as ES ON ST.END_USER_ID = ES.END_USER_ID INNER JOIN "+
+        " dbo.SUPPORT_TICKET_STATUS as STS ON ST.SUPPORT_TICKET_STATUS_ID = STS.SUPPORT_TICKET_STATUS_ID INNER JOIN " +
+        " dbo.TICKET_CATEGORY as TC ON ST.TICKET_CATEGORY_ID = TC.TICKET_CATEGORY_ID INNER JOIN "+
+        " dbo.TICKET_PRIORITY as TP ON ST.TICKET_PRIORITY_ID = TP.TICKET_PRIORITY_ID LEFT OUTER JOIN "+
+        " dbo.SUPPORT_AGENT as SA ON ST.SUPPORT_AGENT_ID = SA.SUPPORT_AGENT_ID LEFT OUTER JOIN "+
+        " dbo.TICKET_SUB_CATEGORY as TSC ON ST.TICKET_SUB_CATEGORY_ID = TSC.TICKET_SUB_CATEGORY_ID "+
         " WHERE SUPPORT_TICKET_ID = @SUPPORT_TICKET_ID"
         const supportTicket = await pool.request()
                             .input('SUPPORT_TICKET_ID', sql.Int, SUPPORT_TICKET_ID)
@@ -151,14 +152,14 @@ const insertNew = async (supportTicketData) => {
                             .input('DEVICE_MAKE', sql.NVarChar(20), supportTicketData.DEVICE_MAKE)
                             .input('DEVICE_MODEL', sql.NVarChar(20), supportTicketData.DEVICE_MODEL)
                             .input('SUPPORT_TICKET_TIMELINE', sql.NVarChar(20), supportTicketData.SUPPORT_TICKET_TIMELINE)
-                            .input('SUPPORT_TICKET_DATE_CREATED', sql.Date, supportTicketData.SUPPORT_TICKET_DATE_CREATED)
+                            .input('SUPPORT_TICKET_DATE_CREATED', sql.DateTime, supportTicketData.SUPPORT_TICKET_DATE_CREATED)
                             .input('SUPPORT_TICKET_RESOLUTION_TIME', sql.Int, supportTicketData.SUPPORT_TICKET_RESOLUTION_TIME)
                             .input('SUPPORT_TICKET_STATUS_ID', sql.SmallInt, supportTicketData.SUPPORT_TICKET_STATUS_ID)
                             .input('TICKET_CATEGORY_ID', sql.SmallInt, supportTicketData.TICKET_CATEGORY_ID)
                             .input('TICKET_SUB_CATEGORY_ID', sql.SmallInt, supportTicketData.TICKET_SUB_CATEGORY_ID)        
                             .input('TICKET_PRIORITY_ID', sql.SmallInt, supportTicketData.TICKET_PRIORITY_ID)        
                             .input('SUPPORT_AGENT_ID', sql.SmallInt, supportTicketData.SUPPORT_AGENT_ID)        
-                            .input('RESOLUTION_DATE', sql.Date, supportTicketData.RESOLUTION_DATE)  
+                            .input('RESOLUTION_DATE', sql.DateTime, supportTicketData.RESOLUTION_DATE)  
                             .input('END_USER_ID', sql.SmallInt, supportTicketData.END_USER_ID)
                             .input('SUPPORT_TICKET_ASSET_TAG', sql.NVarChar(40), supportTicketData.SUPPORT_TICKET_ASSET_TAG)      
                             .query(createSupportTicket);                            
