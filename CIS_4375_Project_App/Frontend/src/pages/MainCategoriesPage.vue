@@ -68,15 +68,16 @@
                   </q-chip>
                 </q-td>
               </template>
-              <template v-slot:body-cell-actions="props">
+                         <template v-slot:body-cell-actions="props">
                 <q-td :props="props">
                   <q-btn
                     dense
                     round
                     flat
                     color="secondary"
+                    size="12px"
                     @click="editRow('Category', props)"
-                    icon="edit"
+                    icon="fa-regular fa-pen-to-square"
                   >
                   </q-btn>
                 </q-td>
@@ -88,7 +89,8 @@
                     round
                     flat
                     @click="deleteRow('Category', props)"
-                    icon="delete"
+                    icon="fa-regular fa-trash-can"
+                    size="12px"
                     color="secondary"
                   ></q-btn>
                 </q-td>
@@ -241,7 +243,8 @@ export default {
       this.editedItem.itemId = itemId;
       this.editedItem.itemName = itemDesc;
       this.editedItem.isItemActive = props.row.ACTIVE_STATUS_ID === 1;
-      this.editedItem.itemType = type;
+      this.editedItem.itemType = "TICKET_CATEGORY";
+
       // show dialog
       this.editedItem.showDialog = true;
     },
@@ -254,6 +257,7 @@ export default {
     closeAddDialog() {
       // close dialog
       this.addItem.showDialog = false;
+      return;
     },
 
     handleCloseDeleteDialog() {
@@ -261,6 +265,7 @@ export default {
       this.deleteItem.showDialog = false;
     },
 
+    // Use promise
     updateCategoryAsync() {
       return new Promise((resolve, reject) => {
         axios
@@ -278,10 +283,10 @@ export default {
 
     async handleSaveDialog(response) {
       // destruct to access id property name and item from the response after you clicked save on the dialog
-      const { item } = response;
-      this.updateCatData.TICKET_CATEGORY_ID = item.TICKET_CATEGORY_ID;
-      this.updateCatData.TICKET_CATEGORY_DESC = item.TICKET_CATEGORY_DESC;
-      this.updateCatData.ACTIVE_STATUS_ID = item.ACTIVE_STATUS_ID;
+      const { item } = response; // item is the updated category or priority
+      this.updateCatData.TICKET_CATEGORY_ID = item.TICKET_CATEGORY_ID; // update the category id
+      this.updateCatData.TICKET_CATEGORY_DESC = item.TICKET_CATEGORY_DESC; // update the category description
+      this.updateCatData.ACTIVE_STATUS_ID = item.ACTIVE_STATUS_ID; // update the category active status
       await this.updateCategoryAsync();
       // close dialog
       this.editedItem.showDialog = false;
