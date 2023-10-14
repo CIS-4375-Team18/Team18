@@ -16,6 +16,21 @@ const GetAll = async () => {
     }
 }
 
+
+const GetAllJoin = async () => {
+    try {
+        let pool = await sql.connect(config.sql);
+        const selectAllQJoin = "SELECT dbo.SOFTW_SUB_CATEGORY.SOFTW_SUB_CATEGORY_ID, "+
+        " dbo.SOFTW_SUB_CATEGORY.SOFTW_SUB_CATEGORY_DESC, dbo.SOFTW_SUB_CATEGORY.ACTIVE_STATUS_ID, " +
+        " dbo.ACTIVE_STATUS.ACTIVE_STATUS_DESC FROM dbo.SOFTW_SUB_CATEGORY INNER JOIN " +
+        "dbo.ACTIVE_STATUS ON dbo.SOFTW_SUB_CATEGORY.ACTIVE_STATUS_ID = dbo.ACTIVE_STATUS.ACTIVE_STATUS_ID"
+        const softwCatList = await pool.request().query(selectAllQJoin);
+        return softwCatList.recordset;
+    } catch (error) {
+        console.log(error.message);
+    }
+}
+
 const GetActive = async () => {
     try {
         let pool = await sql.connect(config.sql);
@@ -99,5 +114,6 @@ module.exports = {
    getById,
    update,
    insertNew,
-   del
+   del,
+   GetAllJoin
 }
