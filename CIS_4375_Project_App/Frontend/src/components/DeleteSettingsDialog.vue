@@ -42,6 +42,7 @@ export default {
       showDialog: true,
       itemId: null,
       itemName: "",
+
     };
   },
   props: {
@@ -55,10 +56,18 @@ export default {
   created() {
     // dynamically create title name based on what type it is
     // e.g. "Update Category" or "Update Priority"
-    this.title = `Confirm Main ${this.type} Deletion`;
+
+
+
+      this.title = `Confirm ${this.type} Deletion`;
+
     // set variables used for save api later
     this.itemId = this.id;
     this.itemName = this.name;
+
+    console.log(this.itemId);
+    console.log(this.itemName);
+    console.log(this.type);
   },
   methods: {
     closeDialog() {
@@ -70,7 +79,7 @@ export default {
     deleteRecord() {
       // create dynamic property name
       // e.g. TICKET_CATEGORY_ID or TICKET_PRIORITY_ID
-      const idPropertyName = `TICKET_${this.type.toUpperCase()}_ID`;
+      const idPropertyName = `${this.type.toUpperCase()}_ID`;
       // notify parent to delete dialog with the following values
       this.$emit("delete-dialog", {
         item: {
