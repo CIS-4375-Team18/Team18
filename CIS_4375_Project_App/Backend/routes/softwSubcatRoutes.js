@@ -3,12 +3,13 @@
 const express = require('express');
 const softwCatContr = require('../controllers/softwSubCategoriesController');
 const router = express.Router();
-router.get('/softwcategories',softwCatContr.getAllsoftwwCategories);
-router.get('/activehardwcategories',softwCatContr.getActivesoftwwSubCat);
-router.get('/hardwcategory/:id', softwCatContr.getsoftwwSubCagtbyId);
-router.post('/hardwcategory', softwCatContr.addsoftwwSubCat);
-router.put('/hardwcategory/:id', softwCatContr.updatesoftwwSubCat);
-router.delete('/hardwcategory/:id', softwCatContr.deletesoftwwSubCat);
+router.get('/softwcategories',softwCatContr.getAllsoftwCategories);
+router.get('/softwcategoriesjoin',softwCatContr.getAllsoftwCategoriesJoin);
+router.get('/activesoftwcategories',softwCatContr.getActivesoftwSubCat);
+router.get('/softwcategory/:id', softwCatContr.getsoftwSubCagtbyId);
+router.post('/softwcategory', softwCatContr.addsoftwSubCat);
+router.put('/softwcategory/:id', softwCatContr.updatesoftwSubCat);
+router.delete('/softwcategory/:id', softwCatContr.deletesoftwSubCat);
 
 
 module.exports = {
