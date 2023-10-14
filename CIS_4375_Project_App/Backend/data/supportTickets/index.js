@@ -114,9 +114,9 @@ const getTicketCountByCat = async () => {
     try {
         let pool = await sql.connect(config.sql);
         const countTicketByCat = "SELECT TC.TICKET_CATEGORY_DESC, "+
-            "COUNT(*) AS NUMBER_OF_TICKETS_BY_CAT "+
+            "COUNT(ST.TICKET_CATEGORY_ID) AS NUMBER_OF_TICKETS_BY_CAT "+
             "FROM [dbo].[SUPPORT_TICKET] AS ST "+
-            "JOIN [dbo].[TICKET_CATEGORY] AS TC "+
+            "RIGHT JOIN [dbo].[TICKET_CATEGORY] AS TC "+
             "ON ST.TICKET_CATEGORY_ID = TC.TICKET_CATEGORY_ID "+
             "GROUP BY TICKET_CATEGORY_DESC"
         const countResult = await pool.request().query(countTicketByCat);
