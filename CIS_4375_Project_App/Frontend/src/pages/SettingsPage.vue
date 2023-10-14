@@ -31,7 +31,7 @@ import { ref } from "vue";
           </q-card>
           <q-card
             class="settings-card text-black cursor-pointer relative-position bg-white shadow-5"
-            @click="$router.push('/categories')"
+            @click="$router.push('/hardwarecategories')"
           >
             <q-card-section>
               <div class="menu-text text-weight-bold">
@@ -45,7 +45,7 @@ import { ref } from "vue";
           </q-card>
           <q-card
             class="settings-card text-black cursor-pointer relative-position bg-white shadow-5"
-            @click="$router.push('/ticketcategories')"
+            @click="$router.push('/softwarecategories')"
           >
             <q-card-section>
               <div class="menu-text text-weight-bold">
@@ -53,7 +53,7 @@ import { ref } from "vue";
                 Subcategories
               </div>
               <div class="text-subheading text-center">
-                View and Edit Hardware Subcategory Data
+                View and Edit Software Subcategory Data
               </div>
             </q-card-section>
           </q-card>
