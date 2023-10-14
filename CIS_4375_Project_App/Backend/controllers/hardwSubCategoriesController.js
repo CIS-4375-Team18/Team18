@@ -13,6 +13,17 @@ const getAllHardwCategories = async (req, res, next) => {
   }
 };
 
+// Retrieve all hardwSubCat with join to active status table
+const getAllHardwCategoriesJoin = async (req, res, next) => {
+  try {
+    const hardwSubCatList = await hardwSubCatData.GetAllJoin();
+    res.send(hardwSubCatList);
+    console.log(hardwSubCatList);
+  } catch (error) {
+    res.status(400).send(error.message);
+  }
+};
+
 // Retrieve all active hardwSubCat
 const getActiveHardwSubCat = async (req, res, next) => {
   try {
@@ -78,4 +89,5 @@ module.exports = {
   addHardwSubCat,
   updateHardwSubCat,
   deleteHardwSubCat,
+  getAllHardwCategoriesJoin,
 };
