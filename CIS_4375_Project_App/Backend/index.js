@@ -12,6 +12,8 @@ const activeStatusRoutes = require('./routes/activeStatusRoutes')
 const supportAgentRoutes = require('./routes/suportAgentRoutes')
 const subCatRoutes = require('./routes/subCategoryRoutes')
 const supportTicketRoutes = require('./routes/supportTicketRoutes')
+const hardwSubCategoryRoutes = require('./routes/hardwSubcatRoutes')
+const softwSubCategoryRoutes = require('./routes/softwSubcatRoutes')
 const app = express();
 
 app.use(express.json());
@@ -27,6 +29,8 @@ app.use('/api', activeStatusRoutes.routes);
 app.use('/api', supportAgentRoutes.routes)
 app.use('/api', subCatRoutes.routes)
 app.use('/api', supportTicketRoutes.routes)
+app.use('/api', hardwSubCategoryRoutes.routes)
+app.use('/api', softwSubCategoryRoutes.routes)
 
 
 
