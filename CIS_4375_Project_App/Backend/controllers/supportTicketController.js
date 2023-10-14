@@ -37,6 +37,16 @@ const getSingleTicket = async (req, res, next) => {
     }
 }
 
+const supportTicketByCat = async (req, res, next) => {
+    try {
+        const countTickets = await supportTicketData.getTicketCountByCat();
+        res.send(countTickets);
+        console.log(countTickets);
+    } catch (error) {
+        res.status(400).send(error.message);
+    }
+}
+
 const insertSupportTicket = async (req, res, next) => {
     try {
         const data = req.body;
@@ -74,6 +84,7 @@ module.exports = {
    GetAllSupportTickets,
    GetAllTicketsDisplay,
    getSingleTicket,
+   supportTicketByCat,
    insertSupportTicket,
    updateSupportTicket,
    delSupportTicket
