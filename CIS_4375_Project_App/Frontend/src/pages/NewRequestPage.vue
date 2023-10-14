@@ -63,9 +63,9 @@
                 <template v-slot:append>
                   <q-icon
                     :align="top"
-                    size="xs"
+                    size="15px"
                     class="q-mb-sm"
-                    name="help"
+                    name="fa-regular fa-circle-question"
                     color="secondary"
                   >
                     <q-tooltip>
@@ -85,9 +85,9 @@
                   <template v-slot:append>
                     <q-icon
                       :align="top"
-                      size="xs"
+                      size="15px"
                       class="q-mb-sm"
-                      name="help"
+                      name="fa-regular fa-circle-question"
                       color="secondary"
                     >
                       <q-tooltip> i.e., DELL, Acer, Lenovo, etc. </q-tooltip>
@@ -105,9 +105,9 @@
                 <template v-slot:append>
                   <q-icon
                     :align="top"
-                    size="xs"
+                    size="15px"
                     class="q-mb-sm"
-                    name="help"
+                    name="fa-regular fa-circle-question"
                     color="secondary"
                   >
                     <q-tooltip> i.e., G7-700 </q-tooltip>
@@ -116,34 +116,7 @@
               </q-input>
             </div>
           </div>
-          <div class="row-inline flex-direction-down row q-mt-md row-custom">
-            <div class="col-4">
-              <div class="col-4">
-              <q-select
-                transition-show="scale"
-                transition-hide="scale"
-                class=" ticket-select"
-                color="secondary"
-                emit-value
-                map-options
-                label="Select Availability"
 
-              >
-              <template v-slot:append>
-                  <q-icon
-                    :align="top"
-                    size="xs"
-                    class="q-mb-sm"
-                    name="help"
-                    color="secondary"
-                  >
-                    <q-tooltip> Select period to indicate availbe time </q-tooltip>
-                  </q-icon>
-                </template>
-            </q-select>
-            </div>
-            </div>
-            </div>
           <div class="row-inline flex-direction-down row q-mt-lg">
             <div class="col">
               <q-input
@@ -154,9 +127,9 @@
                 <template v-slot:append>
                   <q-icon
                     :align="top"
-                    size="xs"
+                    size="15px"
                     class="q-mb-sm"
-                    name="help"
+                    name="fa-regular fa-circle-question"
                     color="secondary"
                   >
                     <q-tooltip>
@@ -173,9 +146,9 @@
                 >Description:
                 <q-icon
                   :align="top"
-                  size="xs"
+                  size="15px"
                   class="q-mb-sm"
-                  name="help"
+                  name="fa-regular fa-circle-question"
                   color="secondary"
                 >
                   <q-tooltip>
@@ -241,7 +214,6 @@
 <script>
 import { ref } from "vue";
 import axios from "axios";
-import { Dialog } from "quasar";
 
 export default {
   data() {
