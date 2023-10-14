@@ -11,7 +11,7 @@
             name="warning"
             color="warning"
             size="3rem"
-          />Delete main  {{ type.toLowerCase() }}: <strong> {{ itemName }} </strong>
+          />Delete  {{ type.toLowerCase() }}: <strong> {{ itemName }} </strong>
         </div>
       </q-card-section>
 
