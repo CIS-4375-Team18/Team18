@@ -3,7 +3,7 @@
 const softwwSubCatData = require("../data/softwSubCategories");
 
 // Retrieve all softwwSubCat
-const getAllsoftwwCategories = async (req, res, next) => {
+const getAllsoftwCategories = async (req, res, next) => {
   try {
     const softwwSubCatList = await softwwSubCatData.GetAll();
     res.send(softwwSubCatList);
@@ -13,8 +13,19 @@ const getAllsoftwwCategories = async (req, res, next) => {
   }
 };
 
+// Retrieve all softwwSubCat
+const getAllsoftwCategoriesJoin = async (req, res, next) => {
+  try {
+    const softwwSubCatList = await softwwSubCatData.GetAllJoin();
+    res.send(softwwSubCatList);
+    console.log(softwwSubCatList);
+  } catch (error) {
+    res.status(400).send(error.message);
+  }
+};
+
 // Retrieve all active softwwSubCat
-const getActivesoftwwSubCat = async (req, res, next) => {
+const getActivesoftwSubCat = async (req, res, next) => {
   try {
     const softwwSubCatList = await softwwSubCatData.GetActive();
     res.send(softwwSubCatList);
@@ -25,7 +36,7 @@ const getActivesoftwwSubCat = async (req, res, next) => {
 };
 
 //  Retrieve a single softwwSubCat by ID
-const getsoftwwSubCagtbyId = async (req, res, next) => {
+const getsoftwSubCagtbyId = async (req, res, next) => {
   try {
     const softwW_SUB_CATEGORY_ID = req.params.id;
     const softwwSubCatList = await softwwSubCatData.getById(
@@ -38,7 +49,7 @@ const getsoftwwSubCagtbyId = async (req, res, next) => {
 };
 
 // Create a new softwwSubCat
-const addsoftwwSubCat = async (req, res, next) => {
+const addsoftwSubCat = async (req, res, next) => {
   try {
     const data = req.body;
     const insert = await softwwSubCatData.insertNew(data);
@@ -49,7 +60,7 @@ const addsoftwwSubCat = async (req, res, next) => {
 };
 
 // Update a softwwSubCat
-const updatesoftwwSubCat = async (req, res, next) => {
+const updatesoftwSubCat = async (req, res, next) => {
   try {
     const softwW_SUB_CATEGORY_ID = req.params.id;
     const data = req.body;
@@ -61,7 +72,7 @@ const updatesoftwwSubCat = async (req, res, next) => {
 };
 
 // Delete a softwwSubCat
-const deletesoftwwSubCat = async (req, res, next) => {
+const deletesoftwSubCat = async (req, res, next) => {
   try {
     const subCatData = req.params.id;
     const delsoftwwSubCat = await softwwSubCatData.del(subCatData);
@@ -72,10 +83,11 @@ const deletesoftwwSubCat = async (req, res, next) => {
 };
 
 module.exports = {
-  getActivesoftwwSubCat,
-  getsoftwwSubCagtbyId,
-  getAllsoftwwCategories,
-  addsoftwwSubCat,
-  updatesoftwwSubCat,
-  deletesoftwwSubCat,
+  getActivesoftwSubCat,
+  getsoftwSubCagtbyId,
+  getAllsoftwCategories,
+  addsoftwSubCat,
+  updatesoftwSubCat,
+  deletesoftwSubCat,
+  getAllsoftwCategoriesJoin
 };
