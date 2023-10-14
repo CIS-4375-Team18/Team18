@@ -50,7 +50,7 @@ const routes = [
     path: '/users',
     component: () => import('layouts/MainLayout.vue'),
     children: [
-      { path: '', component: () => import('pages/ManageUserPage.vue') } 
+      { path: '', component: () => import('pages/ManageUserPage.vue') }
     ]
   },
   {
@@ -65,6 +65,13 @@ const routes = [
     component: () => import('layouts/MainLayout.vue'),
     children: [
       { path: '', component: () => import('pages/SettingsPage.vue') }
+    ]
+  },
+  {
+    path: '/maincategories',
+    component: () => import('layouts/MainLayout.vue'),
+    children: [
+      { path: '', component: () => import('pages/MainCategoriesPage.vue') }
     ]
   },
 
