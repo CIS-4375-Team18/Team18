@@ -39,7 +39,7 @@ import { ref } from "vue";
                 Subcategories
               </div>
               <div class="text-subheading text-center">
-                View and Edit Software Subcategory Data
+                View and Edit Hardware Subcategory Data
               </div>
             </q-card-section>
           </q-card>
