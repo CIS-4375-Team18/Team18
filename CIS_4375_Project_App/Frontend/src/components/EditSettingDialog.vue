@@ -1,19 +1,17 @@
 <template>
     <q-dialog v-model="showDialog" persistent>
-        <q-card style="min-width: 350px">
-            <q-card-section>
-                <div class="text-h6">{{title}}</div>
+        <q-card class="edit-card" style="min-width: 350px">
+            <q-card-section class="qc-header q-pa-md text-white">
+                <div class="header-text">{{title}}</div>
             </q-card-section>
 
-            <template v-if="isAuthenticated && userRole==='System Administrator'">
-                <q-card-section class="q-pt-none">
-                    <q-input label="Name" dense v-model="itemName" autofocus />
-                </q-card-section>
-            </template>
-
-            <template v-if="isAuthenticated && userRole==='IT Teacher'">
-                <q-card-section class="q-pt-none">
-                    <q-input label="Name" dense v-model="itemName" readonly />
+            <template v-if="isAuthenticated && (userRole==='System Administrator' || userRole==='IT Teacher')">
+                <q-card-section >
+                    <q-input
+                    label="Category Name"
+                    dense
+                    v-model="itemName"
+                    autofocus />
                 </q-card-section>
             </template>
 
@@ -31,8 +29,18 @@
             </q-card-section>
 
             <q-card-actions align="right" class="text-primary">
-                <q-btn flat label="Cancel" @click="closeDialog" />
-                <q-btn color="blue" label="Save" @click="saveChanges" />
+                <q-btn
+                flat
+                color="primary"
+                class="actionbtns"
+                label="Cancel"
+                @click="closeDialog"
+                />
+                <q-btn
+                color="primary"
+                class="actionbtns"
+                label="Save"
+                @click="saveChanges" />
             </q-card-actions>
         </q-card>
     </q-dialog>
@@ -55,7 +63,7 @@ export default {
         // item id
         id: Number,
         // item name
-        name: String, 
+        name: String,
         // item active status
         isActive: Boolean,
         // item type
@@ -64,7 +72,7 @@ export default {
     created() {
         // dynamically create title name based on what type it is
         // e.g. "Update Category" or "Update Priority"
-        this.title = `Update ${this.type}`;
+        this.title = `Edit ${this.type}`;
         // set variables used for save api later
         this.itemId = this.id;
         this.itemName = this.name;
@@ -95,9 +103,28 @@ export default {
                 idPropertyName,
             });
         },
+
+
     },
     computed: {
       ...mapGetters('auth', ['isAuthenticated', 'userEmail', 'userFirstName', 'userRole']),
     }
 };
 </script>
+
+<style scoped>
+.actionsbtn {
+  margin: 10px;
+}
+.qc-header {
+border-bottom: 0.2rem solid #a62626;
+background-color: #666262;
+}
+.header-text {
+  font-size: 1.1rem;
+  font-weight: 500;
+}
+.actionbtns {
+  margin: 10px;
+}
+</style>
