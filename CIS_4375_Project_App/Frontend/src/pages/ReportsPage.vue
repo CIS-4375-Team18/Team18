@@ -65,15 +65,15 @@ export default {
   },
 
   methods: {
-    async getCount() {
+    async getTicketByCatCount() {
       try {
-        const res = await axios.get(`http://localhost:8001/api/countsubcat`)
+        const res = await axios.get(`http://localhost:8001/api/ticketbycat`)
 
-        const filterData = res.data.filter(sub => sub.NUMBER_OF_SUBCATEGORIES >= 0)
+        const filterData = res.data.filter(sub => sub.NUMBER_OF_TICKETS_BY_CAT >= 0)
         if (filterData.length > 0) {
-          this.pieSeries = filterData.map((sub) => sub.NUMBER_OF_SUBCATEGORIES)
+          this.pieSeries = filterData.map((sub) => sub.NUMBER_OF_TICKETS_BY_CAT)
           this.chartOptions.labels = filterData.map((sub) => sub.TICKET_CATEGORY_DESC)
-          this.chartOptions.title.text = 'Pie Chart Example'
+          this.chartOptions.title.text = 'Tickets By Categories'
           this.pieLoading = true
 
           setTimeout(() => {
@@ -91,7 +91,7 @@ export default {
   },
 
   mounted() {
-    this.getCount();
+    this.getTicketByCatCount();
   },
 
 
