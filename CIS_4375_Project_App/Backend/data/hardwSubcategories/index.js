@@ -16,6 +16,19 @@ const GetAll = async () => {
     }
 }
 
+const GetAllJoin = async () => {
+    try {
+        let pool = await sql.connect(config.sql);
+        const selectAllJoinQ = "SELECT HARDW_SUB_CATEGORY.HARDW_SUB_CATEGORY_ID, HARDW_SUB_CATEGORY.HARDW_SUB_CATEGORY_DESC, "+
+        " HARDW_SUB_CATEGORY.ACTIVE_STATUS_ID,  ACTIVE_STATUS.ACTIVE_STATUS_DESC "+
+        " FROM HARDW_SUB_CATEGORY INNER JOIN ACTIVE_STATUS ON dbo.HARDW_SUB_CATEGORY.ACTIVE_STATUS_ID = dbo.ACTIVE_STATUS.ACTIVE_STATUS_ID"
+        const hardwCatList = await pool.request().query(selectAllJoinQ);
+        return hardwCatList.recordset;
+    } catch (error) {
+        console.log(error.message);
+    }
+}
+
 const GetActive = async () => {
     try {
         let pool = await sql.connect(config.sql);
@@ -99,5 +112,6 @@ module.exports = {
    getById,
    update,
    insertNew,
-   del
+   del,
+   GetAllJoin
 }
