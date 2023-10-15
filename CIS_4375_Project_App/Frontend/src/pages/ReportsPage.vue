@@ -5,7 +5,8 @@
       <div class="col-md-4">
         <q-card class="shadow-up-10" style="height: 150px;">
           <q-card-section class="q-ml-xl">
-              <div class="text-h3 text-bold q-mt-md">{{ ticketCount }}</div>
+              <div v-if="userRole != 'Staff'" class="text-h3 text-bold q-mt-md">{{ ticketCount }}</div>
+              <div v-else class="text-h3 text-bold q-mt-md">{{ userTicketCount }}</div>
               <div class="text-subtitle3 text-bold" style="color: #626262;">Total Number Of Tickets</div>
           </q-card-section>
         </q-card>
@@ -35,9 +36,15 @@
           </div>
           <div v-else>
             <pieChart
-              v-if="pieLoading"
+              v-if="pieLoading && userRole != 'Staff'"
               :series="pieSeries"
               :options="chartOptions"
+            >
+            </pieChart>
+            <pieChart
+              v-else
+              :series="userPieSeries"
+              :options="userChartOptions"
             >
             </pieChart>
           </div>
@@ -51,7 +58,8 @@
 
 <script>
 import { defineAsyncComponent } from 'vue';
-import axios from 'axios'
+import axios from 'axios';
+import { mapGetters } from 'vuex';
 
 const barChart = defineAsyncComponent(() =>
   import('components/charts/BarChart.vue')
@@ -77,15 +85,28 @@ export default {
           text: ''
         },
       },
+      userPieSeries: [],
+      userChartOptions: {
+        labels: [],
+        title: {
+          text: ''
+        },
+      },
       pieLoading: false,
       visible: true,
       ticketCount: '',
+      userTicketCount: '',
     }
   },
 
   created() {
     axios.get(`http://localhost:8001/api/supporttickets`).then((res) => {
-      this.ticketCount = res.data.length;
+      const allTickets = res.data;
+
+      const userTickets = allTickets.filter(ticket => ticket.END_USER_ID === this.userID);
+
+      this.ticketCount = allTickets.length;
+      this.userTicketCount = userTickets.length;
     })
 
   },
@@ -112,12 +133,40 @@ export default {
         console.log(err)
       }
     },
+    async getTicketCountByCatByUSER() {
+      try {
+        const userID = this.userID;
+
+        const res = await axios.get(`http://localhost:8001/api/ticketbycat/${userID}`)
+
+        const filterData = res.data.filter(sub => sub.NUMBER_OF_TICKETS_BY_CAT >= 0)
+        if (filterData.length > 0) {
+          this.userPieSeries = filterData.map((sub) => sub.NUMBER_OF_TICKETS_BY_CAT)
+          this.userChartOptions.labels = filterData.map((sub) => sub.TICKET_CATEGORY_DESC)
+          this.userChartOptions.title.text = 'Tickets By Categories'
+          this.pieLoading = true
+
+          setTimeout(() => {
+            this.visible = false;
+          }, 4000);
+        } else {
+          this.visible = true;
+        }
+      } catch(err) {
+        console.log(err)
+      }
+    },
 
   },
 
   mounted() {
     this.getTicketCountByCat();
+    this.getTicketCountByCatByUSER();
   },
+
+  computed: {
+    ...mapGetters('auth', ['userID', 'userRole'])
+  }
 
 }
 </script>
