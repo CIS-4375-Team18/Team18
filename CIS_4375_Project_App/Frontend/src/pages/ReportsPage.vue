@@ -1,16 +1,35 @@
 <template>
+  
+  <q-page padding> 
+    <div class="row q-col-gutter-lg">
+      <div class="col-md-4">
+        <q-card class="shadow-up-10" style="height: 150px;">
+          <q-card-section class="text-center">
+              <div class="text-h2 text-bold q-mt-md">{{ ticketCount }}</div>
+              <div class="text-subtitle3 text-bold" style="color: #626262;">Total Number Of Tickets</div>
+          </q-card-section>
+        </q-card>
+      </div>
+      <div class="col-md-4">
+        <q-card class="shadow-up-10 fit">
+          Total Number Of Requests
+        </q-card>
+      </div>
+      <div class="col-md-4">
+        <q-card class="shadow-up-10 fit">
+          Total Number Of Requests
+        </q-card>
+      </div>
+    </div>
 
-  <q-page padding style="background-color: #666262">
-
-    <div class="row q-col-gutter-md">
-
+    <div class="row q-col-gutter-md" style="margin-top: 10px;">
       <div class="col-md-6 col-xs-12">
-        <q-card>
+        <q-card class="shadow-up-9">
           <barChart> </barChart>
         </q-card>
       </div>
       <div class="col-md-6 col-xs-12">
-        <q-card class="fit">
+        <q-card class="fit shadow-up-9">
           <div v-if="!pieLoading">
             <q-inner-loading :showing="visible" size="100px" color="primary" label="Please Wait..."></q-inner-loading>
           </div>
@@ -24,7 +43,6 @@
           </div>
         </q-card>
       </div>
-
     </div>
 
   </q-page>
@@ -61,11 +79,19 @@ export default {
       },
       pieLoading: false,
       visible: true,
+      ticketCount: '',
     }
   },
 
+  created() {
+    axios.get(`http://localhost:8001/api/supporttickets`).then((res) => {
+      this.ticketCount = res.data.length;
+    })
+
+  },
+
   methods: {
-    async getTicketByCatCount() {
+    async getTicketCountByCat() {
       try {
         const res = await axios.get(`http://localhost:8001/api/ticketbycat`)
 
@@ -87,15 +113,19 @@ export default {
       }
     },
 
-
   },
 
   mounted() {
-    this.getTicketByCatCount();
+    this.getTicketCountByCat();
   },
 
+}
+</script>
 
+<style>
 
+.text-container {
+  margin-left: 30px;
 }
 
-</script>
+</style>
