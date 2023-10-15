@@ -126,6 +126,25 @@ const getTicketCountByCat = async () => {
     }
 }
 
+const getTicketCountByCatPerUser = async (END_USER_ID) => {
+    try {
+        let pool = await sql.connect(config.sql);
+        const countTicketByCatPerUser = "SELECT TC.TICKET_CATEGORY_DESC, "+
+            "COUNT(ST.TICKET_CATEGORY_ID) AS NUMBER_OF_TICKETS_BY_CAT "+
+            "FROM [dbo].[SUPPORT_TICKET] AS ST "+
+            "RIGHT JOIN [dbo].[TICKET_CATEGORY] AS TC "+
+            "ON ST.TICKET_CATEGORY_ID = TC.TICKET_CATEGORY_ID "+
+            "WHERE ST.END_USER_ID = @END_USER_ID "+
+            "GROUP BY TICKET_CATEGORY_DESC"
+        const result = await pool.request()
+                .input('END_USER_ID', sql.Int, END_USER_ID)
+                .query(countTicketByCatPerUser);
+        return result.recordset;
+    } catch(error) {
+        return error.message;
+    }
+}
+
 const insertNew = async (supportTicketData) => {
     try {
         let pool = await sql.connect(config.sql);
@@ -250,6 +269,7 @@ module.exports = {
    getById,
    getByIdJoin,
    getTicketCountByCat,
+   getTicketCountByCatPerUser,
    update,
    insertNew,
    del
