@@ -4,8 +4,8 @@
     <div class="row q-col-gutter-lg">
       <div class="col-md-4">
         <q-card class="shadow-up-10" style="height: 150px;">
-          <q-card-section class="text-center">
-              <div class="text-h2 text-bold q-mt-md">{{ ticketCount }}</div>
+          <q-card-section class="q-ml-xl">
+              <div class="text-h3 text-bold q-mt-md">{{ ticketCount }}</div>
               <div class="text-subtitle3 text-bold" style="color: #626262;">Total Number Of Tickets</div>
           </q-card-section>
         </q-card>
