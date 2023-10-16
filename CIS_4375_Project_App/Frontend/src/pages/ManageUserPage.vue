@@ -20,13 +20,13 @@
                                 </template>
                                 <template v-slot:body-cell-actions="props">
                                     <q-td :props="props">
-                                        <q-btn dense round flat @click="editRow(props)" icon="edit"
+                                        <q-btn dense round flat @click="editItem(props)" icon="edit"
                                             style="color: #ad0000;"></q-btn>
                                     </q-td>
                                 </template>
-                                <template v-slot:body-cell-delactions="props">
+                                <template v-slot:body-cell-delactions="props"> <!-- On click will bring out dialog box to confirm deletion-->
                                     <q-td :props="props">
-                                        <q-btn dense round flat @click="deleteRow(props)" icon="delete"
+                                        <q-btn dense round flat @click=deleteUserDialog(props) icon="delete"
                                             style="color: #ad0000;"></q-btn>
                                     </q-td>
                                 </template>
@@ -38,6 +38,26 @@
                         style="margin-top: 30px ; min-width: 140px; background-color: #03521c;"
                     />
                 </div>
+                <template>
+                    <q-dialog v-model="deleteItemDial" persistent>
+                        <q-card style="min-width: 350px;">
+                        <q-card-section class="row items-center">
+                            <div class="text-h6 ">Confirm to Delete User {{ this.itemFirstName }}</div>
+                        </q-card-section>
+                        <q-card-section>
+                        <q-avatar icon="warning" color="white" text-color="warning" size="" />
+                        <span class="text-body2 q-mt-lg">You are about to delete user: 
+                            {{ this.itemFirstName + " " + this.itemLastName}}</span>
+                        </q-card-section>
+
+                        <q-card-actions align="right">
+                        <q-btn flat label="Cancel" color="primary" v-close-popup />
+                        <!-- On confirmation will execute deletion-->
+                        <q-btn flat label="Confirm" color="primary" @click="deleteUser(this.itemID)" v-close-popup />
+                        </q-card-actions>
+                    </q-card>
+                    </q-dialog>
+                </template>
             </div>
         </q-card>
     </div>
@@ -45,17 +65,26 @@
 
 <script>
 import { mapGetters } from 'vuex';
-import axios from 'axios'
+import axios from 'axios';
+import { ref } from 'vue';
 
 export default {
+    setup(){
+        return{
+        deleteItemDial: ref(false),
+        }
+    },
     created() {
         axios.get(`http://localhost:8001/api/endusers`).then((res) => { //Loads data when creating the page
-            this.userData = res.data
+            this.userData = res.data;
         })
     },
 
     data () {
         return {
+            itemID: "",
+            itemFirstName: "",
+            itemLastName: "",
             userData: [],
 
             userColumns : [ //Table template
@@ -74,17 +103,24 @@ export default {
         createNewUser () {
             this.$router.push('/createUser');
         },
-        editRow(item) {
+        editItem(item) {
             console.log(item.row)
             console.log("Edit")
             //fd.editedIndex = fd.currencyData.findIndex((v, i) =>v.__index === item.__index)
             //fd.editedItem = Object.assign({}, item);
             //fd.show_dialog = true;
         },
-        deleteRow(item){
-            console.log(item.row)
-            console.log("Delete")
-        }
+        deleteUserDialog(item){ //saves needed information into variables
+            this.deleteItemDial = true;
+            this.itemID = item.row.END_USER_ID;
+            this.itemFirstName = item.row.END_USER_FIRST_NAME;
+            this.itemLastName = item.row.END_USER_LAST_NAME;
+        },
+        deleteUser(id){ //executes delete
+            axios.delete(`http://localhost:8001/api/enduser/${id}`).then((res) => { 
+                "User deleted"
+            })
+        },
     },
 
     computed: {
