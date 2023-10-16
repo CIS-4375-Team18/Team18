@@ -9,7 +9,7 @@
             <div style="margin-left: 2%;">
                 <div class="q-pa-md" style="margin: 0 auto;">
                     <!-- Users Table -->
-                    <q-table title="Users" color="secondary" :align="left" :loading="loading"
+                    <q-table title="Users" :key="tableKey" color="secondary" :align="left" :loading="loading "
                         :rows="userData" :columns="userColumns" style="width: 98%;"> <!-- Puts table with user data -->
                         <template #body-cell-status="props">
                                     <q-td :props="props">
@@ -41,8 +41,8 @@
                 <template>
                     <q-dialog v-model="deleteItemDial" persistent>
                         <q-card style="min-width: 350px;">
-                        <q-card-section class="row items-center">
-                            <div class="text-h6 ">Confirm to Delete User {{ this.itemFirstName }}</div>
+                        <q-card-section class="row items-center" style="background-color: #af0000">
+                            <div class="text-h6" style="color: white;">Confirm to Delete User</div>
                         </q-card-section>
                         <q-card-section>
                         <q-avatar icon="warning" color="white" text-color="warning" size="" />
@@ -74,12 +74,9 @@ export default {
         deleteItemDial: ref(false),
         }
     },
-    created() {
-        axios.get(`http://localhost:8001/api/endusers`).then((res) => { //Loads data when creating the page
-            this.userData = res.data;
-        })
+    beforeMount() {
+        this.getUsers()
     },
-
     data () {
         return {
             itemID: "",
@@ -96,11 +93,20 @@ export default {
             {name: 'actions', label: 'Edit', field: '', align: 'left' },
             {name: 'delactions', label: 'Delete', field: '', align: 'left' },
             
-        ],
+            ],
+            tableKey : 0, //will be used to re-render table
+
         }
     },
     methods: {
-        createNewUser () {
+        async getUsers(){
+            axios.get(`http://localhost:8001/api/endusers`).then((res) => { //Loads data when creating the page
+            this.userData = res.data;
+            this.rerenderTable;
+            this.loading = false;
+        })
+        },
+        createNewUser() {
             this.$router.push('/createUser');
         },
         editItem(item) {
@@ -110,16 +116,26 @@ export default {
             //fd.editedItem = Object.assign({}, item);
             //fd.show_dialog = true;
         },
+        rerenderTable(){
+            this.tableKey +=1;
+            console.log("rendered table")
+        },
         deleteUserDialog(item){ //saves needed information into variables
             this.deleteItemDial = true;
             this.itemID = item.row.END_USER_ID;
             this.itemFirstName = item.row.END_USER_FIRST_NAME;
             this.itemLastName = item.row.END_USER_LAST_NAME;
+            this.rerenderTable();
         },
-        deleteUser(id){ //executes delete
-            axios.delete(`http://localhost:8001/api/enduser/${id}`).then((res) => { 
-                "User deleted"
-            })
+        async deleteUser(userID){ //executes delete
+            axios.delete(`http://localhost:8001/api/enduser/${userID}`).then((res) => { //deletes from database
+                const index = this.userData.findIndex(userData => userData.END_USER_ID === userID) 
+                if (~index){
+                    this.userData.splice(index, 1)//finds in local table and deletes
+                }
+            });
+
+            this.rerenderTable;//rerenders table
         },
     },
 
