@@ -39,12 +39,16 @@
                 option-label="TICKET_CATEGORY_DESC"
               />
             </div>
-            <div class="col-4">
+            <div class="col-4" v-if="categoryModel === hardwCatId.TICKET_CATEGORY_ID">
               <q-select
                 transition-show="scale"
                 transition-hide="scale"
                 class="ticket-select"
                 color="secondary"
+                v-model="subCatList"
+                :options="subCategoryData"
+                option-value="TICKET_SUB_CATEGORY_ID"
+                option-label="TICKET_SUB_CATEGORY_DESC"
                 emit-value
                 map-options
                 label="Select Subcategory"
@@ -53,9 +57,10 @@
           </div>
 
           <!-- Hide entire row if any category besides hardware is selected -->
-          <div class="row-inline flex-direction-down row q-mt-md row-custom">
+          <div v-if="categoryModel === hardwCatId.TICKET_CATEGORY_ID && subCatList !== null" class="row-inline flex-direction-down row q-mt-md row-custom">
             <div class="col-4">
               <q-input
+                v-model="assetTagModel"
                 class="new-request-input"
                 label="Asset Tag"
                 color="secondary"
@@ -78,6 +83,7 @@
             <div class="col">
               <div>
                 <q-input
+                  v-model="assetMake"
                   class="new-request-input"
                   label="Asset Make"
                   color="secondary"
@@ -98,6 +104,7 @@
             </div>
             <div class="col-4">
               <q-input
+                v-model="assetModel"
                 class="new-request-input"
                 label="Asset Model"
                 color="secondary"
@@ -147,6 +154,7 @@
           <div class="row-inline flex-direction-down row q-mt-lg">
             <div class="col">
               <q-input
+                v-model="subjectModel"
                 class="new-request-subject"
                 label="Subject"
                 color="secondary"
@@ -183,7 +191,13 @@
                   </q-tooltip>
                 </q-icon>
               </q-item-label>
-              <q-input clearable outlined type="textarea" color="secondary" />
+              <q-input
+                v-model="textareaModel"
+                clearable
+                outlined
+                type="textarea"
+                color="secondary"
+              />
             </div>
           </div>
           <div class="row-inline flex-direction-down row q-mt-lg">
@@ -225,6 +239,7 @@
               @click="confirmCancel"
             />
             <q-btn
+              @click="saveRequest(userId)"
               class="q-ml-xl"
               color="secondary"
               no-caps
@@ -288,8 +303,8 @@ export default {
       textareaModel: ref(null),
       subjectModel: ref(null),
       assetTagModel: ref(null),
-      deviceMake: ref(null),
-      deviceModel: ref(null),
+      assetMake: ref(null),
+      assetModel: ref(null),
       subCatList: ref(null),
       dense: ref(true),
       denseOpts: ref(true),
@@ -313,17 +328,17 @@ export default {
 
         // if the category is hardware and if we have a device make, store it into this variable
         // otherwise device make will be null
-        let deviceMake = null;
-        if (this.categoryModel == hardwareCategoryId && this.deviceMake !== null) {
-          deviceMake = this.deviceMake;
+        let assetMake = null;
+        if (this.categoryModel == hardwareCategoryId && this.assetMake !== null) {
+          assetMake = this.assetMake;
         }
 
 
         // if the category is hardware and if we have a device model, store it into this variable
         // otherwise device model will be null
-        let deviceModel = null;
-        if (this.categoryModel == hardwareCategoryId && this.deviceModel !== null) {
-          deviceModel = this.deviceModel;
+        let assetModel = null;
+        if (this.categoryModel == hardwareCategoryId && this.assetModel !== null) {
+          assetModel = this.assetModel;
         }
 
         // today's date in ISO format - which is the same format we will save in the database
@@ -333,8 +348,8 @@ export default {
         const supportticket = {
           SUPPORT_TICKET_SUBJECT: this.subjectModel, // subject
           SUPPORT_TICKET_NOTE: this.textareaModel, // description
-          DEVICE_MAKE: deviceMake,
-          DEVICE_MODEL: deviceModel, 
+          DEVICE_MAKE: assetMake,
+          DEVICE_MODEL: assetModel, 
           SUPPORT_TICKET_TIMELINE: null,
           SUPPORT_TICKET_DATE_CREATED: dateCreated,
           SUPPORT_TICKET_RESOLUTION_TIME: null,
