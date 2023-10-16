@@ -58,6 +58,16 @@ const supportTicketByCatPerUser = async (req, res, next) => {
     }
 }
 
+const supportTicketPerSupport = async (req, res, next) => {
+    try {
+        const ticketsPerSupport = await supportTicketData.getTicketCountPerSupport();
+        res.send(ticketsPerSupport);
+        console.log(ticketsPerSupport);
+    } catch (error) {
+        res.status(400).send(error.message);
+    }
+}
+
 const insertSupportTicket = async (req, res, next) => {
     try {
         const data = req.body;
@@ -97,6 +107,7 @@ module.exports = {
    getSingleTicket,
    supportTicketByCat,
    supportTicketByCatPerUser,
+   supportTicketPerSupport,
    insertSupportTicket,
    updateSupportTicket,
    delSupportTicket
