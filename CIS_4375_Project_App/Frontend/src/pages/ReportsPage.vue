@@ -5,20 +5,28 @@
       <div class="col-md-4">
         <q-card class="shadow-up-10" style="height: 150px;">
           <q-card-section class="q-ml-xl">
-              <div v-if="userRole != 'Staff'" class="text-h3 text-bold q-mt-md">{{ ticketCount }}</div>
+              <div v-if="userRole != 'Staff'" class="text-h3 text-bold q-mt-md">{{ totalTicketCount }}</div>
               <div v-else class="text-h3 text-bold q-mt-md">{{ userTicketCount }}</div>
               <div class="text-subtitle3 text-bold" style="color: #626262;">Total Number Of Tickets</div>
           </q-card-section>
         </q-card>
       </div>
       <div class="col-md-4">
-        <q-card class="shadow-up-10 fit">
-          Total Number Of Requests
+        <q-card class="shadow-up-10" style="height: 150px;">
+          <q-card-section class="q-ml-xl">
+              <div v-if="userRole != 'Staff'" class="text-h3 text-bold q-mt-md">{{ totalOpenTickets }}</div>
+              <div v-else class="text-h3 text-bold q-mt-md">{{ userOpenTickets }}</div>
+              <div class="text-subtitle3 text-bold" style="color: #626262;">Open Tickets</div>
+          </q-card-section>
         </q-card>
       </div>
       <div class="col-md-4">
-        <q-card class="shadow-up-10 fit">
-          Total Number Of Requests
+        <q-card class="shadow-up-10" style="height: 150px;">
+          <q-card-section class="q-ml-xl">
+              <div v-if="userRole != 'Staff'" class="text-h3 text-bold q-mt-md">{{ totalClosedTickets }}</div>
+              <div v-else class="text-h3 text-bold q-mt-md">{{ userClosedTickets }}</div>
+              <div class="text-subtitle3 text-bold" style="color: #626262;">Completed Tickets</div>
+          </q-card-section>
         </q-card>
       </div>
     </div>
@@ -36,18 +44,23 @@
           </div>
           <div v-else>
             <pieChart
-              v-if="pieLoading && userRole != 'Staff'"
-              :series="pieSeries"
-              :options="chartOptions"
+              v-if="showPieChart"
+              :series="userRole !== 'Staff' ? pieSeries : userPieSeries"
+              :options="userRole !== 'Staff' ? chartOptions : userChartOptions"
             >
             </pieChart>
-            <pieChart
-              v-else
-              :series="userPieSeries"
-              :options="userChartOptions"
-            >
-            </pieChart>
+            <div v-else class="text-center"> 
+              <p class="text-h6">User has no tickets.</p>
+            </div>
           </div>
+        </q-card>
+      </div>
+    </div>
+
+    <div class="row" style="margin-top: 20px;">
+      <div class="col-md-12">
+        <q-card class="shadow-up-9">
+          <barChart />
         </q-card>
       </div>
     </div>
@@ -94,8 +107,12 @@ export default {
       },
       pieLoading: false,
       visible: true,
-      ticketCount: '',
+      totalTicketCount: '',
       userTicketCount: '',
+      totalOpenTickets: '',
+      userOpenTickets: '',
+      totalClosedTickets: '',
+      userClosedTickets: '',
     }
   },
 
@@ -104,9 +121,19 @@ export default {
       const allTickets = res.data;
 
       const userTickets = allTickets.filter(ticket => ticket.END_USER_ID === this.userID);
+      const openTickets = allTickets.filter(ticket => ticket.SUPPORT_TICKET_STATUS_ID === 1);
+      const openTicketsByUser = allTickets.filter(ticket => ticket.SUPPORT_TICKET_STATUS_ID === 1 
+        && ticket.END_USER_ID === this.userID);
+      const closedTickets = allTickets.filter(ticket => ticket.SUPPORT_TICKET_STATUS_ID === 3);
+      const closedTicketsByUser = allTickets.filter(ticket => ticket.SUPPORT_TICKET_STATUS_ID === 3 
+        && ticket.END_USER_ID === this.userID);
 
-      this.ticketCount = allTickets.length;
+      this.totalTicketCount = allTickets.length;
       this.userTicketCount = userTickets.length;
+      this.totalOpenTickets = openTickets.length;
+      this.userOpenTickets = openTicketsByUser.length;
+      this.totalClosedTickets = closedTickets.length;
+      this.userClosedTickets = closedTicketsByUser.length;
     })
 
   },
@@ -165,7 +192,14 @@ export default {
   },
 
   computed: {
-    ...mapGetters('auth', ['userID', 'userRole'])
+    ...mapGetters('auth', ['userID', 'userRole']),
+    showPieChart() {
+      if (this.userRole !== 'Staff') {
+        return this.pieSeries.length > 0;
+      } else {
+        return this.userPieSeries.some(value => value !== 0);
+      }
+    },
   }
 
 }
