@@ -10,7 +10,6 @@ const getAllEndUsers= async (req, res, next) => {
 
         const endUsersList = await endUserData.getEndUsers();
         res.send(endUsersList);        
-        console.log(endUsersList)
     } catch (error) {
         res.status(400).send(error.message);
     }
