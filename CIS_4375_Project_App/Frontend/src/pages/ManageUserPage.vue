@@ -23,7 +23,13 @@
                                         <q-btn dense round flat @click="editRow(props)" icon="edit"
                                             style="color: #ad0000;"></q-btn>
                                     </q-td>
-                        </template>
+                                </template>
+                                <template v-slot:body-cell-delactions="props">
+                                    <q-td :props="props">
+                                        <q-btn dense round flat @click="deleteRow(props)" icon="delete"
+                                            style="color: #ad0000;"></q-btn>
+                                    </q-td>
+                                </template>
                     </q-table>
 
                     <!-- Only valid users are able to select this role-->
@@ -57,8 +63,10 @@ export default {
             {name: 'Last Name', label: 'Last Name', field: 'END_USER_LAST_NAME', align: 'left'},
             {name: 'Email', label: 'Email', field: 'END_USER_EMAIL', align: 'left'},
             {name: 'Role', label: 'Role', field: 'USER_ROLE_NAME', align: 'left'},
-            { name: "status", align: "center", label: "Status", field: "ACTIVE_STATUS_DESC", sortable: true},
-            { name: 'actions', label: 'Edit', field: '', align: 'left' },
+            {name: "status", align: "center", label: "Status", field: "ACTIVE_STATUS_DESC", sortable: true},
+            {name: 'actions', label: 'Edit', field: '', align: 'left' },
+            {name: 'delactions', label: 'Delete', field: '', align: 'left' },
+            
         ],
         }
     },
@@ -66,10 +74,16 @@ export default {
         createNewUser () {
             this.$router.push('/createUser');
         },
-        editItem(item) {
-            fd.editedIndex = fd.currencyData.findIndex((v, i) =>v.__index === item.__index)
-            fd.editedItem = Object.assign({}, item);
-            fd.show_dialog = true;
+        editRow(item) {
+            console.log(item.row)
+            console.log("Edit")
+            //fd.editedIndex = fd.currencyData.findIndex((v, i) =>v.__index === item.__index)
+            //fd.editedItem = Object.assign({}, item);
+            //fd.show_dialog = true;
+        },
+        deleteRow(item){
+            console.log(item.row)
+            console.log("Delete")
         }
     },
 
