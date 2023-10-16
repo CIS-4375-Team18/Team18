@@ -3,7 +3,7 @@
   <q-page padding> 
     <div class="row q-col-gutter-lg">
       <div class="col-md-4">
-        <q-card class="shadow-up-10" style="height: 150px;">
+        <q-card class="shadow-up-10" style="height: 130px;">
           <q-card-section class="q-ml-xl">
               <div v-if="userRole != 'Staff'" class="text-h3 text-bold q-mt-md">{{ totalTicketCount }}</div>
               <div v-else class="text-h3 text-bold q-mt-md">{{ userTicketCount }}</div>
@@ -12,7 +12,7 @@
         </q-card>
       </div>
       <div class="col-md-4">
-        <q-card class="shadow-up-10" style="height: 150px;">
+        <q-card class="shadow-up-10" style="height: 130px;">
           <q-card-section class="q-ml-xl">
               <div v-if="userRole != 'Staff'" class="text-h3 text-bold q-mt-md">{{ totalOpenTickets }}</div>
               <div v-else class="text-h3 text-bold q-mt-md">{{ userOpenTickets }}</div>
@@ -21,7 +21,7 @@
         </q-card>
       </div>
       <div class="col-md-4">
-        <q-card class="shadow-up-10" style="height: 150px;">
+        <q-card class="shadow-up-10" style="height: 130px;">
           <q-card-section class="q-ml-xl">
               <div v-if="userRole != 'Staff'" class="text-h3 text-bold q-mt-md">{{ totalClosedTickets }}</div>
               <div v-else class="text-h3 text-bold q-mt-md">{{ userClosedTickets }}</div>
@@ -39,8 +39,8 @@
       </div>
       <div class="col-md-6 col-xs-12">
         <q-card class="fit shadow-up-9">
-          <div v-if="!pieLoading">
-            <q-inner-loading :showing="visible" size="100px" color="primary" label="Please Wait..."></q-inner-loading>
+          <div v-if="!isPieLoading">
+            <q-inner-loading :showing="isVisible" size="100px" color="primary" label="Please Wait..."></q-inner-loading>
           </div>
           <div v-else>
             <pieChart
@@ -60,7 +60,10 @@
     <div class="row" style="margin-top: 20px;">
       <div class="col-md-12">
         <q-card class="shadow-up-9">
-          <barChart />
+          <lineChart
+            v-if="userRole != 'Staff'"
+          >
+          </lineChart>
         </q-card>
       </div>
     </div>
@@ -82,11 +85,16 @@ const pieChart = defineAsyncComponent(() =>
   import('components/charts/PieChart.vue')
 )
 
+const lineChart = defineAsyncComponent(() => 
+  import('components/charts/LineChart.vue')
+)
+
 export default {
 
   components: {
     barChart,
     pieChart,
+    lineChart,
   },
 
   data() {
@@ -105,8 +113,9 @@ export default {
           text: ''
         },
       },
-      pieLoading: false,
-      visible: true,
+
+      isPieLoading: false,
+      isVisible: true,
       totalTicketCount: '',
       userTicketCount: '',
       totalOpenTickets: '',
@@ -148,13 +157,13 @@ export default {
           this.pieSeries = filterData.map((sub) => sub.NUMBER_OF_TICKETS_BY_CAT)
           this.chartOptions.labels = filterData.map((sub) => sub.TICKET_CATEGORY_DESC)
           this.chartOptions.title.text = 'Tickets By Categories'
-          this.pieLoading = true
+          this.isPieLoading = true
 
           setTimeout(() => {
-            this.visible = false;
+            this.isVisible = false;
           }, 4000);
         } else {
-          this.visible = true;
+          this.isVisible = true;
         }
       } catch(err) {
         console.log(err)
@@ -168,7 +177,7 @@ export default {
 
         const filterData = res.data.filter(sub => sub.NUMBER_OF_TICKETS_BY_CAT >= 0)
         if (filterData.length > 0) {
-          this.userPieSeries = filterData.map((sub) => sub.NUMBER_OF_TICKETS_BY_CAT)
+          this.userPieSeries.data = filterData.map((sub) => sub.NUMBER_OF_TICKETS_BY_CAT)
           this.userChartOptions.labels = filterData.map((sub) => sub.TICKET_CATEGORY_DESC)
           this.userChartOptions.title.text = 'Tickets By Categories'
           this.pieLoading = true
