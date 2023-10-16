@@ -1,88 +1,244 @@
-
 <template>
-  <div class="q-pa-md q-gutter-sm" style="margin-left: 15PX; margin-right: 15PX;">
-    <q-card class="requests-card">
-      <q-card-section class="text-white" style="background-color: #af0000;">
-        <div class="text-h6 text-left">New Request</div>
-      </q-card-section>
-      <q-separator />
-      <div class="q-pa-md example-row-column-width">
+  <div class="q-pa-md">
+    <div class="q-gutter-y-md q-mr-lg q-ml-lg q-mt-md">
+      <q-card class="q-ma-lg">
+        <q-card-section class="text-white bg-secondary">
+          <div class="text-h6 text-left">Create New Support Ticket</div>
+        </q-card-section>
+        <q-separator />
 
-      <!-- Category Selection-->
-        <div class="row flex q-col-gutter-md">
-          <div class="col-md-3">
-            <p style="font-weight: bold; color: #666262; margin-bottom: 4px; min-width: 150px;">Select Category: </p>
-            <q-select filled stack-label :dense="dense" :options-dense="denseOpts" label="Category"
-              v-model="categoryModel" :options="categoryData" option-value="TICKET_CATEGORY_ID"
-              option-label="TICKET_CATEGORY_DESC" emit-value map-options />
+        <div class="q-pl-xl q-pr-xl q-pt-md q-pb-md">
+          <div class="row-inline row q-mt-md">
+            <div class="col-4">
+              <q-select
+                class="ticket-select"
+                transition-show="scale"
+                transition-hide="scale"
+                emit-value
+                label="Select Priority"
+                map-options
+                color="secondary"
+                v-model="PriorityList"
+                :options="priorityData"
+                option-value="TICKET_PRIORITY_ID"
+                option-label="TICKET_PRIORITY_DESC"
+              />
+            </div>
+            <div class="col-4">
+              <q-select
+                transition-show="scale"
+                transition-hide="scale"
+                class=" ticket-select"
+                color="secondary"
+                emit-value
+                map-options
+                label="Select Main Category"
+                v-model="categoryModel"
+                :options="categoryData"
+                option-value="TICKET_CATEGORY_ID"
+                option-label="TICKET_CATEGORY_DESC"
+              />
+            </div>
+            <div class="col-4">
+              <q-select
+                transition-show="scale"
+                transition-hide="scale"
+                class="ticket-select"
+                color="secondary"
+                emit-value
+                map-options
+                label="Select Subcategory"
+              />
+            </div>
           </div>
 
-          <!-- Priority Selection-->
-          <div class="col-4"></div>
-          <div class="col-md-3">
-            <p style="font-weight: bold; color: #666262; margin-bottom: 4px; min-width: 150px;">Select Priority: </p>
-            <q-select filled stack-label :dense="dense" :options-dense="denseOpts" label="Priority" v-model="PriorityList"
-              :options="priorityData" option-value="TICKET_PRIORITY_ID" option-label="TICKET_PRIORITY_DESC" emit-value
-              map-options />
+          <!-- Hide entire row if any category besides hardware is selected -->
+          <div class="row-inline flex-direction-down row q-mt-md row-custom">
+            <div class="col-4">
+              <q-input
+                class="new-request-input"
+                label="Asset Tag"
+                color="secondary"
+              >
+                <template v-slot:append>
+                  <q-icon
+                    :align="top"
+                    size="xs"
+                    class="q-mb-sm"
+                    name="help"
+                    color="secondary"
+                  >
+                    <q-tooltip>
+                      Unique identifier allocated to device
+                    </q-tooltip>
+                  </q-icon>
+                </template>
+              </q-input>
+            </div>
+            <div class="col">
+              <div>
+                <q-input
+                  class="new-request-input"
+                  label="Asset Make"
+                  color="secondary"
+                >
+                  <template v-slot:append>
+                    <q-icon
+                      :align="top"
+                      size="xs"
+                      class="q-mb-sm"
+                      name="help"
+                      color="secondary"
+                    >
+                      <q-tooltip> i.e., DELL, Acer, Lenovo, etc. </q-tooltip>
+                    </q-icon>
+                  </template>
+                </q-input>
+              </div>
+            </div>
+            <div class="col-4">
+              <q-input
+                class="new-request-input"
+                label="Asset Model"
+                color="secondary"
+              >
+                <template v-slot:append>
+                  <q-icon
+                    :align="top"
+                    size="xs"
+                    class="q-mb-sm"
+                    name="help"
+                    color="secondary"
+                  >
+                    <q-tooltip> i.e., G7-700 </q-tooltip>
+                  </q-icon>
+                </template>
+              </q-input>
+            </div>
+          </div>
+          <div class="row-inline flex-direction-down row q-mt-md row-custom">
+            <div class="col-4">
+              <div class="col-4">
+              <q-select
+                transition-show="scale"
+                transition-hide="scale"
+                class=" ticket-select"
+                color="secondary"
+                emit-value
+                map-options
+                label="Select Availability"
+
+              >
+              <template v-slot:append>
+                  <q-icon
+                    :align="top"
+                    size="xs"
+                    class="q-mb-sm"
+                    name="help"
+                    color="secondary"
+                  >
+                    <q-tooltip> Select period to indicate availbe time </q-tooltip>
+                  </q-icon>
+                </template>
+            </q-select>
+            </div>
+            </div>
+            </div>
+          <div class="row-inline flex-direction-down row q-mt-lg">
+            <div class="col">
+              <q-input
+                class="new-request-subject"
+                label="Subject"
+                color="secondary"
+              >
+                <template v-slot:append>
+                  <q-icon
+                    :align="top"
+                    size="xs"
+                    class="q-mb-sm"
+                    name="help"
+                    color="secondary"
+                  >
+                    <q-tooltip>
+                      Provide a sentence describing the issue
+                    </q-tooltip>
+                  </q-icon>
+                </template>
+              </q-input>
+            </div>
+          </div>
+          <div class="row-inline flex-direction-down row q-mt-lg">
+            <div class="col">
+              <q-item-label class="text-subtitle1 text-primary q-mb-sm"
+                >Description:
+                <q-icon
+                  :align="top"
+                  size="xs"
+                  class="q-mb-sm"
+                  name="help"
+                  color="secondary"
+                >
+                  <q-tooltip>
+                    Provide a detailed description of the issue
+                  </q-tooltip>
+                </q-icon>
+              </q-item-label>
+              <q-input clearable outlined type="textarea" color="secondary" />
+            </div>
+          </div>
+          <div class="row-inline flex-direction-down row q-mt-lg">
+            <div class="col">
+              <!-- Decide to use file uploader file picker depending on functionality -->
+              <!--
+              <q-uploader
+                class="new-req-uploader"
+                url=""
+                label="Upload Image"
+                color="secondary"
+                text-color="white"
+              />
+              -->
+              <q-file
+              class="new-req-uploader"
+                :dense="dense"
+                v-model="model"
+                filled
+                bg-color="transparent"
+                label="Attach image"
+                clearable
+                color="secondary"
+              >
+                <template v-slot:prepend>
+                  <q-icon name="attach_file" color="secondary" />
+                </template>
+              </q-file>
+            </div>
+          </div>
+
+          <div class="col q-mb-md q-mt-lg" align="right">
+            <q-btn
+              color="accent"
+              text-color="secondary"
+              no-caps
+              label="Cancel"
+              type="submit"
+              @click="confirmCancel"
+            />
+            <q-btn
+              class="q-ml-xl"
+              color="secondary"
+              no-caps
+              label="Submit"
+              type="submit"
+            />
           </div>
         </div>
-
-        <!-- If Hardware category is selected these additional fields appear  -->
-        <div v-if="categoryModel === hardwCatId.TICKET_CATEGORY_ID" class="row flex " style="margin-top: 20px;">
-          <div class="col-md-3">
-            <p style="font-weight: bold; color: #666262; margin-bottom: 4px; min-width: 150px;">Select Sub Category: </p>
-            <q-select filled stack-label :dense="dense" :options-dense="denseOpts" label="Sub Category" v-model="subCatList"
-              :options="subCategoryData" option-value="TICKET_SUB_CATEGORY_ID" option-label="TICKET_SUB_CATEGORY_DESC" emit-value
-              map-options />
-          </div>
-          <div class="col-4"></div>
-
-          <!--Asset Tag Input-->
-          <div class="col-md-3" style="margin-left: 10px;">
-            <p style="font-weight: bold; color: #666262; margin-bottom: 4px; min-width: 150px;">Asset Tag: </p>
-            <q-input filled   v-model="assetTagModel" :dense="dense" :options-dense="denseOpts" />
-          </div>
-        </div>
-        <!-- If sub category is selected these additional fields appear  -->
-        <div v-if="categoryModel === hardwCatId.TICKET_CATEGORY_ID && subCatList !== null" class="row flex " style="margin-top: 20px;">
-          <!-- Device Make -->
-          <div class="col-md-3">
-            <p style="font-weight: bold; color: #666262; margin-bottom: 4px; min-width: 150px;">Device Make: </p>
-            <q-input filled   v-model="deviceMake" :dense="dense" :options-dense="denseOpts" />
-          </div>
-          <div class="col-4"></div>
-          <!-- Device Model -->
-          <div class="col-md-3" style="margin-left: 10px;">
-            <p style="font-weight: bold; color: #666262; margin-bottom: 4px; min-width: 150px;">Device Model: </p>
-            <q-input filled   v-model="deviceModel" :dense="dense" :options-dense="denseOpts" />
-          </div>
-        </div>
-        <div class="row flex " style="margin-top: 20px;">
-          <p style="font-weight: bold; color: #666262; margin-bottom: 4px;">Subject: </p>
-        </div>
-        <q-input filled v-model="subjectModel" :dense="dense" :options-dense="denseOpts" />
-        <div class="row flex " style="margin-top: 20px;">
-          <p style="font-weight: bold; color: #666262; margin-bottom: 4px;">Description: </p>
-        </div>
-        <q-input v-model="textareaModel" filled clearable type="textarea" :shadow-text="textareaShadowText"
-          @keydown="processTextareaFill" @focus="processTextareaFill" />
-      </div>
-      <div class="row flex " style="margin: 20px;">
-        <q-btn icon="attach_file" text-color="black" label="Attach file"
-          style="margin-bottom: 20px; outline-color: #e6e6e6;" />
-      </div>
-      <div class="row flex justify-center" style="margin: 20px; align-content: center;">
-        <q-btn @click="saveRequest(userId)" outline icon="send" text-color="primary" label="Submit"
-          style="margin-bottom: 30px; margin-right: 40px;  min-width: 130px; background-color: #03521c;" />
-        <q-btn @click="confirmCancel" outline icon="cancel"  color="negative" text-color="secondary" label="Cancel"
-          style="margin-bottom: 30px; margin-left: 40px; min-width: 130px;" />
-
-      </div>
-    </q-card>
+      </q-card>
+    </div>
   </div>
 </template>
+
 <script>
-//import axios from 'src/boot/axios'
 import { ref } from 'vue'
 import { mapGetters } from 'vuex'
 import { Dialog } from 'quasar'
@@ -136,10 +292,10 @@ export default {
       deviceModel: ref(null),
       subCatList: ref(null),
       dense: ref(true),
-      denseOpts: ref(true)
-    }
+      denseOpts: ref(true),
+      model: ref(null),
+    };
   },
-
   methods: {
     //Get ID of category Type Hardware
     findHardwareId() {
@@ -217,13 +373,13 @@ export default {
     },
     confirmCancel() {
       Dialog.create({
-        title: 'Cancel Ticket Creation',
-        message: 'Are you sure you want to cancel ticket creation?',
+        title: "Cancel Ticket Creation",
+        message: "Are you sure you want to cancel ticket creation?",
         cancel: true,
-        persistent: true
+        persistent: true,
       })
         .onOk(() => {
-          this.$router.replace('/')
+          this.$router.replace("/");
         })
         .onCancel(() => {
           // Do nothing
@@ -233,5 +389,28 @@ export default {
   computed: {
     ...mapGetters('auth', ['userId']),
   }
-}
+};
 </script>
+<style scoped>
+.text-subtitle1 {
+  font-weight: bold;
+}
+.text-subtitle2 {
+  color: primary;
+}
+.category-select {
+  width: 50%;
+}
+.ticket-select {
+  width: 50%;
+}
+.new-request-input {
+  width: 50%;
+}
+.new-req-uploader {
+  max-width: 40%;
+}
+.new-req-uploader{
+  max-width: 25%;
+}
+</style>
