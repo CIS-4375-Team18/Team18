@@ -133,9 +133,17 @@ export default {
                 if (~index){
                     this.userData.splice(index, 1)//finds in local table and deletes
                 }
+
+                if (res.status === 200) {
+                        this.$q.notify({ color: 'positive', message: 'User deleted successfully' });
+                        this.$router.push('/users');
+                    } else {
+                        this.$q.notify({ color: 'negative', message: 'Error while deleting' });
+                    }
             });
 
             this.rerenderTable;//rerenders table
+
         },
     },
 
