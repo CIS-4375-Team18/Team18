@@ -9,7 +9,7 @@
             <div style="margin-left: 2%;">
                 <div class="q-pa-md" style="margin: 0 auto;">
                     <!-- Users Table -->
-                    <q-table title="Users" :key="tableKey" color="secondary" :align="left" :loading="loading "
+                    <q-table title="Users" v-if="userRole==='System Administrator' || userRole==='IT Teacher'" :key="tableKey" color="secondary" :align="left" :loading="loading "
                         :rows="userData" :columns="userColumns" style="width: 98%;"> <!-- Puts table with user data -->
                         <template #body-cell-status="props">
                                     <q-td :props="props">
@@ -18,13 +18,13 @@
                                                 props.row.ACTIVE_STATUS_DESC }}</q-chip>
                                     </q-td>
                                 </template>
-                                <template v-slot:body-cell-actions="props">
+                                <template v-if="userRole==='System Administrator' || userRole==='IT Teacher'" v-slot:body-cell-actions="props">
                                     <q-td :props="props">
                                         <q-btn dense round flat @click="editItem(props)" icon="edit"
                                             style="color: #ad0000;"></q-btn>
                                     </q-td>
                                 </template>
-                                <template v-slot:body-cell-delactions="props"> <!-- On click will bring out dialog box to confirm deletion-->
+                                <template v-if="userRole==='System Administrator' || userRole==='IT Teacher'" v-slot:body-cell-delactions="props" > <!-- On click will bring out dialog box to confirm deletion-->
                                     <q-td :props="props">
                                         <q-btn dense round flat @click=deleteUserDialog(props) icon="delete"
                                             style="color: #ad0000;"></q-btn>
@@ -112,7 +112,8 @@ export default {
         editItem(item) {
             console.log(item.row)
             console.log("Edit")
-            //fd.editedIndex = fd.currencyData.findIndex((v, i) =>v.__index === item.__index)
+            console.log(fd)
+            fd.editedIndex = fd.currencyData.findIndex((v, i) =>v.__index === item.__index)
             //fd.editedItem = Object.assign({}, item);
             //fd.show_dialog = true;
         },
