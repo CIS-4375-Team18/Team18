@@ -49,8 +49,15 @@
               :options="userRole !== 'Staff' ? chartOptions : userChartOptions"
             >
             </pieChart>
-            <div v-else class="text-center"> 
-              <p class="text-h6">User has no tickets.</p>
+            <div v-else class="q-pa-md">
+              <div class="q-mb-md text-center">
+                <q-flex justify="center">
+                  <q-space />
+                  <q-icon name="warning" size="2em" color="warning" class="q-mr-md" />
+                  <p class="text-h6">User Has No Data to Be Shown.</p>
+                  <q-space />
+                </q-flex>
+              </div>
             </div>
           </div>
         </q-card>
@@ -177,10 +184,12 @@ export default {
 
         const filterData = res.data.filter(sub => sub.NUMBER_OF_TICKETS_BY_CAT >= 0)
         if (filterData.length > 0) {
-          this.userPieSeries.data = filterData.map((sub) => sub.NUMBER_OF_TICKETS_BY_CAT)
+          this.userPieSeries = filterData.map((sub) => sub.NUMBER_OF_TICKETS_BY_CAT)
           this.userChartOptions.labels = filterData.map((sub) => sub.TICKET_CATEGORY_DESC)
           this.userChartOptions.title.text = 'Tickets By Categories'
-          this.pieLoading = true
+          this.pieLoading = false
+          console.log(this.userPieSeries.data)
+          console.log(this.userChartOptions.labels)
 
           setTimeout(() => {
             this.visible = false;
