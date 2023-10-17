@@ -70,7 +70,7 @@
                     :align="top"
                     size="xs"
                     class="q-mb-sm"
-                    name="help"
+                    name="fa-regular fa-circle-question"
                     color="secondary"
                   >
                     <q-tooltip>
@@ -93,7 +93,7 @@
                       :align="top"
                       size="xs"
                       class="q-mb-sm"
-                      name="help"
+                      name="fa-regular fa-circle-question"
                       color="secondary"
                     >
                       <q-tooltip> i.e., DELL, Acer, Lenovo, etc. </q-tooltip>
@@ -114,7 +114,7 @@
                     :align="top"
                     size="xs"
                     class="q-mb-sm"
-                    name="help"
+                    name="fa-regular fa-circle-question"
                     color="secondary"
                   >
                     <q-tooltip> i.e., G7-700 </q-tooltip>
@@ -141,7 +141,7 @@
                     :align="top"
                     size="xs"
                     class="q-mb-sm"
-                    name="help"
+                    name="fa-regular fa-circle-question"
                     color="secondary"
                   >
                     <q-tooltip> Select period to indicate availbe time </q-tooltip>
@@ -164,7 +164,7 @@
                     :align="top"
                     size="xs"
                     class="q-mb-sm"
-                    name="help"
+                    name="fa-regular fa-circle-question"
                     color="secondary"
                   >
                     <q-tooltip>
@@ -183,7 +183,7 @@
                   :align="top"
                   size="xs"
                   class="q-mb-sm"
-                  name="help"
+                  name="fa-regular fa-circle-question"
                   color="secondary"
                 >
                   <q-tooltip>
