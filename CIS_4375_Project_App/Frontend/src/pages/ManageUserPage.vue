@@ -20,7 +20,7 @@
                                 </template>
                                 <template v-if="userRole==='System Administrator' || userRole==='IT Teacher'" v-slot:body-cell-actions="props">
                                     <q-td :props="props">
-                                        <q-btn dense round flat @click="editItem(props)" icon="edit"
+                                        <q-btn dense round flat @click="editUserDialog(props)" icon="edit"
                                             style="color: #ad0000;"></q-btn>
                                     </q-td>
                                 </template>
@@ -38,7 +38,34 @@
                         style="margin-top: 30px ; min-width: 140px; background-color: #03521c;"
                     />
                 </div>
-                <template>
+                <template> <!-- Edit user dialog box-->
+                    <q-dialog v-model="editItemDial" persistent>
+                        <q-card style="min-width: 350px;">
+                        <q-card-section class="row items-center" style="background-color: #af0000">
+                            <div class="text-h6" style="color: white;">Edit User</div>
+                        </q-card-section>
+                        <q-card-section>
+                        <q-avatar color="white" text-color="white">
+                            <img src="https://cdn.quasar.dev/img/boy-avatar.png">
+                        </q-avatar>
+                        <q-input label="First Name: " dense v-model="itemFirstName"></q-input>
+                        <q-input label="Last Name: " dense v-model="itemLastName"></q-input>
+                        <q-input label="Email" dense v-model="itemEmail"></q-input>
+                        <q-input label="Role: " dense v-model="itemRole"></q-input>
+                        <q-input label="Status: " dense v-model="itemStatus"></q-input>
+
+                        </q-card-section>
+
+                        <q-card-actions align="right">
+                        <q-btn flat label="Cancel" color="primary" v-close-popup />
+                        <!-- On confirmation will execute deletion-->
+                        <q-btn flat label="Confirm" color="primary" @click="editUser(this.itemID)" v-close-popup />
+                        </q-card-actions>
+                    </q-card>
+                    </q-dialog>
+                </template>
+
+                <template> <!-- Delete User Dialog-->
                     <q-dialog v-model="deleteItemDial" persistent>
                         <q-card style="min-width: 350px;">
                         <q-card-section class="row items-center" style="background-color: #af0000">
@@ -71,7 +98,8 @@ import { ref } from 'vue';
 export default {
     setup(){
         return{
-        deleteItemDial: ref(false),
+            editItemDial:ref(false),
+            deleteItemDial: ref(false),
         }
     },
     beforeMount() {
@@ -79,9 +107,14 @@ export default {
     },
     data () {
         return {
-            itemID: "",
-            itemFirstName: "",
-            itemLastName: "",
+            editedItem:{
+                itemID: "",
+                itemFirstName: "",
+                itemLastName: "",
+                itemEmail:"",
+                itemRole:"",
+                itemStatus:"",
+            },
             userData: [],
 
             userColumns : [ //Table template
@@ -121,12 +154,21 @@ export default {
             this.tableKey +=1;
             console.log("rendered table")
         },
+        editUserDialog(item){
+            console.log(item.row)
+            this.editItemDial = true;
+            this.itemID = item.row.END_USER_ID;
+            this.itemFirstName = item.row.END_USER_FIRST_NAME;
+            this.itemLastName = item.row.END_USER_LAST_NAME;
+            this.itemEmail = item.row.END_USER_EMAIL;
+            this.itemRole = item.row.USER_ROLE_NAME;
+            this.itemStatus = item.row.ACTIVE_STATUS_DESC;
+        },
         deleteUserDialog(item){ //saves needed information into variables
             this.deleteItemDial = true;
             this.itemID = item.row.END_USER_ID;
             this.itemFirstName = item.row.END_USER_FIRST_NAME;
             this.itemLastName = item.row.END_USER_LAST_NAME;
-            this.rerenderTable();
         },
         async deleteUser(userID){ //executes delete
             axios.delete(`http://localhost:8001/api/enduser/${userID}`).then((res) => { //deletes from database
