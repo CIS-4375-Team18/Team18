@@ -239,7 +239,7 @@
               @click="confirmCancel"
             />
             <q-btn
-              @click="saveRequest(userId)"
+              @click="saveRequest(userID)"
               class="q-ml-xl"
               color="secondary"
               no-caps
@@ -316,7 +316,7 @@ export default {
     findHardwareId() {
       this.hardwCatId = this.categoryData.find(o => o.TICKET_CATEGORY_DESC === 'HARDWARE');
     },
-    async saveRequest(userId) {
+    async saveRequest(userID) {
       try {
         const hardwareCategoryId = this.hardwCatId.TICKET_CATEGORY_ID;
         // if the category is hardware and if we have a subcategory, store it into this variable
