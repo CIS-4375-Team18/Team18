@@ -38,28 +38,40 @@
                         style="margin-top: 30px ; min-width: 140px; background-color: #03521c;"
                     />
                 </div>
-                <template> <!-- Edit user dialog box-->
+                <template> <!-- Edit user dialog box, except password-->
                     <q-dialog v-model="editItemDial" persistent>
                         <q-card style="min-width: 350px;">
                         <q-card-section class="row items-center" style="background-color: #af0000">
                             <div class="text-h6" style="color: white;">Edit User</div>
                         </q-card-section>
-                        <q-card-section>
+
+                        <q-card-section> <!-- Show user information that can be edited-->
                         <q-avatar color="white" text-color="white">
                             <img src="https://cdn.quasar.dev/img/boy-avatar.png">
                         </q-avatar>
-                        <q-input label="First Name: " dense v-model="itemFirstName"></q-input>
-                        <q-input label="Last Name: " dense v-model="itemLastName"></q-input>
-                        <q-input label="Email" dense v-model="itemEmail"></q-input>
-                        <q-input label="Role: " dense v-model="itemRole"></q-input>
-                        <q-input label="Status: " dense v-model="itemStatus"></q-input>
+                        <q-input label="First Name: " dense v-model="editedItem.itemFirstName"></q-input>
+                        <q-input label="Last Name: " dense v-model="editedItem.itemLastName"></q-input>
+                        <q-input label="Email" dense v-model="editedItem.itemEmail"></q-input>
+                        <q-input label="Role: " dense v-model="editedItem.itemRole"></q-input>
+                        </q-card-section>
 
+                        <q-card-section> <!-- Toggle active and inactive Status of User-->
+                            <q-toggle label="Status"
+                                v-model="editedItem.itemStatus"
+                                checked-icon="check"
+                                color="green"
+                                unchecked-icon="clear"
+                                left-label
+                                false-value="INACTIVE"
+                                true-value="ACTIVE"
+                            />
+                            {{ editedItem.itemStatus }}
                         </q-card-section>
 
                         <q-card-actions align="right">
                         <q-btn flat label="Cancel" color="primary" v-close-popup />
                         <!-- On confirmation will execute deletion-->
-                        <q-btn flat label="Confirm" color="primary" @click="editUser(this.itemID)" v-close-popup />
+                        <q-btn flat label="Confirm" color="primary" @click="editUser(editedItem)" v-close-popup />
                         </q-card-actions>
                     </q-card>
                     </q-dialog>
@@ -114,6 +126,7 @@ export default {
                 itemEmail:"",
                 itemRole:"",
                 itemStatus:"",
+                itemStatusID: "",
             },
             userData: [],
 
@@ -142,27 +155,26 @@ export default {
         createNewUser() {
             this.$router.push('/createUser');
         },
-        editItem(item) {
-            console.log(item.row)
-            console.log("Edit")
-            console.log(fd)
-            fd.editedIndex = fd.currencyData.findIndex((v, i) =>v.__index === item.__index)
-            //fd.editedItem = Object.assign({}, item);
-            //fd.show_dialog = true;
-        },
         rerenderTable(){
             this.tableKey +=1;
             console.log("rendered table")
         },
-        editUserDialog(item){
-            console.log(item.row)
+        editUserDialog(item){ //Puts values into appropriate fields in dialog box
             this.editItemDial = true;
-            this.itemID = item.row.END_USER_ID;
-            this.itemFirstName = item.row.END_USER_FIRST_NAME;
-            this.itemLastName = item.row.END_USER_LAST_NAME;
-            this.itemEmail = item.row.END_USER_EMAIL;
-            this.itemRole = item.row.USER_ROLE_NAME;
-            this.itemStatus = item.row.ACTIVE_STATUS_DESC;
+
+            this.editedItem.itemID = item.row.END_USER_ID;
+            this.editedItem.itemFirstName = item.row.END_USER_FIRST_NAME;
+            this.editedItem.itemLastName = item.row.END_USER_LAST_NAME;
+            this.editedItem.itemEmail = item.row.END_USER_EMAIL;
+            this.editedItem.itemRole = item.row.USER_ROLE_NAME;
+            this.editedItem.itemStatus = item.row.ACTIVE_STATUS_DESC; //Different, so that toggle recognized initial position
+            this.editedItem.itemStatusID = item.row.ACTIVE_STATUS_ID;
+
+            console.log(this.editedItem.itemStatus);
+            
+        },
+        editUser(itemData) {
+            console.log(itemData)
         },
         deleteUserDialog(item){ //saves needed information into variables
             this.deleteItemDial = true;
