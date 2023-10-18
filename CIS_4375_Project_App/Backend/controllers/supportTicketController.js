@@ -68,6 +68,16 @@ const supportTicketPerSupport = async (req, res, next) => {
     }
 }
 
+const ticketsClosedCount = async (req, res, next) => {
+    try {
+        const closedTickets = await supportTicketData.getResolvedTicketCountPerMonth();
+        res.send(closedTickets);
+        console.log(closedTickets);
+    } catch (error) {
+        res.status(400).send(error.message);
+    }
+}
+
 const insertSupportTicket = async (req, res, next) => {
     try {
         const data = req.body;
@@ -108,6 +118,7 @@ module.exports = {
    supportTicketByCat,
    supportTicketByCatPerUser,
    supportTicketPerSupport,
+   ticketsClosedCount,
    insertSupportTicket,
    updateSupportTicket,
    delSupportTicket

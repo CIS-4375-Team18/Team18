@@ -162,6 +162,24 @@ const getTicketCountPerSupport = async () => {
     }
 }
 
+const getResolvedTicketCountPerMonth = async () => {
+    try {
+        let pool = await sql.connect(config.sql);
+        const closedTicketPerMonth = "SELECT FORMAT(ST.RESOLUTION_DATE, 'MM-yyyy') AS MONTHYEAR, "+
+            "COUNT(ST.SUPPORT_TICKET_NOTE) AS CLOSED_TICKETS_COUNT "+
+            "FROM dbo.SUPPORT_TICKET AS ST "+
+            "JOIN dbo.SUPPORT_TICKET_STATUS AS STS "+
+            "ON ST.SUPPORT_TICKET_STATUS_ID = STS.SUPPORT_TICKET_STATUS_ID "+
+            "WHERE STS.SUPPORT_TICKET_STATUS_DESC = 'CLOSED' "+
+            "GROUP BY FORMAT(ST.RESOLUTION_DATE, 'MM-yyyy') "+
+            "ORDER BY MONTHYEAR"
+        const closedTicketsCount = await pool.request().query(closedTicketPerMonth);
+        return closedTicketsCount.recordset;
+    } catch(error) {
+        return error.message;
+    }
+}
+
 const insertNew = async (supportTicketData) => {
     try {
         let pool = await sql.connect(config.sql);
@@ -288,6 +306,7 @@ module.exports = {
    getTicketCountByCat,
    getTicketCountByCatPerUser,
    getTicketCountPerSupport,
+   getResolvedTicketCountPerMonth,
    update,
    insertNew,
    del
