@@ -12,6 +12,13 @@
                         <div class="q-pa-md">
                             <q-table title="Requests" color="secondary" :align="left" :loading="loading"
                                 :rows="supporttickets" :columns="supportticketsColumns" style="width: 80%;">
+                                <template #body-cell-status="props">
+                                    <q-td :props="props">
+                                        <q-chip :color="props.row.SUPPORT_TICKET_STATUS_ID === 1 ? 'green' : 'red'"
+                                            text-color="white" dense class="text-weight-bolder" square>
+                                            {{ props.row.SUPPORT_TICKET_STATUS_ID === 1 ? 'ACTIVE' : 'INACTIVE'}}</q-chip>
+                                    </q-td>
+                                </template>
                             </q-table>
                         </div>
                     </q-tab-panel>
@@ -44,6 +51,7 @@ export default {
         const supportticketsColumns = [
             { name: 'subject', label: 'Subject', field: 'SUPPORT_TICKET_SUBJECT', align: 'left' },
             { name: "creationDate", align: "left", label: "Creation Date", field: "SUPPORT_TICKET_DATE_CREATED", sortable: true, format: (val) => `${new Date(val)}` },
+            { name: "status", align: "center", label: "Status", field: "SUPPORT_TICKET_STATUS_ID", sortable: true },
         ];
         return {
             tab: ref('requests'),
