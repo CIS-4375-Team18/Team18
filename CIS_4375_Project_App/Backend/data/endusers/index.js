@@ -6,13 +6,15 @@ const bcrypt = require('bcrypt');
 
 
 const getEndUsers = async () => {
-
+    
     try {
         let pool = await sql.connect(config.sql);
-        const getAllQuery = "SELECT [END_USER_ID] ,[END_USER_FIRST_NAME],[END_USER_LAST_NAME] "+
-        " ,[END_USER_EMAIL], [USER_ROLE_NAME], [ACTIVE_STATUS_DESC], eu.[ACTIVE_STATUS_ID] FROM [dbo].[END_USER] AS eu" +
-        " JOIN [dbo].[USER_ROLE] AS ur ON eu.[USER_ROLE_ID] = ur.[USER_ROLE_ID] " +
-        " JOIN [dbo].[ACTIVE_STATUS] AS acs ON eu.[ACTIVE_STATUS_ID] = acs.[ACTIVE_STATUS_ID]" ;
+        const getAllQuery = 'SELECT [END_USER_ID], [END_USER_FIRST_NAME], [END_USER_LAST_NAME], ' + //Keep in single ' quotes, SQL will
+        ' [END_USER_EMAIL], [END_USER_PERIOD], eu.[USER_ROLE_ID], [USER_ROLE_NAME], [ACTIVE_STATUS_DESC],' + //not find some tables if in
+        ' eu.[SUPPORT_ROLE_ID], [SUPPORT_ROLE_DESC], eu.[ACTIVE_STATUS_ID] FROM [dbo].[END_USER] AS eu' + //" quotes
+        ' JOIN [dbo].[USER_ROLE] AS ur ON eu.[USER_ROLE_ID] = ur.[USER_ROLE_ID] ' +
+        ' JOIN [dbo].[ACTIVE_STATUS] AS acs ON eu.[ACTIVE_STATUS_ID] = acs.[ACTIVE_STATUS_ID]' +
+        ' JOIN [dbo].[SUPPORT_ROLE] AS sr ON eu.[SUPPORT_ROLE_ID] = sr.[SUPPORT_ROLE_ID]' ;
         const endUsersList = await pool.request().query(getAllQuery);
         return endUsersList.recordset;
     } catch (error) {
