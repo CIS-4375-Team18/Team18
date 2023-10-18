@@ -49,7 +49,7 @@ export default {
     },
     setup() {
         const supportticketsColumns = [
-            { name: 'subject', label: 'Subject', field: 'SUPPORT_TICKET_SUBJECT', align: 'left' },
+            { name: 'subject', label: 'Subject', field: 'SUPPORT_TICKET_SUBJECT', align: 'left', sortable: true  },
             { name: "creationDate", align: "left", label: "Creation Date", field: "SUPPORT_TICKET_DATE_CREATED", sortable: true, format: (val) => `${new Date(val)}` },
             { name: "status", align: "center", label: "Status", field: "SUPPORT_TICKET_STATUS_ID", sortable: true },
         ];
