@@ -9,12 +9,14 @@
 </template>
 
 <script>
+import axios from 'axios';
+
 export default {
     data() {
         return {
             series: [{
-                name: 'Inflation',
-                data: [2.3, 3.1, 4.0, 10.1, 4.0, 3.6, 3.2, 2.3, 1.4, 0.8, 0.5, 0.2]
+                name: 'Closed Tickets',
+                data: []
             }],
             chartOptions: {
                 chart: {
@@ -43,9 +45,6 @@ export default {
                 },
                 dataLabels: {
                     enabled: true,
-                    formatter: function (val) {
-                        return val + "%";
-                    },
                     offsetY: -20,
                     style: {
                         fontSize: '12px',
@@ -54,7 +53,7 @@ export default {
                 },
             
                 xaxis: {
-                    categories: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
+                    categories: [],
                     position: 'top',
                     axisBorder: {
                         show: false
@@ -88,14 +87,11 @@ export default {
                     },
                     labels: {
                         show: false,
-                        formatter: function (val) {
-                            return val + "%";
-                        }
                     }
             
                 },
                 title: {
-                    text: 'Monthly Inflation in Argentina, 2002',
+                    text: 'Tickets Closed Per Month, 2023',
                     align: 'center',
                     style: {
                         color: '#444'
@@ -103,7 +99,68 @@ export default {
                 }
             },
         }
-    }
+    },
+
+    mounted() {
+        this.fetchAndPopulateBarchart();
+    },
+
+    methods: {
+        updateAxis(data) {
+            this.chartOptions = {
+                ...this.chartOptions,
+                xaxis: {
+                    categories: data
+                }
+            }
+        },
+
+        createMonthsAndYear() {
+            const currentYear = new Date().getFullYear();
+            const monthsAndYear = [];
+            for(let i = 11; i >= 0; i--) {
+                const month = i < 9 ? `0${i+1}` : `${i+1}`;
+                const monthName = new Date(`${currentYear}-${month}-01`).toLocaleString('default', { month: 'short' });
+                const formattedMonthYear = `${monthName}${currentYear}`;
+                monthsAndYear.push(formattedMonthYear);
+            }
+            return monthsAndYear;
+        },
+
+        fetchAndPopulateBarchart() {
+            axios.get(`http://localhost:8001/api/ticketsclosedcountmonthly`)
+            .then(res => {
+                const apiData = res.data;
+                const monthsData = this.createMonthsAndYear();
+                this.updateAxis(monthsData);
+
+                monthsData.forEach((monthYear) => {
+                    const matchingData = apiData.find(item => {
+                        const itemMonthYear = this.formatMonthYear(item.MONTHYEAR);
+                        return itemMonthYear === monthYear;
+                        
+                    });
+                    if (matchingData) {
+                        this.series[0].data.push(matchingData.CLOSED_TICKETS_COUNT);
+                    } else {
+                        this.series[0].data.push(0);
+                    }
+                })
+                console.log(this.chartOptions.xaxis.categories)
+                console.log(this.series[0].data)
+            })
+            .catch(error => {
+                console.error('Error fetching data: ', error)
+            })
+        },
+
+        formatMonthYear(monthYear) {
+            const [month, year] = monthYear.split('-');
+            const monthName = new Date(`${year}-${month}-01`).toLocaleString('default', { month: 'short' });
+            return `${monthName}${year}`;
+        }
+
+    },
 }
 
 </script>

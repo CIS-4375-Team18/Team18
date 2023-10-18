@@ -37,6 +37,47 @@ const getSingleTicket = async (req, res, next) => {
     }
 }
 
+const supportTicketByCat = async (req, res, next) => {
+    try {
+        const countTickets = await supportTicketData.getTicketCountByCat();
+        res.send(countTickets);
+        console.log(countTickets);
+    } catch (error) {
+        res.status(400).send(error.message);
+    }
+}
+
+const supportTicketByCatPerUser = async (req, res, next) => {
+    try {
+        const END_USER_ID = req.params.id;
+        const ticketsPerUser = await supportTicketData.getTicketCountByCatPerUser(END_USER_ID);
+        res.send(ticketsPerUser);
+        console.log(ticketsPerUser);
+    } catch (error) {
+        res.status(400).send(error.message)
+    }
+}
+
+const supportTicketPerSupport = async (req, res, next) => {
+    try {
+        const ticketsPerSupport = await supportTicketData.getTicketCountPerSupport();
+        res.send(ticketsPerSupport);
+        console.log(ticketsPerSupport);
+    } catch (error) {
+        res.status(400).send(error.message);
+    }
+}
+
+const ticketsClosedCount = async (req, res, next) => {
+    try {
+        const closedTickets = await supportTicketData.getResolvedTicketCountPerMonth();
+        res.send(closedTickets);
+        console.log(closedTickets);
+    } catch (error) {
+        res.status(400).send(error.message);
+    }
+}
+
 const insertSupportTicket = async (req, res, next) => {
     try {
         const data = req.body;
@@ -74,6 +115,10 @@ module.exports = {
    GetAllSupportTickets,
    GetAllTicketsDisplay,
    getSingleTicket,
+   supportTicketByCat,
+   supportTicketByCatPerUser,
+   supportTicketPerSupport,
+   ticketsClosedCount,
    insertSupportTicket,
    updateSupportTicket,
    delSupportTicket

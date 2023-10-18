@@ -16,21 +16,6 @@ const GetAll = async () => {
     }
 }
 
-const testSubcat = async () => {
-    try  {
-        let pool = await sql.connect(config.sql);
-        const countSubcat = "SELECT TC.TICKET_CATEGORY_DESC, COUNT(TS.TICKET_SUB_CATEGORY_ID) AS NUMBER_OF_SUBCATEGORIES "+
-            "FROM dbo.TICKET_CATEGORY as TC "+
-            "LEFT JOIN dbo.TICKET_SUB_CATEGORY as TS ON TC.TICKET_CATEGORY_ID = TS.TICKET_CATEGORY_ID "+
-            "GROUP BY TC.TICKET_CATEGORY_DESC"
-        const resultCount = await pool.request().query(countSubcat);
-        return resultCount.recordset;
-    } catch(error) {
-        return error.message;
-    }
-}
-
-
 const GetActive = async () => {
     try {
         let pool = await sql.connect(config.sql);
@@ -114,5 +99,4 @@ module.exports = {
    update,
    insertNew,
    del, 
-   testSubcat
 }
