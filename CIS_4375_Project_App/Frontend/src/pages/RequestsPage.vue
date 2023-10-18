@@ -37,11 +37,26 @@ export default {
     data() {
         return {
             supporttickets: [],
+            priorities: {}
         }
     },
-    created() {
+    async created() {
+        // call active prioties api to get the list of all apis
+        const activePriorities = await axios.get(`${apiURL}/activepriorities`)
+        // map the id and priority description
+        activePriorities.data.forEach((priority) => {
+          this.priorities[priority.TICKET_PRIORITY_ID] = priority.TICKET_PRIORITY_DESC;
+        });
+
         axios.get(`${apiURL}/supporttickets`).then((res) => {
-            this.supporttickets = res.data
+            this.supporttickets = res.data.map((supportticket) => {
+              // add a new property called priority status to supportticket
+              // set it to the status from priorities based on the current ticket priority id
+              return {
+                prioritystatus: this.priorities[supportticket.TICKET_PRIORITY_ID],
+                ...supportticket
+              }
+            });
             this.loading = false
         });
     },
@@ -52,6 +67,7 @@ export default {
             { name: 'subject', label: 'Subject', field: 'SUPPORT_TICKET_SUBJECT', align: 'left', sortable: true  },
             { name: "creationDate", align: "left", label: "Creation Date", field: "SUPPORT_TICKET_DATE_CREATED", sortable: true, format: (val) => `${new Date(val)}` },
             { name: "status", align: "center", label: "Status", field: "SUPPORT_TICKET_STATUS_ID", sortable: true },
+            { name: "priority", align: "center", label: "Priority", field: "prioritystatus", sortable: true },
         ];
         return {
             tab: ref('requests'),
