@@ -35,6 +35,7 @@ export default {
                         }
                     }
                 },
+                colors: '#3CB043',
                 plotOptions: {
                     bar: {
                         borderRadius: 10,
@@ -54,7 +55,7 @@ export default {
             
                 xaxis: {
                     categories: [],
-                    position: 'top',
+                    position: 'bottom',
                     axisBorder: {
                         show: false
                     },

@@ -1,6 +1,6 @@
 <template>
   
-    <q-page padding> 
+    <q-page v-if="isAuthenticated" padding> 
       <div class="row q-col-gutter-lg">
         <div class="col-md-4">
           <q-card class="shadow-up-10" style="height: 130px;">
@@ -31,7 +31,7 @@
         </div>
       </div>
   
-      <div class="row q-col-gutter-md" style="margin-top: 10px;">
+      <div v-if="userRole !== 'Staff'" class="row q-col-gutter-md" style="margin-top: 10px;">
         <div class="col-md-6 col-xs-12">
           <q-card class="shadow-up-9">
             <barChart> </barChart>
@@ -210,7 +210,7 @@
     },
   
     computed: {
-      ...mapGetters('auth', ['userID', 'userRole']),
+      ...mapGetters('auth', ['userID', 'userRole', 'isAuthenticated']),
       showPieChart() {
         if (this.userRole !== 'Staff') {
           return this.pieSeries.length > 0;
