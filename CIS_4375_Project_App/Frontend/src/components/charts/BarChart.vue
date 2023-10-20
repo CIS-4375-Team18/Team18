@@ -99,6 +99,20 @@ export default {
                     }
                 }
             },
+            shortToNumberMonthNames : {
+                'Jan' : '01',
+                'Feb' : '02',
+                'Mar' : '03',
+                'Apr' : '04',
+                'May' : '05',
+                'Jun' : '06',
+                'Jul' : '07',
+                'Aug' : '08',
+                'Sep' : '09',
+                'Oct' : '10',
+                'Nov' : '11',
+                'Dec' : '12',
+            }
         }
     },
 
@@ -117,13 +131,16 @@ export default {
         },
 
         createMonthsAndYear() {
-            const currentYear = new Date().getFullYear();
+            const currentDate = new Date();
+            const lastMonth = new Date(currentDate);
+            lastMonth.setMonth(lastMonth.getMonth());
             const monthsAndYear = [];
-            for(let i = 11; i >= 0; i--) {
-                const month = i < 9 ? `0${i+1}` : `${i+1}`;
-                const monthName = new Date(`${currentYear}-${month}-01`).toLocaleString('default', { month: 'short' });
-                const formattedMonthYear = `${monthName}${currentYear}`;
-                monthsAndYear.push(formattedMonthYear);
+            for(let i = 0; i < 12; i++) {
+                const date = new Date(lastMonth);
+                date.setMonth(date.getMonth() -i);
+                const shortMonth = date.toLocaleString('default', {month: 'short'});
+                const year = date.getFullYear();
+                monthsAndYear.push(`${shortMonth} ${year}`)
             }
             return monthsAndYear;
         },
@@ -135,17 +152,11 @@ export default {
                 const monthsData = this.createMonthsAndYear();
                 this.updateAxis(monthsData);
 
-                monthsData.forEach((monthYear) => {
-                    const matchingData = apiData.find(item => {
-                        const itemMonthYear = this.formatMonthYear(item.MONTHYEAR);
-                        return itemMonthYear === monthYear;
-                        
-                    });
-                    if (matchingData) {
-                        this.series[0].data.push(matchingData.CLOSED_TICKETS_COUNT);
-                    } else {
-                        this.series[0].data.push(0);
-                    }
+                this.series[0].data = monthsData.map((monthAndYear) => {
+                    const [shortMonth, year] = monthAndYear.split(' ');
+                    const numberMonthYear = `${this.shortToNumberMonthNames[shortMonth]}-${year}`
+                    const matchingData = apiData.find((item) => item.MONTHYEAR === numberMonthYear);
+                    return matchingData ? matchingData.CLOSED_TICKETS_COUNT : 0;
                 })
                 console.log(this.chartOptions.xaxis.categories)
                 console.log(this.series[0].data)
