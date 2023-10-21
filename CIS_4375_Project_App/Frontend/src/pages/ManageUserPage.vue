@@ -6,11 +6,16 @@
             </q-card-section>
             <q-separator />
 
+            <q-btn v-if="userRole==='System Administrator' || userRole==='IT Teacher'" 
+                    @click="createNewUser" outline icon="person_add" text-color="primary" label="Create New User" 
+                    style="margin-top: 20px ; min-width: 140px; margin-left: 3%;"
+                />
+
             <div style="margin-left: 2%;">
                 <div class="q-pa-md" style="margin: 0 auto;">
                     <!-- Users Table -->
-                    <q-table title="Users" color="secondary" :align="left" :loading="loading"
-                        :rows="userData" :columns="userColumns" style="width: 98%;"> <!-- Puts table with user data -->
+                    <q-table title="Users" color="secondary" :align="left" :loading="loading" 
+                        :rows="userData" :columns="userColumns" virtual-scroll style="width: 98%;"> <!-- Puts table with user data -->
                         <template #body-cell-status="props">
                                     <q-td :props="props">
                                         <q-chip :color="props.row.ACTIVE_STATUS_ID === 1 ? 'green' : 'red'"
@@ -24,13 +29,15 @@
                                             style="color: #ad0000;"></q-btn>
                                     </q-td>
                         </template>
+                        <template #loading>
+                            <q-inner-loading
+                                showing
+                                color="primary">
+                            </q-inner-loading>
+                        </template>
                     </q-table>
 
                     <!-- Only valid users are able to select this role-->
-                    <q-btn v-if="userRole==='System Administrator' || userRole==='IT Teacher'" 
-                        @click="createNewUser" outline icon="person_add" text-color="primary" label="Create New User" 
-                        style="margin-top: 30px ; min-width: 140px; background-color: #03521c;"
-                    />
                 </div>
             </div>
         </q-card>
@@ -39,12 +46,14 @@
 
 <script>
 import { mapGetters } from 'vuex';
-import axios from 'axios'
+import axios from 'axios';
+import { ref } from 'vue';
 
 export default {
     created() {
         axios.get(`http://localhost:8001/api/endusers`).then((res) => { //Loads data when creating the page
             this.userData = res.data
+            this.loading = false
         })
     },
 
@@ -76,6 +85,12 @@ export default {
     computed: {
       ...mapGetters('auth', ['userRole']),
 
+    },
+
+    setup() {
+        return {
+            loading: ref(true)
+        }
     },
 }
 </script>

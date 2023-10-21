@@ -13,7 +13,6 @@ const getAllSubCategories = async (req, res, next) => {
     }
 }
 
-
 const getActiveSubCat = async (req, res, next) => {
     try {
 
@@ -75,5 +74,5 @@ module.exports = {
    getActiveSubCat,
    addSubCat,
    updateSubCat,
-   deleteSubCat
+   deleteSubCat,
 }

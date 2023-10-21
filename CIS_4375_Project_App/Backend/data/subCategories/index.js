@@ -92,12 +92,11 @@ const del = async (TICKET_SUB_CATEGORY_ID) => {
     }
 }
 
-
 module.exports = {
    GetAll,
    GetActive,
    getById,
    update,
    insertNew,
-   del
+   del, 
 }
