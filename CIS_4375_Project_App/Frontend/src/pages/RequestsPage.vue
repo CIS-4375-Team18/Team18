@@ -15,9 +15,22 @@
                             :options="filterByOptions"
                             option-value="SUPPORT_TICKET_STATUS_ID" 
                             option-label="SUPPORT_TICKET_STATUS_DESC"
-                            label="Filter By"
-                            style="min-width: 100px;"
+                            label="Filter By Status"
+                            style="min-width: 120px; margin-right:10px;"
                             @update:model-value="getSupportTickets"
+                        />
+                        <q-select
+                            use-input
+                            hide-selected
+                            fill-input
+                            v-model="userModel"
+                            :options="endUsersOptions"
+                            option-value="END_USER_ID" 
+                            option-label="END_USER_FULL_NAME"
+                            label="Filter By User"
+                            style="min-width: 120px;"
+                            @update:model-value="getSupportTickets"
+                            @filter="filterFn"
                         />
                     </template>
                      <template #body-cell-status="props">
@@ -43,7 +56,10 @@ export default {
         return {
             supporttickets: [],
             priorities: {},
-            filterByOptions: []
+            filterByOptions: [],
+            endUsers: [],
+            endUsersOptions: [],
+            allUser: { END_USER_ID: null, END_USER_FULL_NAME: 'All Users' }
         }
     },
     async created() {
@@ -61,6 +77,22 @@ export default {
             this.setTicketColumns();
             this.getSupportTickets();
         });
+
+        axios.get(`${apiURL}/endusers`).then((res) => {
+            const users = res.data.map((user) => {
+                return {
+                    END_USER_FULL_NAME: `${user.END_USER_FIRST_NAME} ${user.END_USER_LAST_NAME}`,
+                    ...user
+                }
+            });
+
+            this.endUsers = users;
+            this.userModel = this.allUser;
+            // first option is "All Users"
+            // only show 9 users in case the list of users is too long
+            this.endUsersOptions = [this.allUser, ...this.endUsers.slice(0, 9)];
+
+        });
     },
     methods: {
         getSupportTickets() {
@@ -69,7 +101,8 @@ export default {
             axios.post(`${apiURL}/ticketDisplay`, {
                 userId: this.userId,
                 userRole: this.userRole,
-                status: this.filterByModel.SUPPORT_TICKET_STATUS_ID
+                status: this.filterByModel.SUPPORT_TICKET_STATUS_ID,
+                createdByUserId: this.userModel?.END_USER_ID || null
             }).then((res) => {
                 if (res.data) {
                     this.setSupportTickets(res.data);
@@ -128,6 +161,17 @@ export default {
             supportticketsColumns.push({ name: "status", align: "center", label: "Priority", field: "TICKET_PRIORITY_ID", sortable: true });
 
             this.supportticketsColumns = supportticketsColumns;
+        },
+        filterFn (val, update, abort) {
+            update(() => {
+                if (val.length === 0) {
+                    this.endUsersOptions = [this.allUser, ...this.endUsers.slice(0, 9)];
+                } else {
+                    const searchTerm = val.toLowerCase()
+                    const results = this.endUsers.filter(user => user.END_USER_FULL_NAME.toLowerCase().indexOf(searchTerm) > -1);
+                    this.endUsersOptions = [this.allUser, ...results.slice(0, 9)];
+                }
+            });
         }
     },
     setup() {
@@ -139,6 +183,7 @@ export default {
             selected: ref([]),
             redModel: ref(true),
             filterByModel: ref(null),
+            userModel: ref(null),
         };
     },
     computed: {

@@ -19,10 +19,11 @@ const GetAllTicketsDisplay = async (req, res, next) => {
         const userRole = req.body.userRole;
         const userId = req.body.userId;
         const status = req.body.status;
+        const createdByUserId = req.body.createdByUserId;
 
         let ticketList = [];
         if (userRole === 'System Administrator' || userRole === 'IT Teacher') {
-            ticketList = await supportTicketData.GetAllJoinByStatus(status);
+            ticketList = await supportTicketData.GetAllJoin(createdByUserId, status);
         } else if (userRole === 'Technician') {
             ticketList = await supportTicketData.GetAssignedByUserId(userId, status);
         } else {

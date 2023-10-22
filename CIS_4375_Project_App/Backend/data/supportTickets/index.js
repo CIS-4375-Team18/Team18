@@ -4,10 +4,10 @@ const config = require('../../config');
 const sql = require('mssql');
 
 
-const GetAllJoinByStatus = async (SUPPORT_TICKET_STATUS) => {
+const GetAllJoin = async (USER_ID, SUPPORT_TICKET_STATUS) => {
     try {
         let pool = await sql.connect(config.sql);
-        const selectAllTicketsQ = "SELECT ST.SUPPORT_TICKET_ID "+
+        let selectAllTicketsQ = "SELECT ST.SUPPORT_TICKET_ID "+
         " ,ST.SUPPORT_TICKET_SUBJECT  "+
         " ,ST.SUPPORT_TICKET_NOTE "+
         " ,ST.DEVICE_MAKE "+
@@ -29,8 +29,13 @@ const GetAllJoinByStatus = async (SUPPORT_TICKET_STATUS) => {
         " FROM dbo.SUPPORT_TICKET as ST "+
         " JOIN dbo.END_USER as EU ON ST.END_USER_ID = EU.END_USER_ID " +
         " WHERE ST.SUPPORT_TICKET_STATUS_ID = @SUPPORT_TICKET_STATUS";
+
+        if (USER_ID) {
+            selectAllTicketsQ += " AND ST.END_USER_ID = @USER_ID";
+        }
         const supportTicketsList = await pool.request()
                             .input('SUPPORT_TICKET_STATUS', sql.Int, SUPPORT_TICKET_STATUS)
+                            .input('USER_ID', sql.Int, USER_ID)
                             .query(selectAllTicketsQ);
         return supportTicketsList.recordset;
     } catch (error) {
@@ -309,7 +314,7 @@ const del = async (SUPPORT_TICKET_ID) => {
 
 module.exports = {
    GetAll,
-   GetAllJoinByStatus,
+   GetAllJoin,
    GetByUserId,
    GetAssignedByUserId,
    getById,
