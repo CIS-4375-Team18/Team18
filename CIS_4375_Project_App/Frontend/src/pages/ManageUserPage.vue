@@ -53,8 +53,24 @@
                         <q-input label="Last Name: " dense v-model="editedItem.itemLastName"></q-input>
                         <q-input label="Email" dense v-model="editedItem.itemEmail"></q-input>
                         <q-input label="Role: " dense v-model="editedItem.itemRole"></q-input>
+                        <q-input label="Period: " dense v-model="editedItem.itemUserPeriod"></q-input>
                         </q-card-section>
 
+                        <q-card-section> <!-- Toggle support authorization-->
+                            <q-toggle label="Support?"
+                                v-model="editedItem.itemSupportRole"
+                                checked-icon="check"
+                                color="green"
+                                unchecked-icon="clear"
+                                left-label
+                                false-value="NOT-SUPPORT"
+                                true-value="SUPPORT"
+                                toggle-order="fT"
+                            />
+                            {{ editedItem.itemSupportRole }}
+                        </q-card-section>
+
+                        
                         <q-card-section> <!-- Toggle active and inactive Status of User-->
                             <q-toggle label="Status"
                                 v-model="editedItem.itemStatus"
@@ -124,9 +140,13 @@ export default {
                 itemFirstName: "",
                 itemLastName: "",
                 itemEmail:"",
+                itemRoleID:"",
                 itemRole:"",
+                itemSupportRole:"",
+                itemSupportRoleID: "",
                 itemStatus:"",
                 itemStatusID: "",
+                itemUserPeriod: "",
             },
             userData: [],
 
@@ -134,7 +154,7 @@ export default {
             {name: 'First Name', required: true, label: 'First Name', field: 'END_USER_FIRST_NAME', align: 'left'}, 
             {name: 'Last Name', label: 'Last Name', field: 'END_USER_LAST_NAME', align: 'left'},
             {name: 'Email', label: 'Email', field: 'END_USER_EMAIL', align: 'left'},
-            {name: 'Role', label: 'Role', field: 'USER_ROLE_NAME', align: 'left'},
+            {name: 'User Role', label: 'Role', field: 'USER_ROLE_NAME', align: 'left'},
             {name: "status", align: "center", label: "Status", field: "ACTIVE_STATUS_DESC", sortable: true},
             {name: 'actions', label: 'Edit', field: '', align: 'left' },
             {name: 'delactions', label: 'Delete', field: '', align: 'left' },
@@ -160,21 +180,37 @@ export default {
             console.log("rendered table")
         },
         editUserDialog(item){ //Puts values into appropriate fields in dialog box
+            console.log("Start of get to edit")
+            console.log(item.row)
+            console.log("End of get to edit user")
             this.editItemDial = true;
 
             this.editedItem.itemID = item.row.END_USER_ID;
             this.editedItem.itemFirstName = item.row.END_USER_FIRST_NAME;
             this.editedItem.itemLastName = item.row.END_USER_LAST_NAME;
             this.editedItem.itemEmail = item.row.END_USER_EMAIL;
+            this.editedItem.itemRoleID = item.row.USER_ROLE_ID;
             this.editedItem.itemRole = item.row.USER_ROLE_NAME;
             this.editedItem.itemStatus = item.row.ACTIVE_STATUS_DESC; //Different, so that toggle recognized initial position
             this.editedItem.itemStatusID = item.row.ACTIVE_STATUS_ID;
-
+            this.editedItem.itemSupportRole = item.row.SUPPORT_ROLE_DESC;
+            this.editedItem.itemSupportRoleID = item.row.SUPPORT_ROLE_ID;
+            this.editedItem.itemUserPeriod = item.row.END_USER_PERIOD;
             console.log(this.editedItem.itemStatus);
             
         },
         editUser(itemData) {
             console.log(itemData)
+
+            /*axios.put(`http://localhost:8001/api/enduser/${itemData.itemID}`).then((res) => {
+                if (res.status === 200) {
+                        this.$q.notify({ color: 'positive', message: 'User deleted successfully' });
+                        this.$router.push('/users');
+                    } 
+                else {
+                        this.$q.notify({ color: 'negative', message: 'Error while deleting' });
+                    }
+            })*/
         },
         deleteUserDialog(item){ //saves needed information into variables
             this.deleteItemDial = true;
@@ -192,7 +228,8 @@ export default {
                 if (res.status === 200) {
                         this.$q.notify({ color: 'positive', message: 'User deleted successfully' });
                         this.$router.push('/users');
-                    } else {
+                    } 
+                else {
                         this.$q.notify({ color: 'negative', message: 'Error while deleting' });
                     }
             });
