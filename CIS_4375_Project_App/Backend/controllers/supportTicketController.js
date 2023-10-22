@@ -16,10 +16,20 @@ const GetAllSupportTickets = async (req, res, next) => {
 
 const GetAllTicketsDisplay = async (req, res, next) => {
     try {
+        const userRole = req.body.userRole;
+        const userId = req.body.userId;
+        const status = req.body.status;
 
-        const ticketLIst = await supportTicketData.GetAllJoin();
-        res.send(ticketLIst);        
-        console.log(ticketLIst)
+        let ticketList = [];
+        if (userRole === 'System Administrator' || userRole === 'IT Teacher') {
+            ticketList = await supportTicketData.GetAllJoinByStatus(status);
+        } else if (userRole === 'Technician') {
+            ticketList = await supportTicketData.GetAssignedByUserId(userId, status);
+        } else {
+            ticketList = await supportTicketData.GetByUserId(userId, status);
+        }
+        
+        res.send(ticketList);         
     } catch (error) {
         res.status(400).send(error.message);
     }

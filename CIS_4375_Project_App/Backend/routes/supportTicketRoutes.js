@@ -4,7 +4,7 @@ const express = require('express');
 const supportTicketCntr  = require('../controllers/supportTicketController');
 const router = express.Router();
 router.get('/supporttickets', supportTicketCntr.GetAllSupportTickets);
-router.get('/ticketDisplay', supportTicketCntr.GetAllTicketsDisplay);
+router.post('/ticketDisplay', supportTicketCntr.GetAllTicketsDisplay);
 router.get('/supportticket/:id', supportTicketCntr.getSingleTicket);
 router.post('/supportticket', supportTicketCntr.insertSupportTicket);
 router.put('/supportticket/:id', supportTicketCntr.updateSupportTicket);

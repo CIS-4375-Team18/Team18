@@ -1,28 +1,49 @@
 <template>
-    <div class="q-pa-md">
-        <div class="q-gutter-y-md" style="margin-left: 15px; margin-right: 15px;">
-            <div class="q-pa-md">
+    <div class="q-pa-md q-gutter-sm" style="margin-left: 15px; margin-right: 15px;">
+        <q-card class="requests-card">
+            <q-card-section class="text-white" style="background-color: #af0000;">
+                <div class="text-h6 text-left"> Manage Requests </div>
+            </q-card-section>
+            <q-separator />
+
+            <div class="q-pa-md" style="margin: 0 auto;">
                 <q-table title="Requests" color="secondary" :align="left" :loading="loading"
-                    :rows="supporttickets" :columns="supportticketsColumns" style="width: 80%;">
+                    :rows="supporttickets" :columns="supportticketsColumns" style="width: 95%; margin: auto">
                     <template v-slot:top>
-                        <q-select v-model="filterByModel" :options="filterByOptions" label="Filter By" />
+                        <q-select
+                            v-model="filterByModel"
+                            :options="filterByOptions"
+                            option-value="SUPPORT_TICKET_STATUS_ID" 
+                            option-label="SUPPORT_TICKET_STATUS_DESC"
+                            label="Filter By"
+                            style="min-width: 100px;"
+                            @update:model-value="getSupportTickets"
+                        />
+                    </template>
+                     <template #body-cell-status="props">
+                        <q-td :props="props">
+                            <q-chip :color="props.row.prioritystatus === 'Critical' ? 'red' : (props.row.prioritystatus === 'High' ? 'black' :  (props.row.prioritystatus === 'Medium' ? 'blue' : 'green'))" text-color="white"
+                                dense class="text-weight-bolder" square>{{ props.row.prioritystatus }}</q-chip>
+                        </q-td>
                     </template>
                 </q-table>
             </div>
-        </div>
+        </q-card>
     </div>
 </template>
   
 <script>
 import { ref } from 'vue'
 import axios from "axios";
+import { mapGetters } from 'vuex';
 const apiURL = import.meta.env.VITE_API_URL
 
 export default {
     data() {
         return {
             supporttickets: [],
-            priorities: {}
+            priorities: {},
+            filterByOptions: []
         }
     },
     async created() {
@@ -33,19 +54,40 @@ export default {
           this.priorities[priority.TICKET_PRIORITY_ID] = priority.TICKET_PRIORITY_DESC;
         });
 
-        axios.get(`${apiURL}/supporttickets`).then((res) => {
-            this.supporttickets = res.data.map((supportticket) => {
-              // add a new property called priority status to supportticket
-              // set it to the status from priorities based on the current ticket priority id
-              return {
-                prioritystatus: this.priorities[supportticket.TICKET_PRIORITY_ID],
-                ...supportticket
-              }
-            });
-            this.loading = false
+        axios.get(`${apiURL}/activeticketstatuses`).then((res) => {
+            this.filterByOptions = res.data;
+            this.filterByModel = this.filterByOptions[0]; 
+            
+            this.getSupportTickets();
         });
     },
     methods: {
+        getSupportTickets() {
+            axios.post(`${apiURL}/ticketDisplay`, {
+                userId: this.userId,
+                userRole: this.userRole,
+                status: this.filterByModel.SUPPORT_TICKET_STATUS_ID
+            }).then((res) => {
+                if (res.data) {
+                    this.setSupportTickets(res.data);
+                } else {
+                    console.log(res.error);
+                }
+                this.loading = false
+            });
+        },
+        setSupportTickets(supporttickets) {
+            if (supporttickets) {
+                this.supporttickets = supporttickets.map((supportticket) => {
+                    // add a new property called priority status to supportticket
+                    // set it to the status from priorities based on the current ticket priority id
+                    return {
+                        prioritystatus: this.priorities[supportticket.TICKET_PRIORITY_ID],
+                        ...supportticket
+                    }
+                });
+            }
+        }
     },
     setup() {
         const supportticketsColumns = [
@@ -72,9 +114,8 @@ export default {
 
                 return formattedDate;
             } },
-            { name: "priority", align: "center", label: "Priority", field: "prioritystatus", sortable: true },
+            { name: "status", align: "center", label: "Priority", field: "TICKET_PRIORITY_ID", sortable: true },
         ];
-        const filterByOptions = ['All', 'In Progress', 'Closed'];
         return {
             tab: ref('requests'),
             setActive: ref('Active'),
@@ -82,10 +123,13 @@ export default {
             supportticketsColumns,
             selected: ref([]),
             redModel: ref(true),
-            filterByModel: ref('All'),
-            filterByOptions
+            filterByModel: ref(null),
         };
     },
+    computed: {
+      ...mapGetters('auth', ['userId','userRole']),
+
+    }
 }
 </script>
   
