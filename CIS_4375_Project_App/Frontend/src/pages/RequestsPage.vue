@@ -58,11 +58,14 @@ export default {
             this.filterByOptions = res.data;
             this.filterByModel = this.filterByOptions[0]; 
             
+            this.setTicketColumns();
             this.getSupportTickets();
         });
     },
     methods: {
         getSupportTickets() {
+            this.loading = true;
+            this.supporttickets = [];
             axios.post(`${apiURL}/ticketDisplay`, {
                 userId: this.userId,
                 userRole: this.userRole,
@@ -73,7 +76,7 @@ export default {
                 } else {
                     console.log(res.error);
                 }
-                this.loading = false
+                this.loading = false;
             });
         },
         setSupportTickets(supporttickets) {
@@ -87,40 +90,52 @@ export default {
                     }
                 });
             }
+        },
+        setTicketColumns() {
+            const supportticketsColumns = [
+                { name: 'subject', label: 'Subject', field: 'SUPPORT_TICKET_SUBJECT', align: 'left', sortable: true  },
+                { name: "creationDate", align: "left", label: "Creation Date", field: "SUPPORT_TICKET_DATE_CREATED", sortable: true, format: (val) => {
+                    const date = new Date(val);
+                    const month = (date.getMonth() + 1).toString().padStart(2, '0');
+                    const day = date.getDate().toString().padStart(2, '0');
+                    const year = date.getFullYear();
+                    let hours = date.getHours();
+                    const minutes = date.getMinutes().toString().padStart(2, '0');
+                    let ampm = 'AM';
+
+                    // Convert to 12-hour format and determine AM/PM
+                    if (hours >= 12) {
+                        ampm = 'PM';
+                        if (hours > 12) {
+                        hours -= 12;
+                        }
+                    }
+
+                    // Create the formatted date string
+                    const formattedDate = `${month}/${day}/${year} ${hours.toString().padStart(2, '0')}:${minutes} ${ampm}`;
+
+                    return formattedDate;
+                } 
+            }];
+
+            if (this.userRole !== 'Staff') {
+                
+                supportticketsColumns.push({ name: "firstName", align: "center", label: "First Name", field: "END_USER_FIRST_NAME", sortable: true });
+                supportticketsColumns.push({ name: "lastName", align: "center", label: "Last Name", field: "END_USER_LAST_NAME", sortable: true });
+                supportticketsColumns.push({ name: "email", align: "center", label: "Email", field: "END_USER_EMAIL", sortable: true });
+            }
+
+            supportticketsColumns.push({ name: "status", align: "center", label: "Priority", field: "TICKET_PRIORITY_ID", sortable: true });
+
+            this.supportticketsColumns = supportticketsColumns;
         }
     },
     setup() {
-        const supportticketsColumns = [
-            { name: 'subject', label: 'Subject', field: 'SUPPORT_TICKET_SUBJECT', align: 'left', sortable: true  },
-            { name: "creationDate", align: "left", label: "Creation Date", field: "SUPPORT_TICKET_DATE_CREATED", sortable: true, format: (val) => {
-                const date = new Date(val);
-                const month = (date.getMonth() + 1).toString().padStart(2, '0');
-                const day = date.getDate().toString().padStart(2, '0');
-                const year = date.getFullYear();
-                let hours = date.getHours();
-                const minutes = date.getMinutes().toString().padStart(2, '0');
-                let ampm = 'AM';
-
-                // Convert to 12-hour format and determine AM/PM
-                if (hours >= 12) {
-                    ampm = 'PM';
-                    if (hours > 12) {
-                    hours -= 12;
-                    }
-                }
-
-                // Create the formatted date string
-                const formattedDate = `${month}/${day}/${year} ${hours.toString().padStart(2, '0')}:${minutes} ${ampm}`;
-
-                return formattedDate;
-            } },
-            { name: "status", align: "center", label: "Priority", field: "TICKET_PRIORITY_ID", sortable: true },
-        ];
         return {
             tab: ref('requests'),
             setActive: ref('Active'),
             loading: ref(true),
-            supportticketsColumns,
+            supportticketsColumns: ref([]),
             selected: ref([]),
             redModel: ref(true),
             filterByModel: ref(null),

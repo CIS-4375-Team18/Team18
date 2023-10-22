@@ -26,8 +26,8 @@ const GetAllJoinByStatus = async (SUPPORT_TICKET_STATUS) => {
         " ,EU.END_USER_FIRST_NAME "+
         " ,EU.END_USER_LAST_NAME "+
         " ,EU.END_USER_EMAIL "+
-        " FROM [dbo].[SUPPORT_TICKET] as ST "+
-        " JOIN dbo.END_USER as EU ON ST.END_USER_ID = EU.END_USER_ID"
+        " FROM dbo.SUPPORT_TICKET as ST "+
+        " JOIN dbo.END_USER as EU ON ST.END_USER_ID = EU.END_USER_ID " +
         " WHERE ST.SUPPORT_TICKET_STATUS_ID = @SUPPORT_TICKET_STATUS";
         const supportTicketsList = await pool.request()
                             .input('SUPPORT_TICKET_STATUS', sql.Int, SUPPORT_TICKET_STATUS)
