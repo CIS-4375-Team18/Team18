@@ -14,7 +14,8 @@ const getEndUsers = async () => {
         ' eu.[SUPPORT_ROLE_ID], [SUPPORT_ROLE_DESC], eu.[ACTIVE_STATUS_ID] FROM [dbo].[END_USER] AS eu' + //" quotes
         ' JOIN [dbo].[USER_ROLE] AS ur ON eu.[USER_ROLE_ID] = ur.[USER_ROLE_ID] ' +
         ' JOIN [dbo].[ACTIVE_STATUS] AS acs ON eu.[ACTIVE_STATUS_ID] = acs.[ACTIVE_STATUS_ID]' +
-        ' FULL OUTER JOIN [dbo].[SUPPORT_ROLE] AS sr ON eu.[SUPPORT_ROLE_ID] = sr.[SUPPORT_ROLE_ID]' ;
+        ' FULL OUTER JOIN [dbo].[SUPPORT_ROLE] AS sr ON eu.[SUPPORT_ROLE_ID] = sr.[SUPPORT_ROLE_ID]' +
+        ' WHERE [END_USER_ID] IS NOT NULL' ;
         const endUsersList = await pool.request().query(getAllQuery);
         return endUsersList.recordset;
     } catch (error) {
