@@ -194,6 +194,76 @@ const getById = async(SUPPORT_TICKET_ID) => {
     }
 }
 
+const getTicketCountByCat = async () => {
+    try {
+        let pool = await sql.connect(config.sql);
+        const countTicketByCat = "SELECT TC.TICKET_CATEGORY_DESC, "+
+            "COUNT(ST.TICKET_CATEGORY_ID) AS NUMBER_OF_TICKETS_BY_CAT "+
+            "FROM [dbo].[SUPPORT_TICKET] AS ST "+
+            "RIGHT JOIN [dbo].[TICKET_CATEGORY] AS TC "+
+            "ON ST.TICKET_CATEGORY_ID = TC.TICKET_CATEGORY_ID "+
+            "GROUP BY TICKET_CATEGORY_DESC"
+        const countResult = await pool.request().query(countTicketByCat);
+        return countResult.recordset;
+    } catch(error) {
+        return error.message;
+    }
+}
+
+const getTicketCountByCatPerUser = async (END_USER_ID) => {
+    try {
+        let pool = await sql.connect(config.sql);
+        const countTicketByCatPerUser = "SELECT TC.TICKET_CATEGORY_DESC, "+
+            "COUNT(ST.SUPPORT_TICKET_ID) AS NUMBER_OF_TICKETS_BY_CAT "+
+            "FROM [dbo].[TICKET_CATEGORY] AS TC "+
+            "LEFT JOIN (SELECT DISTINCT TICKET_CATEGORY_ID, SUPPORT_TICKET_ID, END_USER_ID FROM [dbo].[SUPPORT_TICKET] "+
+            "WHERE END_USER_ID = @END_USER_ID) AS ST "+
+            "ON TC.TICKET_CATEGORY_ID = ST.TICKET_CATEGORY_ID "+
+            "GROUP BY TC.TICKET_CATEGORY_DESC"
+        const result = await pool.request()
+                .input('END_USER_ID', sql.Int, END_USER_ID)
+                .query(countTicketByCatPerUser);
+        return result.recordset;
+    } catch(error) {
+        return error.message;
+    }
+}
+
+const getTicketCountPerSupport = async () => {
+    try {
+        let pool = await sql.connect(config.sql);
+        const countPerSupport = "SELECT CONCAT(END_USER_FIRST_NAME, ' ', END_USER_LAST_NAME) AS SUPPORT_AGENT, "+
+            "COUNT(SUPPORT_TICKET_ID) AS NUMBER_OF_ASSIGNED_TICKETS "+
+            "FROM [dbo].[END_USER] AS ES "+   
+            "LEFT JOIN [dbo].[SUPPORT_TICKET] AS ST "+
+            "ON ES.END_USER_ID = ST.SUPPORT_AGENT_ID "+
+            "WHERE ES.SUPPORT_ROLE_ID = 1 "+
+            "GROUP BY ES.END_USER_FIRST_NAME, ES.END_USER_LAST_NAME"
+        const numberPerSupport = await pool.request().query(countPerSupport)
+        return numberPerSupport.recordset
+    } catch(error) {
+        return error.message;
+    }
+}
+
+const getResolvedTicketCountPerMonth = async () => {
+    try {
+        let pool = await sql.connect(config.sql);
+        const closedTicketPerMonth = "SELECT FORMAT(ST.RESOLUTION_DATE, 'MM-yyyy') AS MONTHYEAR, "+
+            "COUNT(ST.SUPPORT_TICKET_NOTE) AS CLOSED_TICKETS_COUNT "+
+            "FROM dbo.SUPPORT_TICKET AS ST "+
+            "JOIN dbo.SUPPORT_TICKET_STATUS AS STS "+
+            "ON ST.SUPPORT_TICKET_STATUS_ID = STS.SUPPORT_TICKET_STATUS_ID "+
+            "WHERE STS.SUPPORT_TICKET_STATUS_DESC = 'CLOSED' "+
+            "GROUP BY FORMAT(ST.RESOLUTION_DATE, 'MM-yyyy') "+
+            "ORDER BY MONTHYEAR"
+        const closedTicketsCount = await pool.request().query(closedTicketPerMonth);
+        return closedTicketsCount.recordset;
+    } catch(error) {
+        return error.message;
+    }
+}
+
 const insertNew = async (supportTicketData) => {
     try {
         let pool = await sql.connect(config.sql);
@@ -319,6 +389,10 @@ module.exports = {
    GetAssignedByUserId,
    getById,
    getByIdJoin,
+   getTicketCountByCat,
+   getTicketCountByCatPerUser,
+   getTicketCountPerSupport,
+   getResolvedTicketCountPerMonth,
    update,
    insertNew,
    del

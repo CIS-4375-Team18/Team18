@@ -70,7 +70,7 @@
                     :align="top"
                     size="xs"
                     class="q-mb-sm"
-                    name="help"
+                    name="fa-regular fa-circle-question"
                     color="secondary"
                   >
                     <q-tooltip>
@@ -93,7 +93,7 @@
                       :align="top"
                       size="xs"
                       class="q-mb-sm"
-                      name="help"
+                      name="fa-regular fa-circle-question"
                       color="secondary"
                     >
                       <q-tooltip> i.e., DELL, Acer, Lenovo, etc. </q-tooltip>
@@ -114,7 +114,7 @@
                     :align="top"
                     size="xs"
                     class="q-mb-sm"
-                    name="help"
+                    name="fa-regular fa-circle-question"
                     color="secondary"
                   >
                     <q-tooltip> i.e., G7-700 </q-tooltip>
@@ -141,7 +141,7 @@
                     :align="top"
                     size="xs"
                     class="q-mb-sm"
-                    name="help"
+                    name="fa-regular fa-circle-question"
                     color="secondary"
                   >
                     <q-tooltip> Select period to indicate availbe time </q-tooltip>
@@ -164,7 +164,7 @@
                     :align="top"
                     size="xs"
                     class="q-mb-sm"
-                    name="help"
+                    name="fa-regular fa-circle-question"
                     color="secondary"
                   >
                     <q-tooltip>
@@ -183,7 +183,7 @@
                   :align="top"
                   size="xs"
                   class="q-mb-sm"
-                  name="help"
+                  name="fa-regular fa-circle-question"
                   color="secondary"
                 >
                   <q-tooltip>
@@ -239,7 +239,7 @@
               @click="confirmCancel"
             />
             <q-btn
-              @click="saveRequest(userId)"
+              @click="saveRequest(userID)"
               class="q-ml-xl"
               color="secondary"
               no-caps
@@ -316,7 +316,7 @@ export default {
     findHardwareId() {
       this.hardwCatId = this.categoryData.find(o => o.TICKET_CATEGORY_DESC === 'HARDWARE');
     },
-    async saveRequest(userId) {
+    async saveRequest(userID) {
       try {
         const hardwareCategoryId = this.hardwCatId.TICKET_CATEGORY_ID;
         // if the category is hardware and if we have a subcategory, store it into this variable
@@ -359,7 +359,7 @@ export default {
           TICKET_PRIORITY_ID: this.PriorityList, // priority
           SUPPORT_AGENT_ID: null,
           RESOLUTION_DATE: null,
-          END_USER_ID: userId,
+          END_USER_ID: userID,
           SUPPORT_TICKET_ASSET_TAG: this.assetTagModel // asset tag
         };
 
@@ -402,7 +402,7 @@ export default {
     }
   },
   computed: {
-    ...mapGetters('auth', ['userId']),
+    ...mapGetters('auth', ['userID']),
   }
 };
 </script>

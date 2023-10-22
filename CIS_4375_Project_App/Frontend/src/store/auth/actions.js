@@ -10,10 +10,10 @@ export const login = async ({ commit }, { email, password }) => {
         if(response && response.data.ACTIVE_STATUS_ID === 1) {
             const userData = {
                 isAuthenticated: true,
+                userID: response.data.END_USER_ID,
                 userFirstName: response.data.END_USER_FIRST_NAME,
                 userEmail: response.data.END_USER_EMAIL,
                 userRole: response.data.USER_ROLE_NAME,
-                userId: response.data.END_USER_ID
             }
             commit('SET_STATE', userData)
             return userData;
