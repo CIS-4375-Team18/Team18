@@ -4,23 +4,39 @@ const config = require('../../config');
 const sql = require('mssql');
 
 
-const GetAllJoin = async () => {
+const GetAllJoin = async (USER_ID, SUPPORT_TICKET_STATUS) => {
     try {
         let pool = await sql.connect(config.sql);
-        const selectAllTicketsQ = "SELECT dbo.SUPPORT_TICKET.SUPPORT_TICKET_ID, dbo.SUPPORT_TICKET.SUPPORT_TICKET_SUBJECT, dbo.SUPPORT_TICKET.SUPPORT_TICKET_NOTE, dbo.SUPPORT_TICKET.DEVICE_MAKE, "+
-       " dbo.SUPPORT_TICKET.DEVICE_MODEL, dbo.SUPPORT_TICKET.SUPPORT_TICKET_TIMELINE, dbo.SUPPORT_TICKET.SUPPORT_TICKET_DATE_CREATED, dbo.SUPPORT_TICKET.SUPPORT_TICKET_RESOLUTION_TIME, "+
-       " dbo.END_USER.END_USER_ID, dbo.END_USER.END_USER_FIRST_NAME, dbo.END_USER.END_USER_LAST_NAME, dbo.SUPPORT_TICKET_STATUS.SUPPORT_TICKET_STATUS_ID, "+
-       " dbo.SUPPORT_TICKET_STATUS.SUPPORT_TICKET_STATUS_DESC, dbo.TICKET_CATEGORY.TICKET_CATEGORY_ID, dbo.TICKET_CATEGORY.TICKET_CATEGORY_DESC, dbo.TICKET_PRIORITY.TICKET_PRIORITY_ID, "+
-       " dbo.TICKET_PRIORITY.TICKET_PRIORITY_DESC, dbo.SUPPORT_TICKET.RESOLUTION_DATE, dbo.SUPPORT_AGENT.SUPPORT_AGENT_ID, dbo.SUPPORT_AGENT.SUPPORT_AGENT_FIRST_NAME, "+
-       " dbo.SUPPORT_AGENT.SUPPORT_AGENT_LAST_NAME, dbo.TICKET_SUB_CATEGORY.TICKET_SUB_CATEGORY_ID, dbo.TICKET_SUB_CATEGORY.TICKET_SUB_CATEGORY_DESC "+
-       " FROM dbo.SUPPORT_TICKET INNER JOIN "+
-       " dbo.END_USER ON dbo.SUPPORT_TICKET.END_USER_ID = dbo.END_USER.END_USER_ID INNER JOIN "+
-       " dbo.SUPPORT_TICKET_STATUS ON dbo.SUPPORT_TICKET.SUPPORT_TICKET_STATUS_ID = dbo.SUPPORT_TICKET_STATUS.SUPPORT_TICKET_STATUS_ID INNER JOIN " +
-       " dbo.TICKET_CATEGORY ON dbo.SUPPORT_TICKET.TICKET_CATEGORY_ID = dbo.TICKET_CATEGORY.TICKET_CATEGORY_ID INNER JOIN "+
-       " dbo.TICKET_PRIORITY ON dbo.SUPPORT_TICKET.TICKET_PRIORITY_ID = dbo.TICKET_PRIORITY.TICKET_PRIORITY_ID LEFT OUTER JOIN "+
-       " dbo.SUPPORT_AGENT ON dbo.SUPPORT_TICKET.SUPPORT_AGENT_ID = dbo.SUPPORT_AGENT.SUPPORT_AGENT_ID LEFT OUTER JOIN "+
-       " dbo.TICKET_SUB_CATEGORY ON dbo.SUPPORT_TICKET.TICKET_SUB_CATEGORY_ID = dbo.TICKET_SUB_CATEGORY.TICKET_SUB_CATEGORY_ID"
-        const supportTicketsList = await pool.request().query(selectAllTicketsQ);
+        let selectAllTicketsQ = "SELECT ST.SUPPORT_TICKET_ID "+
+        " ,ST.SUPPORT_TICKET_SUBJECT  "+
+        " ,ST.SUPPORT_TICKET_NOTE "+
+        " ,ST.DEVICE_MAKE "+
+        " ,ST.DEVICE_MODEL "+
+        " ,ST.SUPPORT_TICKET_TIMELINE "+
+        " ,ST.SUPPORT_TICKET_DATE_CREATED "+
+        " ,ST.SUPPORT_TICKET_RESOLUTION_TIME "+
+        " ,ST.SUPPORT_TICKET_STATUS_ID "+
+        " ,ST.TICKET_CATEGORY_ID "+
+        " ,ST.TICKET_SUB_CATEGORY_ID "+
+        " ,ST.TICKET_PRIORITY_ID "+
+        " ,ST.SUPPORT_AGENT_ID "+
+        " ,ST.RESOLUTION_DATE "+
+        " ,ST.END_USER_ID "+
+        " ,ST.SUPPORT_TICKET_ASSET_TAG "+
+        " ,EU.END_USER_FIRST_NAME "+
+        " ,EU.END_USER_LAST_NAME "+
+        " ,EU.END_USER_EMAIL "+
+        " FROM dbo.SUPPORT_TICKET as ST "+
+        " JOIN dbo.END_USER as EU ON ST.END_USER_ID = EU.END_USER_ID " +
+        " WHERE ST.SUPPORT_TICKET_STATUS_ID = @SUPPORT_TICKET_STATUS";
+
+        if (USER_ID) {
+            selectAllTicketsQ += " AND ST.END_USER_ID = @USER_ID";
+        }
+        const supportTicketsList = await pool.request()
+                            .input('SUPPORT_TICKET_STATUS', sql.Int, SUPPORT_TICKET_STATUS)
+                            .input('USER_ID', sql.Int, USER_ID)
+                            .query(selectAllTicketsQ);
         return supportTicketsList.recordset;
     } catch (error) {
         console.log(error.message);
@@ -31,7 +47,7 @@ const GetAllJoin = async () => {
 const GetAll = async () => {
     try {
         let pool = await sql.connect(config.sql);
-        const selectAllTicketsQ = "SELECT  [SUPPORT_TICKET_ID] "+
+        const selectAllTicketsQ = "SELECT [SUPPORT_TICKET_ID] "+
         " ,[SUPPORT_TICKET_SUBJECT]  "+
         " ,[SUPPORT_TICKET_NOTE] "+
         " ,[DEVICE_MAKE] "+
@@ -49,6 +65,42 @@ const GetAll = async () => {
         " ,[SUPPORT_TICKET_ASSET_TAG] "+
         " FROM [dbo].[SUPPORT_TICKET] "
         const supportTicketsList = await pool.request().query(selectAllTicketsQ);
+        return supportTicketsList.recordset;
+    } catch (error) {
+        console.log(error.message);
+    }
+}
+
+const GetAssignedByUserId = async (USER_ID) => {
+    try {
+        let pool = await sql.connect(config.sql);
+        const selectAllTicketsQ = "SELECT ST.SUPPORT_TICKET_ID "+
+        " ,ST.SUPPORT_TICKET_SUBJECT  "+
+        " ,ST.SUPPORT_TICKET_NOTE "+
+        " ,ST.DEVICE_MAKE "+
+        " ,ST.DEVICE_MODEL "+
+        " ,ST.SUPPORT_TICKET_TIMELINE "+
+        " ,ST.SUPPORT_TICKET_DATE_CREATED "+
+        " ,ST.SUPPORT_TICKET_RESOLUTION_TIME "+
+        " ,ST.SUPPORT_TICKET_STATUS_ID "+
+        " ,ST.TICKET_CATEGORY_ID "+
+        " ,ST.TICKET_SUB_CATEGORY_ID "+
+        " ,ST.TICKET_PRIORITY_ID "+
+        " ,ST.SUPPORT_AGENT_ID "+
+        " ,ST.RESOLUTION_DATE "+
+        " ,ST.END_USER_ID "+
+        " ,ST.SUPPORT_TICKET_ASSET_TAG "+
+        " ,EU.END_USER_FIRST_NAME "+
+        " ,EU.END_USER_LAST_NAME "+
+        " ,EU.END_USER_EMAIL "+
+        " FROM [dbo].[SUPPORT_TICKET] as ST "+
+        " JOIN dbo.END_USER as EU ON ST.END_USER_ID = EU.END_USER_ID"
+        " WHERE ST.SUPPORT_TICKET_STATUS_ID = @SUPPORT_TICKET_STATUS";
+        " AND ST.SUPPORT_AGENT_ID = @USER_ID";
+        const supportTicketsList = await pool.request()
+                            .input('USER_ID', sql.Int, USER_ID)
+                            .input('SUPPORT_TICKET_STATUS', sql.Int, SUPPORT_TICKET_STATUS)
+                            .query(selectAllTicketsQ);
         return supportTicketsList.recordset;
     } catch (error) {
         console.log(error.message);
@@ -301,6 +353,7 @@ const del = async (SUPPORT_TICKET_ID) => {
 module.exports = {
    GetAll,
    GetAllJoin,
+   GetAssignedByUserId,
    getById,
    getByIdJoin,
    getTicketCountByCat,
