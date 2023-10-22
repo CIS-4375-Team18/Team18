@@ -1,29 +1,14 @@
 <template>
     <div class="q-pa-md">
         <div class="q-gutter-y-md" style="margin-left: 15px; margin-right: 15px;">
-            <q-card>
-                <q-tabs v-model="tab" dense class="text-white" indicator-color="white" :align="'justify'" narrow-indicator
-                    style="background-color: #ad0000;">
-                    <q-tab name="requests" label="View Requests" />
-                </q-tabs>
-                <q-separator />
-                <q-tab-panels v-model="tab" animated :align="'center'">
-                    <q-tab-panel name="requests">
-                        <div class="q-pa-md">
-                            <q-table title="Requests" color="secondary" :align="left" :loading="loading"
-                                :rows="supporttickets" :columns="supportticketsColumns" style="width: 80%;">
-                                <template #body-cell-status="props">
-                                    <q-td :props="props">
-                                        <q-chip :color="props.row.SUPPORT_TICKET_STATUS_ID === 1 ? 'green' : 'red'"
-                                            text-color="white" dense class="text-weight-bolder" square>
-                                            {{ props.row.SUPPORT_TICKET_STATUS_ID === 1 ? 'ACTIVE' : 'INACTIVE'}}</q-chip>
-                                    </q-td>
-                                </template>
-                            </q-table>
-                        </div>
-                    </q-tab-panel>
-                </q-tab-panels>
-            </q-card>
+            <div class="q-pa-md">
+                <q-table title="Requests" color="secondary" :align="left" :loading="loading"
+                    :rows="supporttickets" :columns="supportticketsColumns" style="width: 80%;">
+                    <template v-slot:top>
+                        <q-select v-model="filterByModel" :options="filterByOptions" label="Filter By" />
+                    </template>
+                </q-table>
+            </div>
         </div>
     </div>
 </template>
@@ -65,10 +50,31 @@ export default {
     setup() {
         const supportticketsColumns = [
             { name: 'subject', label: 'Subject', field: 'SUPPORT_TICKET_SUBJECT', align: 'left', sortable: true  },
-            { name: "creationDate", align: "left", label: "Creation Date", field: "SUPPORT_TICKET_DATE_CREATED", sortable: true, format: (val) => `${new Date(val)}` },
-            { name: "status", align: "center", label: "Status", field: "SUPPORT_TICKET_STATUS_ID", sortable: true },
+            { name: "creationDate", align: "left", label: "Creation Date", field: "SUPPORT_TICKET_DATE_CREATED", sortable: true, format: (val) => {
+                const date = new Date(val);
+                const month = (date.getMonth() + 1).toString().padStart(2, '0');
+                const day = date.getDate().toString().padStart(2, '0');
+                const year = date.getFullYear();
+                let hours = date.getHours();
+                const minutes = date.getMinutes().toString().padStart(2, '0');
+                let ampm = 'AM';
+
+                // Convert to 12-hour format and determine AM/PM
+                if (hours >= 12) {
+                    ampm = 'PM';
+                    if (hours > 12) {
+                    hours -= 12;
+                    }
+                }
+
+                // Create the formatted date string
+                const formattedDate = `${month}/${day}/${year} ${hours.toString().padStart(2, '0')}:${minutes} ${ampm}`;
+
+                return formattedDate;
+            } },
             { name: "priority", align: "center", label: "Priority", field: "prioritystatus", sortable: true },
         ];
+        const filterByOptions = ['All', 'In Progress', 'Closed'];
         return {
             tab: ref('requests'),
             setActive: ref('Active'),
@@ -76,6 +82,8 @@ export default {
             supportticketsColumns,
             selected: ref([]),
             redModel: ref(true),
+            filterByModel: ref('All'),
+            filterByOptions
         };
     },
 }
