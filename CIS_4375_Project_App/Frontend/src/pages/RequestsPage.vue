@@ -20,6 +20,7 @@
                             @update:model-value="getSupportTickets"
                         />
                         <q-select
+                            v-if="userRole ==='System Administrator' || userRole ==='IT Teacher'"
                             use-input
                             hide-selected
                             fill-input
