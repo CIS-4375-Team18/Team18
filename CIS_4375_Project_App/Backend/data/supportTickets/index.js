@@ -71,38 +71,6 @@ const GetAll = async () => {
     }
 }
 
-const GetByUserId = async (USER_ID, SUPPORT_TICKET_STATUS) => {
-    try {
-        let pool = await sql.connect(config.sql);
-        const selectAllTicketsQ = "SELECT  [SUPPORT_TICKET_ID] "+
-        " ,[SUPPORT_TICKET_SUBJECT]  "+
-        " ,[SUPPORT_TICKET_NOTE] "+
-        " ,[DEVICE_MAKE] "+
-        " ,[DEVICE_MODEL] "+
-        " ,[SUPPORT_TICKET_TIMELINE] "+
-        " ,[SUPPORT_TICKET_DATE_CREATED] "+
-        " ,[SUPPORT_TICKET_RESOLUTION_TIME] "+
-        " ,[SUPPORT_TICKET_STATUS_ID] "+
-        " ,[TICKET_CATEGORY_ID] "+
-        " ,[TICKET_SUB_CATEGORY_ID] "+
-        " ,[TICKET_PRIORITY_ID] "+
-        " ,[SUPPORT_AGENT_ID] "+
-        " ,[RESOLUTION_DATE] "+
-        " ,[END_USER_ID] "+
-        " ,[SUPPORT_TICKET_ASSET_TAG] "+
-        " FROM [dbo].[SUPPORT_TICKET] " + 
-        " WHERE END_USER_ID = @USER_ID AND " +
-        " [SUPPORT_TICKET_STATUS_ID] = @SUPPORT_TICKET_STATUS";
-        const supportTicketsList = await pool.request()
-                            .input('USER_ID', sql.Int, USER_ID)
-                            .input('SUPPORT_TICKET_STATUS', sql.Int, SUPPORT_TICKET_STATUS)
-                            .query(selectAllTicketsQ);
-        return supportTicketsList.recordset;
-    } catch (error) {
-        console.log(error.message);
-    }
-}
-
 const GetAssignedByUserId = async (USER_ID) => {
     try {
         let pool = await sql.connect(config.sql);
@@ -385,7 +353,6 @@ const del = async (SUPPORT_TICKET_ID) => {
 module.exports = {
    GetAll,
    GetAllJoin,
-   GetByUserId,
    GetAssignedByUserId,
    getById,
    getByIdJoin,

@@ -27,7 +27,7 @@ const GetAllTicketsDisplay = async (req, res, next) => {
         } else if (userRole === 'Technician') {
             ticketList = await supportTicketData.GetAssignedByUserId(userId, status);
         } else {
-            ticketList = await supportTicketData.GetByUserId(userId, status);
+            ticketList = await supportTicketData.GetAllJoin(userId, status);
         }
         
         res.send(ticketList);         
