@@ -1,6 +1,15 @@
 <template>
   
     <q-page v-if="isAuthenticated" padding> 
+      <div v-if="userRole === 'Staff'">
+        <div class="row q-mt-md text-h5 q-ml-md">
+          Welcome {{ userFirstName }},
+        </div>
+        <div class="row q-mb-lg text-subtitle2 q-ml-md" style="color: #626262;">
+          All systems are running smoothly!
+        </div>
+      </div>
+
       <div class="row q-col-gutter-lg">
         <div class="col-md-4">
           <q-card class="shadow-up-10" style="height: 130px;">
@@ -45,8 +54,8 @@
             <div v-else>
               <pieChart
                 v-if="showPieChart"
-                :series="userRole !== 'Staff' ? pieSeries : userPieSeries"
-                :options="userRole !== 'Staff' ? chartOptions : userChartOptions"
+                :series="pieSeries"
+                :options="chartOptions"
               >
               </pieChart>
               <div v-else class="q-pa-md">
@@ -71,6 +80,14 @@
               v-if="userRole != 'Staff'"
             >
             </lineChart>
+          </q-card>
+        </div>
+      </div>
+
+      <div v-if="userRole === 'Staff'" class="row" style="margin-top: 10px;">
+        <div class="col-md-12">
+          <q-card class="shadow-up-9">
+            Hello
           </q-card>
         </div>
       </div>
@@ -113,13 +130,6 @@
             text: ''
           },
         },
-        userPieSeries: [],
-        userChartOptions: {
-          labels: [],
-          title: {
-            text: ''
-          },
-        },
   
         isPieLoading: false,
         isVisible: true,
@@ -129,6 +139,12 @@
         userOpenTickets: '',
         totalClosedTickets: '',
         userClosedTickets: '',
+        ticketColums: [
+          {name: 'Date Created', label: 'Date Created', field: 'DATE_CREATED', align: 'left'},
+          {name: 'Ticket Subject', required: true, label: 'Ticket Subject', field: 'SUPPORT_TICKET_SUBJECT', align: 'left'}, 
+          {name: 'Status', label: 'Status', field: 'SUPPORT_TICKET_STATUS_DESC', align: 'left'},
+          {name: 'Priority', label: 'Priority', field: 'TICKET_PRIORITY_ID', align: 'left'},
+        ],
       }
     },
   
@@ -210,7 +226,7 @@
     },
   
     computed: {
-      ...mapGetters('auth', ['userID', 'userRole', 'isAuthenticated']),
+      ...mapGetters('auth', ['userID', 'userRole', 'isAuthenticated', 'userFirstName']),
       showPieChart() {
         if (this.userRole !== 'Staff') {
           return this.pieSeries.length > 0;

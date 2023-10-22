@@ -115,7 +115,7 @@
 
           </q-list>
 
-            <q-item clickable v-ripple style="margin-top: 10px;"
+            <!-- <q-item clickable v-ripple style="margin-top: 10px;"
             @click="$router.push('/reports')" >
               <q-item-section avatar>
                 <q-icon name="equalizer" />
@@ -124,9 +124,9 @@
               <q-item-section>
                 Reports
               </q-item-section>
-            </q-item>
+            </q-item> -->
 
-            <q-item clickable v-ripple style="margin-top: 10px;"
+            <!-- <q-item clickable v-ripple style="margin-top: 10px;"
             @click="$router.push('/knowledge')" >
               <q-item-section avatar>
                 <q-icon name="storage" />
@@ -135,7 +135,7 @@
               <q-item-section>
                 Knowledge Base
               </q-item-section>
-            </q-item>
+            </q-item> -->
             <q-separator  style="margin-top: 10px;"/>
 
             <q-item clickable v-ripple style="margin-top: 10px;"
