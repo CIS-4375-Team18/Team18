@@ -100,7 +100,7 @@ export default {
             this.loading = true;
             this.supporttickets = [];
             axios.post(`${apiURL}/ticketDisplay`, {
-                userId: this.userId,
+                userId: this.userID,
                 userRole: this.userRole,
                 status: this.filterByModel.SUPPORT_TICKET_STATUS_ID,
                 createdByUserId: this.userModel?.END_USER_ID || null
@@ -188,7 +188,7 @@ export default {
         };
     },
     computed: {
-      ...mapGetters('auth', ['userId','userRole']),
+      ...mapGetters('auth', ['userID','userRole']),
 
     }
 }
