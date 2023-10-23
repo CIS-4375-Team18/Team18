@@ -30,6 +30,12 @@
                                             style="color: #ad0000;"></q-btn>
                                     </q-td>
                                 </template>
+                                <template v-if="userRole==='System Administrator' || userRole==='IT Teacher'" v-slot:body-cell-chngPass="props" > <!-- On click will bring out dialog box to confirm deletion-->
+                                    <q-td :props="props">
+                                        <q-btn dense round flat @click=changePassword(props) icon="edit"
+                                            style="color: #ad0000;"></q-btn>
+                                    </q-td>
+                                </template>
                     </q-table>
 
                     <!-- Only valid users are able to select this role-->
@@ -187,7 +193,7 @@ export default {
             {name: "status", align: "center", label: "Status", field: "ACTIVE_STATUS_DESC", sortable: true},
             {name: 'actions', label: 'Edit', field: '', align: 'left' },
             {name: 'delactions', label: 'Delete', field: '', align: 'left' },
-            
+            {name: 'chngPass', label: 'Change Password', field: '', align: 'left' },            
             ],
 
         }
@@ -204,36 +210,10 @@ export default {
             this.user_roles = res.data
             })
         },
-        updateStatusID(status){ //Will get id based on status
-            try{
-                axios.get(`${apiURL}/activeSingleStatus/${status}`).then((res) => {
-                    console.log('before status id change' + this.editedItem.ACTIVE_STATUS_ID);
-                this.editedItem.ACTIVE_STATUS_ID = res.data[0].ACTIVE_STATUS_ID;
-                console.log("after status id change" + this.editedItem.ACTIVE_STATUS_ID)
-            })
-            }
-            catch(error){
-                console.error('API request failed:', error);
-                this.$q.notify({ color: 'negative', message: 'An error occurred while getting statuses.' });
-            }
-            
-        },
-        updateSupportRoleID(status){
-            try{
-                axios.get(`${apiURL}/supportroleByStatus/${status}`).then((res) => {
-                    this.editedItem.SUPPORT_ROLE_ID = res.data[0].SUPPORT_ROLE_ID;
-
-            })
-            }
-            catch(error){
-                console.error('API request failed:', error);
-                this.$q.notify({ color: 'negative', message: 'An error occurred while getting Support roles.' });
-            }
-        },
         createNewUser() {
             this.$router.push('/createUser');
         },
-        rerenderTable(){
+        rerenderTable(){//rerenders page
             this.tableKey +=1;
             console.log("rendered table");
             window.location.reload();
@@ -273,15 +253,15 @@ export default {
             
             this.getRoles();
         },
-        editUser() { //Once customer presses confirm on dialog box
-            if(this.editedItem.ACTIVE_STATUS_DESC == "ACTIVE"){
+        editUser() { //Once customer presses confirm on dialog box, pushed changes to DB
+            if(this.editedItem.ACTIVE_STATUS_DESC == "ACTIVE"){//Ony two values, placed into code
                 this.editedItem.ACTIVE_STATUS_ID = 1;
             }
             else if(this.editedItem.ACTIVE_STATUS_DESC == "INACTIVE"){
                 this.editedItem.ACTIVE_STATUS_ID = 2;
             }
 
-            if(this.editedItem.SUPPORT_ROLE_DESC == "SUPPORT"){
+            if(this.editedItem.SUPPORT_ROLE_DESC == "SUPPORT"){ //Ony two values, placed into code
                 this.editedItem.SUPPORT_ROLE_ID = 1;
             }
             else if(this.editedItem.SUPPORT_ROLE_DESC == "NOT-SUPPORT"){
