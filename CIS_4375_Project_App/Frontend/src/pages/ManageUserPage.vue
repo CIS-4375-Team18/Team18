@@ -97,7 +97,7 @@
                         <q-card-actions align="right">
                         <q-btn flat label="Cancel" color="primary" v-close-popup />
                         <!-- On confirmation will execute deletion-->
-                        <q-btn flat label="Confirm" color="primary" @click="editUser(editedItem)" v-close-popup />
+                        <q-btn flat label="Confirm" color="primary" @click="editUser()" v-close-popup />
                         </q-card-actions>
                     </q-card>
                     </q-dialog>
@@ -146,6 +146,8 @@ export default {
     },
     data () {
         return {
+            tableKey : 0, //will be used to re-render table
+
             editedItem:{
                 END_USER_ID: "",
                 END_USER_FIRST_NAME: "",
@@ -187,7 +189,6 @@ export default {
             {name: 'delactions', label: 'Delete', field: '', align: 'left' },
             
             ],
-            tableKey : 0, //will be used to re-render table
 
         }
     },
@@ -203,22 +204,25 @@ export default {
             this.user_roles = res.data
             })
         },
-        async updateStatusID(status){ //Will get id based on status
+        updateStatusID(status){ //Will get id based on status
             try{
                 axios.get(`${apiURL}/activeSingleStatus/${status}`).then((res) => {
-                this.editedItem.ACTIVE_STATUS_ID = res.data[0].ACTIVE_STATUS_ID
+                    console.log('before status id change' + this.editedItem.ACTIVE_STATUS_ID);
+                this.editedItem.ACTIVE_STATUS_ID = res.data[0].ACTIVE_STATUS_ID;
+                console.log("after status id change" + this.editedItem.ACTIVE_STATUS_ID)
             })
             }
             catch(error){
                 console.error('API request failed:', error);
                 this.$q.notify({ color: 'negative', message: 'An error occurred while getting statuses.' });
             }
-            console.log(this.editedItem.ACTIVE_STATUS_ID)
+            
         },
-        async updateSupportRoleID(status){
+        updateSupportRoleID(status){
             try{
                 axios.get(`${apiURL}/supportroleByStatus/${status}`).then((res) => {
                     this.editedItem.SUPPORT_ROLE_ID = res.data[0].SUPPORT_ROLE_ID;
+
             })
             }
             catch(error){
@@ -231,7 +235,8 @@ export default {
         },
         rerenderTable(){
             this.tableKey +=1;
-            console.log("rendered table")
+            console.log("rendered table");
+            window.location.reload();
         },
         editUserDialog(item){ //Puts values into appropriate fields in dialog box
             console.log("Start of get to edit")
@@ -246,66 +251,89 @@ export default {
             this.editedItem.END_USER_EMAIL = item.row.END_USER_EMAIL;
             this.editedItem.USER_ROLE_ID = item.row.USER_ROLE_ID;
             this.editedItem.USER_ROLE_NAME = item.row.USER_ROLE_NAME;
-            this.pre_changeUser_Role = item.row.USER_ROLE_NAME; //Will be user for a comparison
             this.editedItem.ACTIVE_STATUS_DESC = item.row.ACTIVE_STATUS_DESC;
-            this.pre_changeUser_Status = item.row.ACTIVE_STATUS_DESC; //Will be user for a comparison
             this.editedItem.ACTIVE_STATUS_ID = item.row.ACTIVE_STATUS_ID;
             this.editedItem.SUPPORT_ROLE_DESC = item.row.SUPPORT_ROLE_DESC;
-            this.pre_ChangeSupport_Role = item.row.SUPPORT_ROLE_DESC;
             this.editedItem.SUPPORT_ROLE_ID = item.row.SUPPORT_ROLE_ID;
             this.editedItem.END_USER_PERIOD = item.row.END_USER_PERIOD;
+
+            this.pre_changeUser_Role = item.row.USER_ROLE_NAME; //Will be user for a comparison
+            this.pre_changeUser_Status = item.row.ACTIVE_STATUS_DESC; //Will be user for a comparison
+            this.pre_ChangeSupport_Role = item.row.SUPPORT_ROLE_DESC;
             this.pre_changeUser_Period = item.row.END_USER_PERIOD;//Used for comparison
+
+            if(this.editedItem.SUPPORT_ROLE_DESC == null){
+                this.editedItem.SUPPORT_ROLE_DESC = "NOT-SUPPORT";
+                this.editedItem.SUPPORT_ROLE_ID = 2;
+                this.pre_ChangeSupport_Role = "NOT-SUPPORT";
+            }
+            else{
+
+            }
             
             this.getRoles();
         },
-        editUser(itemData) { //Once customer presses confirm on dialog box
-            try{
-                const isEmailValid = this.validateEmail(this.editedItem.END_USER_EMAIL);//validate email
+        editUser() { //Once customer presses confirm on dialog box
+            if(this.editedItem.ACTIVE_STATUS_DESC == "ACTIVE"){
+                this.editedItem.ACTIVE_STATUS_ID = 1;
+            }
+            else if(this.editedItem.ACTIVE_STATUS_DESC == "INACTIVE"){
+                this.editedItem.ACTIVE_STATUS_ID = 2;
+            }
 
-                if(isEmailValid === true){
-                    if(this.editedItem.USER_ROLE_NAME != this.pre_changeUser_Role){ //Check to see if there are changes
-                        this.editedItem.USER_ROLE_ID = this.editedItem.USER_ROLE_NAME.USER_ROLE_ID; //Assigns changes to correctly
-                        this.editedItem.USER_ROLE_NAME = this.editedItem.USER_ROLE_NAME.USER_ROLE_NAME;
+            if(this.editedItem.SUPPORT_ROLE_DESC == "SUPPORT"){
+                this.editedItem.SUPPORT_ROLE_ID = 1;
+            }
+            else if(this.editedItem.SUPPORT_ROLE_DESC == "NOT-SUPPORT"){
+                this.editedItem.SUPPORT_ROLE_ID = 2;
+            }
+            
+ 
+            if(this.editedItem.END_USER_PERIOD != this.pre_changeUser_Period){//Updates changes correctly
+                this.editedItem.END_USER_PERIOD = this.editedItem.END_USER_PERIOD.value;
+               
+            }
+
+            if(this.editedItem.USER_ROLE_NAME != this.pre_changeUser_Role){ //Check to see if there are changes
+                    this.editedItem.USER_ROLE_ID = this.editedItem.USER_ROLE_NAME.USER_ROLE_ID; //Updates changes to correctly
+                    this.editedItem.USER_ROLE_NAME = this.editedItem.USER_ROLE_NAME.USER_ROLE_NAME;                        
                     }
 
-                    if(this.editedItem.END_USER_PERIOD != this.pre_changeUser_Period){//Updates changes correctly
-                        this.editedItem.END_USER_PERIOD = this.editedItem.END_USER_PERIOD.value;
+            const isEmailValid = this.validateEmail(this.editedItem.END_USER_EMAIL);//validate email
+            if(isEmailValid === true){
+                    const updatedUser = {
+                    END_USER_ID: this.editedItem.END_USER_ID, 
+                    END_USER_FIRST_NAME: this.editedItem.END_USER_FIRST_NAME,
+                    END_USER_LAST_NAME: this.editedItem.END_USER_LAST_NAME,
+                    END_USER_EMAIL: this.editedItem.END_USER_EMAIL,
+                    USER_ROLE_ID: this.editedItem.USER_ROLE_ID,
+                    USER_ROLE_NAME: this.editedItem.USER_ROLE_NAME,
+                    SUPPORT_ROLE_DESC: this.editedItem.SUPPORT_ROLE_DESC,
+                    SUPPORT_ROLE_ID: this.editedItem.SUPPORT_ROLE_ID,
+                    ACTIVE_STATUS_DESC: this.editedItem.ACTIVE_STATUS_DESC,
+                    ACTIVE_STATUS_ID: this.editedItem.ACTIVE_STATUS_ID,
+                    END_USER_PERIOD: this.editedItem.END_USER_PERIOD,
                     }
 
-                    if(this.editedItem.ACTIVE_STATUS_DESC != this.pre_changeUser_Status){//Updates changes correctly
-                        this.updateStatusID(this.editedItem.ACTIVE_STATUS_DESC);
-                    }
+                    console.log(updatedUser);
+                    const response = axios.put(`${apiURL}/enduser/${updatedUser.END_USER_ID}`, updatedUser);
 
-                    if(this.editedItem.SUPPORT_ROLE_DESC != this.pre_ChangeSupport_Role){ //Updates changes
-                        this.editedItem.SUPPORT_ROLE_ID = this.updateSupportRoleID(this.editedItem.SUPPORT_ROLE_DESC);
-                        console.log(this.editedItem.SUPPORT_ROLE_DESC);
-                        console.log(this.pre_ChangeSupport_Role);
+                    if (response.status === 200) {
+                        this.$q.notify({ color: 'positive', message: 'User registered successfully' });
+                        this.$router.push('/users');
+                        console.log(response);
+                    } 
+                    else {
+                        console.log(response);
+                        this.$q.notify({ color: 'negative', message: 'Registration failed' });
                     }
-                    
-                    console.log(itemData);
-                    
-
-                    /*axios.put(`${apiURL}/enduser/${itemData.END_USER_ID}`).then((res) => {
-                        if (res.status === 200) {
-                            this.$q.notify({ color: 'positive', message: 'User deleted successfully' });
-                            this.$router.push('/users');
-                        } 
-                        else {
-                            this.$q.notify({ color: 'negative', message: 'Error while deleting' });
-                        }
-                    })*/
                 }
                 else{
                     this.$q.notify({ color: 'negative', message: 'Email is not valid. Please try again.' });
-                    this.user.password = '';
-                }
-            }
-            catch (error) {
-                console.error('API request failed:', error);
-                this.$q.notify({ color: 'negative', message: 'An error occurred while updating user.' });
-            }
+                    this.editedItem.END_USER_EMAIL = '';
+                }            
 
-            
+                this.rerenderTable();
         },
         deleteUserDialog(item){ //saves needed information into variables
             this.deleteItemDial = true;
