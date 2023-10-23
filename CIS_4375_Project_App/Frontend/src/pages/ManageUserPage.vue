@@ -49,16 +49,26 @@
                         <q-avatar color="white" text-color="white">
                             <img src="https://cdn.quasar.dev/img/boy-avatar.png">
                         </q-avatar>
-                        <q-input label="First Name: " dense v-model="editedItem.itemFirstName"></q-input>
-                        <q-input label="Last Name: " dense v-model="editedItem.itemLastName"></q-input>
-                        <q-input label="Email" dense v-model="editedItem.itemEmail"></q-input>
-                        <q-input label="Role: " dense v-model="editedItem.itemRole"></q-input>
-                        <q-input label="Period: " dense v-model="editedItem.itemUserPeriod"></q-input>
+                        <q-input label="First Name: " dense v-model="editedItem.END_USER_FIRST_NAME"></q-input>
+                        <q-input label="Last Name: " dense v-model="editedItem.END_USER_LAST_NAME"></q-input>
+                        <q-input label="Email" dense v-model="editedItem.END_USER_EMAIL"></q-input>
+
+                        <q-select v-model="this.editedItem.USER_ROLE_NAME" label="Role"
+                        :options="user_roles" option-value="USER_ROLE_ID" 
+                        option-label="USER_ROLE_NAME"
+                        :rules="[val => !!val || 'Field is required']">
+                        </q-select>
+
+                        <q-select v-model="editedItem.END_USER_PERIOD" label="Class Period"
+                        :options="period_options" option-value="value" 
+                        option-label="label"
+                        :rules="[val => !!val || 'Field is required']">
+                        </q-select>
                         </q-card-section>
 
                         <q-card-section> <!-- Toggle support authorization-->
                             <q-toggle label="Support?"
-                                v-model="editedItem.itemSupportRole"
+                                v-model="editedItem.SUPPORT_ROLE_DESC"
                                 checked-icon="check"
                                 color="green"
                                 unchecked-icon="clear"
@@ -67,13 +77,13 @@
                                 true-value="SUPPORT"
                                 toggle-order="fT"
                             />
-                            {{ editedItem.itemSupportRole }}
+                            {{ editedItem.SUPPORT_ROLE_DESC }}
                         </q-card-section>
 
                         
                         <q-card-section> <!-- Toggle active and inactive Status of User-->
                             <q-toggle label="Status"
-                                v-model="editedItem.itemStatus"
+                                v-model="editedItem.ACTIVE_STATUS_DESC"
                                 checked-icon="check"
                                 color="green"
                                 unchecked-icon="clear"
@@ -81,7 +91,7 @@
                                 false-value="INACTIVE"
                                 true-value="ACTIVE"
                             />
-                            {{ editedItem.itemStatus }}
+                            {{ editedItem.ACTIVE_STATUS_DESC }}
                         </q-card-section>
 
                         <q-card-actions align="right">
@@ -102,13 +112,13 @@
                         <q-card-section>
                         <q-avatar icon="warning" color="white" text-color="warning" size="" />
                         <span class="text-body2 q-mt-lg">You are about to delete user: 
-                            {{ this.itemFirstName + " " + this.itemLastName}}</span>
+                            {{ this.END_USER_FIRST_NAME + " " + this.END_USER_LAST_NAME}}</span>
                         </q-card-section>
 
                         <q-card-actions align="right">
                         <q-btn flat label="Cancel" color="primary" v-close-popup />
                         <!-- On confirmation will execute deletion-->
-                        <q-btn flat label="Confirm" color="primary" @click="deleteUser(this.itemID)" v-close-popup />
+                        <q-btn flat label="Confirm" color="primary" @click="deleteUser(this.END_USER_ID)" v-close-popup />
                         </q-card-actions>
                     </q-card>
                     </q-dialog>
@@ -122,6 +132,7 @@
 import { mapGetters } from 'vuex';
 import axios from 'axios';
 import { ref } from 'vue';
+const apiURL = import.meta.env.VITE_API_URL
 
 export default {
     setup(){
@@ -136,19 +147,35 @@ export default {
     data () {
         return {
             editedItem:{
-                itemID: "",
-                itemFirstName: "",
-                itemLastName: "",
-                itemEmail:"",
-                itemRoleID:"",
-                itemRole:"",
-                itemSupportRole:"",
-                itemSupportRoleID: "",
-                itemStatus:"",
-                itemStatusID: "",
-                itemUserPeriod: "",
+                END_USER_ID: "",
+                END_USER_FIRST_NAME: "",
+                END_USER_LAST_NAME: "",
+                END_USER_EMAIL:"",
+                USER_ROLE_ID:"",
+                USER_ROLE_NAME:"",
+                SUPPORT_ROLE_DESC:"",
+                SUPPORT_ROLE_ID: "",
+                ACTIVE_STATUS_DESC:"",
+                ACTIVE_STATUS_ID: "",
+                END_USER_PERIOD: "",
+                
             },
-            userData: [],
+            userData: [], //Will hold all users data to put into tables
+            user_roles: [], //Will hold available user_roles
+            pre_changeUser_Period: "",
+            pre_changeUser_Role:"",
+            pre_changeUser_Status:"",
+            pre_ChangeSupport_Role:"",
+            period_options: [//Manual, but will hold user periods
+                {label: '1', value: 1},
+                {label: '2', value: 2},
+                {label: '3', value: 3},
+                {label: '4', value: 4},
+                {label: '5', value: 5},
+                {label: '6', value: 6},
+                {label: '7', value: 7},
+                {label: '8', value: 8}
+            ],
 
             userColumns : [ //Table template
             {name: 'First Name', required: true, label: 'First Name', field: 'END_USER_FIRST_NAME', align: 'left'}, 
@@ -165,12 +192,39 @@ export default {
         }
     },
     methods: {
-        async getUsers(){
-            axios.get(`http://localhost:8001/api/endusers`).then((res) => { //Loads data when creating the page
+        getUsers(){
+            axios.get(`${apiURL}/endusers`).then((res) => { //Loads data when creating the page
             this.userData = res.data;
             this.rerenderTable;
             this.loading = false;
-        })
+        })},
+        getRoles(){
+            axios.get(`${apiURL}/roles`).then((res) => {
+            this.user_roles = res.data
+            })
+        },
+        async updateStatusID(status){ //Will get id based on status
+            try{
+                axios.get(`${apiURL}/activeSingleStatus/${status}`).then((res) => {
+                this.editedItem.ACTIVE_STATUS_ID = res.data[0].ACTIVE_STATUS_ID
+            })
+            }
+            catch(error){
+                console.error('API request failed:', error);
+                this.$q.notify({ color: 'negative', message: 'An error occurred while getting statuses.' });
+            }
+            console.log(this.editedItem.ACTIVE_STATUS_ID)
+        },
+        async updateSupportRoleID(status){
+            try{
+                axios.get(`${apiURL}/supportroleByStatus/${status}`).then((res) => {
+                    this.editedItem.SUPPORT_ROLE_ID = res.data[0].SUPPORT_ROLE_ID;
+            })
+            }
+            catch(error){
+                console.error('API request failed:', error);
+                this.$q.notify({ color: 'negative', message: 'An error occurred while getting Support roles.' });
+            }
         },
         createNewUser() {
             this.$router.push('/createUser');
@@ -185,60 +239,113 @@ export default {
             console.log("End of get to edit user")
             this.editItemDial = true;
 
-            this.editedItem.itemID = item.row.END_USER_ID;
-            this.editedItem.itemFirstName = item.row.END_USER_FIRST_NAME;
-            this.editedItem.itemLastName = item.row.END_USER_LAST_NAME;
-            this.editedItem.itemEmail = item.row.END_USER_EMAIL;
-            this.editedItem.itemRoleID = item.row.USER_ROLE_ID;
-            this.editedItem.itemRole = item.row.USER_ROLE_NAME;
-            this.editedItem.itemStatus = item.row.ACTIVE_STATUS_DESC; //Different, so that toggle recognized initial position
-            this.editedItem.itemStatusID = item.row.ACTIVE_STATUS_ID;
-            this.editedItem.itemSupportRole = item.row.SUPPORT_ROLE_DESC;
-            this.editedItem.itemSupportRoleID = item.row.SUPPORT_ROLE_ID;
-            this.editedItem.itemUserPeriod = item.row.END_USER_PERIOD;
-            console.log(this.editedItem.itemStatus);
+            //Puts all current values into dialogue box
+            this.editedItem.END_USER_ID = item.row.END_USER_ID;
+            this.editedItem.END_USER_FIRST_NAME = item.row.END_USER_FIRST_NAME;
+            this.editedItem.END_USER_LAST_NAME = item.row.END_USER_LAST_NAME;
+            this.editedItem.END_USER_EMAIL = item.row.END_USER_EMAIL;
+            this.editedItem.USER_ROLE_ID = item.row.USER_ROLE_ID;
+            this.editedItem.USER_ROLE_NAME = item.row.USER_ROLE_NAME;
+            this.pre_changeUser_Role = item.row.USER_ROLE_NAME; //Will be user for a comparison
+            this.editedItem.ACTIVE_STATUS_DESC = item.row.ACTIVE_STATUS_DESC;
+            this.pre_changeUser_Status = item.row.ACTIVE_STATUS_DESC; //Will be user for a comparison
+            this.editedItem.ACTIVE_STATUS_ID = item.row.ACTIVE_STATUS_ID;
+            this.editedItem.SUPPORT_ROLE_DESC = item.row.SUPPORT_ROLE_DESC;
+            this.pre_ChangeSupport_Role = item.row.SUPPORT_ROLE_DESC;
+            this.editedItem.SUPPORT_ROLE_ID = item.row.SUPPORT_ROLE_ID;
+            this.editedItem.END_USER_PERIOD = item.row.END_USER_PERIOD;
+            this.pre_changeUser_Period = item.row.END_USER_PERIOD;//Used for comparison
             
+            this.getRoles();
         },
-        editUser(itemData) {
-            console.log(itemData)
+        editUser(itemData) { //Once customer presses confirm on dialog box
+            try{
+                const isEmailValid = this.validateEmail(this.editedItem.END_USER_EMAIL);//validate email
 
-            /*axios.put(`http://localhost:8001/api/enduser/${itemData.itemID}`).then((res) => {
-                if (res.status === 200) {
-                        this.$q.notify({ color: 'positive', message: 'User deleted successfully' });
-                        this.$router.push('/users');
-                    } 
-                else {
-                        this.$q.notify({ color: 'negative', message: 'Error while deleting' });
+                if(isEmailValid === true){
+                    if(this.editedItem.USER_ROLE_NAME != this.pre_changeUser_Role){ //Check to see if there are changes
+                        this.editedItem.USER_ROLE_ID = this.editedItem.USER_ROLE_NAME.USER_ROLE_ID; //Assigns changes to correctly
+                        this.editedItem.USER_ROLE_NAME = this.editedItem.USER_ROLE_NAME.USER_ROLE_NAME;
                     }
-            })*/
+
+                    if(this.editedItem.END_USER_PERIOD != this.pre_changeUser_Period){//Updates changes correctly
+                        this.editedItem.END_USER_PERIOD = this.editedItem.END_USER_PERIOD.value;
+                    }
+
+                    if(this.editedItem.ACTIVE_STATUS_DESC != this.pre_changeUser_Status){//Updates changes correctly
+                        this.updateStatusID(this.editedItem.ACTIVE_STATUS_DESC);
+                    }
+
+                    if(this.editedItem.SUPPORT_ROLE_DESC != this.pre_ChangeSupport_Role){ //Updates changes
+                        this.editedItem.SUPPORT_ROLE_ID = this.updateSupportRoleID(this.editedItem.SUPPORT_ROLE_DESC);
+                        console.log(this.editedItem.SUPPORT_ROLE_DESC);
+                        console.log(this.pre_ChangeSupport_Role);
+                    }
+                    
+                    console.log(itemData);
+                    
+
+                    /*axios.put(`${apiURL}/enduser/${itemData.END_USER_ID}`).then((res) => {
+                        if (res.status === 200) {
+                            this.$q.notify({ color: 'positive', message: 'User deleted successfully' });
+                            this.$router.push('/users');
+                        } 
+                        else {
+                            this.$q.notify({ color: 'negative', message: 'Error while deleting' });
+                        }
+                    })*/
+                }
+                else{
+                    this.$q.notify({ color: 'negative', message: 'Email is not valid. Please try again.' });
+                    this.user.password = '';
+                }
+            }
+            catch (error) {
+                console.error('API request failed:', error);
+                this.$q.notify({ color: 'negative', message: 'An error occurred while updating user.' });
+            }
+
+            
         },
         deleteUserDialog(item){ //saves needed information into variables
             this.deleteItemDial = true;
-            this.itemID = item.row.END_USER_ID;
-            this.itemFirstName = item.row.END_USER_FIRST_NAME;
-            this.itemLastName = item.row.END_USER_LAST_NAME;
+            this.END_USER_ID = item.row.END_USER_ID;
+            this.END_USER_FIRST_NAME = item.row.END_USER_FIRST_NAME;
+            this.END_USER_LAST_NAME = item.row.END_USER_LAST_NAME;
         },
         async deleteUser(userID){ //executes delete
-            axios.delete(`http://localhost:8001/api/enduser/${userID}`).then((res) => { //deletes from database
+            try{
+            axios.delete(`${apiURL}/enduser/${userID}`).then((res) => { //deletes from database
                 const index = this.userData.findIndex(userData => userData.END_USER_ID === userID) 
-                if (~index){
-                    this.userData.splice(index, 1)//finds in local table and deletes
-                }
+                    if (~index){
+                        this.userData.splice(index, 1)//finds in local table and deletes
+                    }
 
-                if (res.status === 200) {
-                        this.$q.notify({ color: 'positive', message: 'User deleted successfully' });
+                    if (res.status === 200) {
+                        this.$q.notify({ color: 'positive', message: 'User deleted successfully.' });
                         this.$router.push('/users');
                     } 
-                else {
-                        this.$q.notify({ color: 'negative', message: 'Error while deleting' });
-                    }
-            });
-
-            this.rerenderTable;//rerenders table
-
+                    else {
+                        this.$q.notify({ color: 'negative', message: 'Error while deleting.' });
+                        }
+                });
+                this.rerenderTable();//rerenders table     
+            }
+            catch(error){
+                console.error('API request failed:', error);
+                this.$q.notify({ color: 'negative', message: 'An error occurred during deletion.' });
+            }
         },
-    },
+        validateEmail(email) {
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            const isValidEmail = emailRegex.test(email);
 
+            if (!isValidEmail) {
+                this.$q.notify({ color: 'negative', message: 'Invalid email format' });
+            }
+
+            return isValidEmail;
+    }},
     computed: {
       ...mapGetters('auth', ['userRole']),
 

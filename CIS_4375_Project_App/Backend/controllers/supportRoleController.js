@@ -35,6 +35,16 @@ const getSupportRole = async (req, res, next) => {
     }
 }
 
+const getSupportRoleByStatus = async (req, res, next) => {
+    try {
+        const SUPPORT_ROLE_DESC = req.params.status;
+        const supportRole = await supportRoleData.getByStatus(SUPPORT_ROLE_DESC);
+        res.send(supportRole);
+    } catch (error) {
+        res.status(400).send(error.message);
+    }
+}
+
 const addSupportRole = async (req, res, next) => {
     try {
         const data = req.body;
@@ -73,6 +83,7 @@ module.exports = {
    getAllSupportRoles,
    getSupportRole,
    getActiveSupportRoles,
+   getSupportRoleByStatus,
    addSupportRole,
    updateSupportRole,
    deleteSupportRole
