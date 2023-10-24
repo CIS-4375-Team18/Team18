@@ -18,16 +18,25 @@ const GetAllTicketsDisplay = async (req, res, next) => {
     try {
         const userRole = req.body.userRole;
         const userId = req.body.userId;
-        const status = req.body.status;
+        const SUPPORT_TICKET_STATUS = req.body.status;
         const createdByUserId = req.body.createdByUserId;
+        const SEARCH_TERM = req.body.searchTerm;
 
         let ticketList = [];
         if (userRole === 'System Administrator' || userRole === 'IT Teacher') {
-            ticketList = await supportTicketData.GetAllJoin(createdByUserId, status);
+            ticketList = await supportTicketData.GetAllJoin({
+                USER_ID: createdByUserId, 
+                SUPPORT_TICKET_STATUS,
+                SEARCH_TERM,
+            });
         } else if (userRole === 'Technician') {
-            ticketList = await supportTicketData.GetAssignedByUserId(userId, status);
+            ticketList = await supportTicketData.GetAssignedByUserId(userId, SUPPORT_TICKET_STATUS);
         } else {
-            ticketList = await supportTicketData.GetAllJoin(userId, status);
+            ticketList = await supportTicketData.GetAllJoin({
+                USER_ID: userId,
+                SUPPORT_TICKET_STATUS,
+                SEARCH_TERM
+            });
         }
         
         res.send(ticketList);         

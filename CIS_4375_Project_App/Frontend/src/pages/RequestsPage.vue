@@ -19,25 +19,33 @@
                             style="min-width: 120px; margin-right:10px;"
                             @update:model-value="getSupportTickets"
                         />
-                        <q-select
+                        <q-input
                             v-if="userRole ==='System Administrator' || userRole ==='IT Teacher'"
-                            use-input
-                            hide-selected
-                            fill-input
-                            v-model="userModel"
-                            :options="endUsersOptions"
-                            option-value="END_USER_ID" 
-                            option-label="END_USER_FULL_NAME"
-                            label="Filter By User"
-                            style="min-width: 120px;"
+                            v-model="searchTerm"
+                            label="Search"
                             @update:model-value="getSupportTickets"
-                            @filter="filterFn"
-                        />
+                        >
+                            <template v-slot:prepend>
+                                <q-icon name="search" />
+                            </template>
+                        </q-input>
                     </template>
                      <template #body-cell-status="props">
                         <q-td :props="props">
+                            <q-chip :color="props.row.SUPPORT_TICKET_STATUS_DESC === 'CLOSED' ? 'green' : (props.row.SUPPORT_TICKET_STATUS_DESC === 'OPEN' ? 'grey' :  'blue')" text-color="white"
+                                dense class="text-weight-bolder" square>{{ props.row.SUPPORT_TICKET_STATUS_DESC }}</q-chip>
+                        </q-td>
+                    </template>
+                     <template #body-cell-priority="props">
+                        <q-td :props="props">
                             <q-chip :color="props.row.prioritystatus === 'Critical' ? 'red' : (props.row.prioritystatus === 'High' ? 'black' :  (props.row.prioritystatus === 'Medium' ? 'blue' : 'green'))" text-color="white"
                                 dense class="text-weight-bolder" square>{{ props.row.prioritystatus }}</q-chip>
+                        </q-td>
+                    </template>
+                    <template v-slot:body-cell-actions="props">
+                        <q-td :props="props">
+                            <q-btn dense round flat @click="editRow('Category', props)" icon="edit"
+                                style="color: #ad0000;"></q-btn>
                         </q-td>
                     </template>
                 </q-table>
@@ -60,7 +68,9 @@ export default {
             filterByOptions: [],
             endUsers: [],
             endUsersOptions: [],
-            allUser: { END_USER_ID: null, END_USER_FULL_NAME: 'All Users' }
+            allStatus: { SUPPORT_TICKET_STATUS_ID: null, SUPPORT_TICKET_STATUS_DESC: 'ALL' },
+            allUser: { END_USER_ID: null, END_USER_FULL_NAME: 'All Users' },
+            searchTerm: ''
         }
     },
     async created() {
@@ -72,7 +82,7 @@ export default {
         });
 
         axios.get(`${apiURL}/activeticketstatuses`).then((res) => {
-            this.filterByOptions = res.data;
+            this.filterByOptions = [this.allStatus, ...res.data];
             this.filterByModel = this.filterByOptions[0]; 
             
             this.setTicketColumns();
@@ -103,7 +113,8 @@ export default {
                 userId: this.userID,
                 userRole: this.userRole,
                 status: this.filterByModel.SUPPORT_TICKET_STATUS_ID,
-                createdByUserId: this.userModel?.END_USER_ID || null
+                createdByUserId: this.userModel?.END_USER_ID || null,
+                searchTerm: this.searchTerm
             }).then((res) => {
                 if (res.data) {
                     this.setSupportTickets(res.data);
@@ -127,6 +138,7 @@ export default {
         },
         setTicketColumns() {
             const supportticketsColumns = [
+                { name: "status", align: "center", label: "Status", field: "SUPPORT_TICKET_STATUS_DESC", sortable: true },
                 { name: 'subject', label: 'Subject', field: 'SUPPORT_TICKET_SUBJECT', align: 'left', sortable: true  },
                 { name: "creationDate", align: "left", label: "Creation Date", field: "SUPPORT_TICKET_DATE_CREATED", sortable: true, format: (val) => {
                     const date = new Date(val);
@@ -153,14 +165,14 @@ export default {
             }];
 
             if (this.userRole !== 'Staff') {
-                
-                supportticketsColumns.push({ name: "firstName", align: "center", label: "First Name", field: "END_USER_FIRST_NAME", sortable: true });
-                supportticketsColumns.push({ name: "lastName", align: "center", label: "Last Name", field: "END_USER_LAST_NAME", sortable: true });
                 supportticketsColumns.push({ name: "email", align: "center", label: "Email", field: "END_USER_EMAIL", sortable: true });
             }
 
-            supportticketsColumns.push({ name: "status", align: "center", label: "Priority", field: "TICKET_PRIORITY_ID", sortable: true });
+            supportticketsColumns.push({ name: "priority", align: "center", label: "Priority", field: "TICKET_PRIORITY_ID", sortable: true });
 
+            if (this.userRole !== 'Staff') {
+                supportticketsColumns.push({ name: 'actions', label: 'Edit', field: '', align: 'left' });
+            }
             this.supportticketsColumns = supportticketsColumns;
         },
         filterFn (val, update, abort) {
