@@ -29,7 +29,8 @@ const GetAllJoin = async ({ USER_ID, SUPPORT_TICKET_STATUS, SEARCH_TERM }) => {
         " ,EU.END_USER_EMAIL "+
         " FROM dbo.SUPPORT_TICKET as ST "+
         " JOIN dbo.SUPPORT_TICKET_STATUS as STS ON ST.SUPPORT_TICKET_STATUS_ID = STS.SUPPORT_TICKET_STATUS_ID " +
-        " JOIN dbo.END_USER as EU ON ST.END_USER_ID = EU.END_USER_ID ";
+        " JOIN dbo.END_USER as EU ON ST.END_USER_ID = EU.END_USER_ID "
+        " JOIN dbo.END_USER as SA ON ST.SUPPORT_AGENT_ID = SA.END_USER_ID ";
 
         if (SUPPORT_TICKET_STATUS || USER_ID || SEARCH_TERM) {
             selectAllTicketsQ += " WHERE"

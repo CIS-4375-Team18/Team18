@@ -65,6 +65,7 @@ export default {
         return {
             supporttickets: [],
             priorities: {},
+            supportAgents: {},
             filterByOptions: [],
             endUsers: [],
             endUsersOptions: [],
@@ -74,12 +75,8 @@ export default {
         }
     },
     async created() {
-        // call active prioties api to get the list of all apis
-        const activePriorities = await axios.get(`${apiURL}/activepriorities`)
-        // map the id and priority description
-        activePriorities.data.forEach((priority) => {
-          this.priorities[priority.TICKET_PRIORITY_ID] = priority.TICKET_PRIORITY_DESC;
-        });
+        await this.getPriorities();
+        await this.getSupportAgents();
 
         axios.get(`${apiURL}/activeticketstatuses`).then((res) => {
             this.filterByOptions = [this.allStatus, ...res.data];
@@ -106,6 +103,22 @@ export default {
         });
     },
     methods: {
+        async getPriorities() {
+            // call active priorities api to get the list of all apis
+            const activePriorities = await axios.get(`${apiURL}/activepriorities`)
+            // map the id and priority description
+            activePriorities.data.forEach((priority) => {
+                this.priorities[priority.TICKET_PRIORITY_ID] = priority.TICKET_PRIORITY_DESC;
+            });
+        },
+        async getSupportAgents() {
+            // call support agent api to get the list of technicians
+            const supportAgents = await axios.get(`${apiURL}/supportAgents`)
+            // map the supportAgent id to their email email
+            supportAgents.data.forEach((supportAgent) => {
+                this.supportAgents[supportAgent.END_USER_ID] = supportAgent.END_USER_EMAIL;
+            });
+        },
         getSupportTickets() {
             this.loading = true;
             this.supporttickets = [];
@@ -129,8 +142,10 @@ export default {
                 this.supporttickets = supporttickets.map((supportticket) => {
                     // add a new property called priority status to supportticket
                     // set it to the status from priorities based on the current ticket priority id
+                    const email = this.supportAgents[supportticket.SUPPORT_AGENT_ID] || 'Unassigned';
                     return {
                         prioritystatus: this.priorities[supportticket.TICKET_PRIORITY_ID],
+                        SUPPORT_AGENT_EMAIL: email,
                         ...supportticket
                     }
                 });
@@ -165,14 +180,16 @@ export default {
             }];
 
             if (this.userRole !== 'Staff') {
-                supportticketsColumns.push({ name: "email", align: "center", label: "Email", field: "END_USER_EMAIL", sortable: true });
+                supportticketsColumns.push({ name: "email", align: "center", label: "Ticket Creator Email", field: "END_USER_EMAIL", sortable: true });
             }
 
             supportticketsColumns.push({ name: "priority", align: "center", label: "Priority", field: "TICKET_PRIORITY_ID", sortable: true });
+            supportticketsColumns.push({ name: "supportAgent", align: "center", label: "Support Agent Email", field: "SUPPORT_AGENT_EMAIL", sortable: true });
 
-            if (this.userRole !== 'Staff') {
+            if (this.userRole !== 'Technician') {
                 supportticketsColumns.push({ name: 'actions', label: 'Edit', field: '', align: 'left' });
             }
+
             this.supportticketsColumns = supportticketsColumns;
         },
         filterFn (val, update, abort) {
