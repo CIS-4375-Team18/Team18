@@ -20,7 +20,7 @@
                                 </template>
                                 <template v-if="userRole==='System Administrator' || userRole==='IT Teacher'" v-slot:body-cell-actions="props">
                                     <q-td :props="props">
-                                        <q-btn dense round flat @click="editUserDialog(props)" icon="edit"
+                                        <q-btn dense round flat @click=editUserDialog(props) icon="edit"
                                             style="color: #ad0000;"></q-btn>
                                     </q-td>
                                 </template>
@@ -30,9 +30,9 @@
                                             style="color: #ad0000;"></q-btn>
                                     </q-td>
                                 </template>
-                                <template v-if="userRole==='System Administrator' || userRole==='IT Teacher'" v-slot:body-cell-chngPass="props" > <!-- On click will bring out dialog box to confirm deletion-->
+                                <template v-if="userRole==='System Administrator' || userRole==='IT Teacher'" v-slot:body-cell-changePass="props" > <!-- On click will bring out dialog box change password-->
                                     <q-td :props="props">
-                                        <q-btn dense round flat @click=changePassword(props) icon="edit"
+                                        <q-btn dense round flat @click=changePasswordDialog(props) icon="lock"
                                             style="color: #ad0000;"></q-btn>
                                     </q-td>
                                 </template>
@@ -129,6 +129,51 @@
                     </q-card>
                     </q-dialog>
                 </template>
+
+                <template> <!-- Change Password Dialog-->
+                    <q-dialog v-model="changePassDial" persistent>
+                        <q-card style="min-width: 450px;">
+                        <q-card-section class="row items-center" style="background-color: #af0000">
+                            <div class="text-h6" style="color: white;">Change Password</div>
+                        </q-card-section>
+                        <q-card-section>
+                        <q-avatar icon="warning" color="white" text-color="warning" size="" />
+                        <span class="text-body2 q-mt-lg">Change password for user
+                            {{this.END_USER_FIRST_NAME + " " + this.END_USER_LAST_NAME}} ?</span>
+                        </q-card-section>
+                        <div >
+                            <q-input class="q-pa-sm" v-model="user.password" label="Password" 
+                            :type="isPwd ? 'password' : 'text'" 
+                            :rules="[val => !!val || 'Field is required']">
+                                <template v-slot:append>
+                                    <q-icon :name="isPwd ? 'visibility_off' : 'visibility'" 
+                                    class="cursor-pointer"
+                                    @click="isPwd = !isPwd">
+                                    </q-icon>
+                                </template>
+                            </q-input>
+                        </div>
+                        <div class="q-pa-sm">
+                            <q-input class="text-body2 q-mt-lg" v-model="user.confirmPassword" label="Confirm Password" 
+                                :type="isPwd ? 'password' : 'text'" 
+                                :rules="[val => !!val || 'Field is required']">
+                                <template v-slot:append>
+                                    <q-icon :name="isPwd ? 'visibility_off' : 'visibility'" 
+                                    class="cursor-pointer"
+                                    @click="isPwd = !isPwd">
+                                    </q-icon>
+                                </template>
+                            </q-input>
+                        </div>
+
+                        <q-card-actions>
+                        <q-btn align="center" flat label="Cancel" color="primary" v-close-popup />
+                        <!-- On confirmation will execute deletion-->
+                        <q-btn flat label="Confirm" color="primary" @click="changePassword(this.END_USER_ID)" v-close-popup />
+                        </q-card-actions>
+                    </q-card>
+                    </q-dialog>
+                </template>
             </div>
         </q-card>
     </div>
@@ -145,6 +190,8 @@ export default {
         return{
             editItemDial:ref(false),
             deleteItemDial: ref(false),
+            changePassDial:ref(false),
+            isPwd: ref(true),
         }
     },
     beforeMount() {
@@ -153,7 +200,6 @@ export default {
     data () {
         return {
             tableKey : 0, //will be used to re-render table
-
             editedItem:{
                 END_USER_ID: "",
                 END_USER_FIRST_NAME: "",
@@ -167,6 +213,10 @@ export default {
                 ACTIVE_STATUS_ID: "",
                 END_USER_PERIOD: "",
                 
+            },
+            user:{
+                password:"",
+                confirmPassword:"",
             },
             userData: [], //Will hold all users data to put into tables
             user_roles: [], //Will hold available user_roles
@@ -193,7 +243,7 @@ export default {
             {name: "status", align: "center", label: "Status", field: "ACTIVE_STATUS_DESC", sortable: true},
             {name: 'actions', label: 'Edit', field: '', align: 'left' },
             {name: 'delactions', label: 'Delete', field: '', align: 'left' },
-            {name: 'chngPass', label: 'Change Password', field: '', align: 'left' },            
+            {name: 'changePass', label: 'Change Password', field: '', align: 'center' },            
             ],
 
         }
@@ -216,12 +266,8 @@ export default {
         rerenderTable(){//rerenders page
             this.tableKey +=1;
             console.log("rendered table");
-            window.location.reload();
         },
         editUserDialog(item){ //Puts values into appropriate fields in dialog box
-            console.log("Start of get to edit")
-            console.log(item.row)
-            console.log("End of get to edit user")
             this.editItemDial = true;
 
             //Puts all current values into dialogue box
@@ -296,17 +342,17 @@ export default {
                     }
 
                     console.log(updatedUser);
-                    const response = axios.put(`${apiURL}/enduser/${updatedUser.END_USER_ID}`, updatedUser);
+                    const response = axios.put(`${apiURL}/enduser/${updatedUser.END_USER_ID}`, updatedUser).then((res) => { //deletes from database
+                    
+                        if (res.status === 200) {
+                            this.$q.notify({ color: 'positive', message: 'User updated successfully.' });
+                            this.$router.push('/users');
+                        } 
+                        else {
+                            this.$q.notify({ color: 'negative', message: 'Error while updating.' });
+                            }
+                    });
 
-                    if (response.status === 200) {
-                        this.$q.notify({ color: 'positive', message: 'User registered successfully' });
-                        this.$router.push('/users');
-                        console.log(response);
-                    } 
-                    else {
-                        console.log(response);
-                        this.$q.notify({ color: 'negative', message: 'Registration failed' });
-                    }
                 }
                 else{
                     this.$q.notify({ color: 'negative', message: 'Email is not valid. Please try again.' });
@@ -344,6 +390,13 @@ export default {
                 this.$q.notify({ color: 'negative', message: 'An error occurred during deletion.' });
             }
         },
+        changePasswordDialog(item){
+            this.changePassDial = true;
+            this.END_USER_ID = item.row.END_USER_ID;
+            this.END_USER_FIRST_NAME = item.row.END_USER_FIRST_NAME;
+            this.END_USER_LAST_NAME = item.row.END_USER_LAST_NAME;
+        }
+        ,
         validateEmail(email) {
             const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
             const isValidEmail = emailRegex.test(email);
@@ -353,7 +406,17 @@ export default {
             }
 
             return isValidEmail;
-    }},
+        },
+        validatePassword(password) {
+            const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!#%*?&])[A-Za-z\d@$!#%*?&]{8,}$/;
+            const isValidPassword = passwordRegex.test(password)
+            if (!isValidPassword) {
+                this.$q.notify({ color: 'negative', message: 'Invalid password format' });
+            }
+
+            return isValidPassword
+        },
+},
     computed: {
       ...mapGetters('auth', ['userRole']),
 
