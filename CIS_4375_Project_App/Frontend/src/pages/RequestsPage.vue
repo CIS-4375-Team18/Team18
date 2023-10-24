@@ -44,7 +44,7 @@
                     </template>
                     <template v-slot:body-cell-actions="props">
                         <q-td :props="props">
-                            <q-btn dense round flat @click="editRow('Category', props)" icon="edit"
+                            <q-btn dense round flat @click="editRow(props)" icon="edit"
                                 style="color: #ad0000;"></q-btn>
                         </q-td>
                     </template>
@@ -202,6 +202,9 @@ export default {
                     this.endUsersOptions = [this.allUser, ...results.slice(0, 9)];
                 }
             });
+        },
+        editRow(props) {
+            
         }
     },
     setup() {
