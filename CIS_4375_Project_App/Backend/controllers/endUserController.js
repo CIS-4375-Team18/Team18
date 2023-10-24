@@ -94,6 +94,19 @@ const updateEndUser = async (req, res, next) => {
     }
 }
 
+const updateEndUserPassword = async (req, res, next) => {
+    try {
+        const data = req.body;
+        const saltRounds = 10;
+        const hashedPassword = await bcrypt.hash(data.END_USER_PASSWORD, saltRounds);
+        data.END_USER_PASSWORD = hashedPassword;
+        const update = await endUserData.updateEndUserPass(data);
+        res.send(update);
+    } catch (error) {
+        res.status(400).send(error.message);
+    }
+}
+
 /** */
 const deleteEndUser = async (req, res, next) => {
     try {
@@ -111,5 +124,6 @@ module.exports = {
     addEndUser,
     loginEndUser,
     updateEndUser,
+    updateEndUserPassword,
     deleteEndUser,
 }

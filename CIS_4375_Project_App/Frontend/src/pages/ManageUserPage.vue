@@ -118,7 +118,7 @@
                         <q-card-section>
                         <q-avatar icon="warning" color="white" text-color="warning" size="" />
                         <span class="text-body2 q-mt-lg">You are about to delete user: 
-                            {{ this.END_USER_FIRST_NAME + " " + this.END_USER_LAST_NAME}}</span>
+                            {{ this.editedItem.END_USER_FIRST_NAME + " " + this.editedItem.END_USER_LAST_NAME}}</span>
                         </q-card-section>
 
                         <q-card-actions align="right">
@@ -139,10 +139,10 @@
                         <q-card-section>
                         <q-avatar icon="warning" color="white" text-color="warning" size="" />
                         <span class="text-body2 q-mt-lg">Change password for user
-                            {{this.END_USER_FIRST_NAME + " " + this.END_USER_LAST_NAME}} ?</span>
+                            {{this. editedItem.END_USER_FIRST_NAME + " " +  this.editedItem.END_USER_LAST_NAME}} ?</span>
                         </q-card-section>
                         <div >
-                            <q-input class="q-pa-sm" v-model="user.password" label="Password" 
+                            <q-input class="q-pa-sm" v-model="editedItem.password" label="Password" 
                             :type="isPwd ? 'password' : 'text'" 
                             :rules="[val => !!val || 'Field is required']">
                                 <template v-slot:append>
@@ -154,7 +154,7 @@
                             </q-input>
                         </div>
                         <div class="q-pa-sm">
-                            <q-input class="text-body2 q-mt-lg" v-model="user.confirmPassword" label="Confirm Password" 
+                            <q-input class="text-body2 q-mt-lg" v-model="editedItem.confirmPassword" label="Confirm Password" 
                                 :type="isPwd ? 'password' : 'text'" 
                                 :rules="[val => !!val || 'Field is required']">
                                 <template v-slot:append>
@@ -169,7 +169,7 @@
                         <q-card-actions>
                         <q-btn align="center" flat label="Cancel" color="primary" v-close-popup />
                         <!-- On confirmation will execute deletion-->
-                        <q-btn flat label="Confirm" color="primary" @click="changePassword(this.END_USER_ID)" v-close-popup />
+                        <q-btn flat label="Confirm" color="primary" @click="changePassword(this.END_USER_ID)" />
                         </q-card-actions>
                     </q-card>
                     </q-dialog>
@@ -212,11 +212,9 @@ export default {
                 ACTIVE_STATUS_DESC:"",
                 ACTIVE_STATUS_ID: "",
                 END_USER_PERIOD: "",
-                
-            },
-            user:{
                 password:"",
-                confirmPassword:"",
+                confirmPassword :"",
+                
             },
             userData: [], //Will hold all users data to put into tables
             user_roles: [], //Will hold available user_roles
@@ -288,13 +286,15 @@ export default {
             this.pre_ChangeSupport_Role = item.row.SUPPORT_ROLE_DESC;
             this.pre_changeUser_Period = item.row.END_USER_PERIOD;//Used for comparison
 
-            if(this.editedItem.SUPPORT_ROLE_DESC == null){
+            if(this.editedItem.SUPPORT_ROLE_DESC == null || this.editedItem.SUPPORT_ROLE_DESC=="Staff"){
                 this.editedItem.SUPPORT_ROLE_DESC = "NOT-SUPPORT";
                 this.editedItem.SUPPORT_ROLE_ID = 2;
                 this.pre_ChangeSupport_Role = "NOT-SUPPORT";
             }
             else{
-
+                this.editedItem.SUPPORT_ROLE_DESC = "SUPPORT";
+                this.editedItem.SUPPORT_ROLE_ID = 1;
+                this.pre_ChangeSupport_Role = "SUPPORT";
             }
             
             this.getRoles();
@@ -342,7 +342,7 @@ export default {
                     }
 
                     console.log(updatedUser);
-                    const response = axios.put(`${apiURL}/enduser/${updatedUser.END_USER_ID}`, updatedUser).then((res) => { //deletes from database
+                    axios.put(`${apiURL}/enduser/${updatedUser.END_USER_ID}`, updatedUser).then((res) => { //deletes from database
                     
                         if (res.status === 200) {
                             this.$q.notify({ color: 'positive', message: 'User updated successfully.' });
@@ -392,11 +392,42 @@ export default {
         },
         changePasswordDialog(item){
             this.changePassDial = true;
-            this.END_USER_ID = item.row.END_USER_ID;
-            this.END_USER_FIRST_NAME = item.row.END_USER_FIRST_NAME;
-            this.END_USER_LAST_NAME = item.row.END_USER_LAST_NAME;
-        }
-        ,
+            this.editedItem.password = ""; //blanks passwords each time dialog box comes up
+            this.editedItem.confirmPassword = "";
+            this.editedItem.END_USER_ID = item.row.END_USER_ID;
+            this.editedItem.END_USER_FIRST_NAME = item.row.END_USER_FIRST_NAME;
+            this.editedItem.END_USER_LAST_NAME = item.row.END_USER_LAST_NAME;
+        },
+        changePassword(){//After confirm button is pressed, updates password
+            const isPasswordValid = this.validatePassword(this.editedItem.password);
+            console.log(isPasswordValid)
+
+            if (this.editedItem.password === this.editedItem.confirmPassword) {
+                    const updatePass = {
+                        END_USER_PASSWORD: this.editedItem.password,
+                        END_USER_ID: this.editedItem.END_USER_ID,
+                    };
+                    console.log(updatePass);
+
+                    axios.put(`${apiURL}/updatePassword/${this.editedItem.END_USER_ID}`, updatePass).then((res) => {
+                    
+                    if (res.status === 200) {
+                        this.$q.notify({ color: 'positive', message: 'Password updated successfully.' });
+                        this.$router.push('/users');
+                        this.changePassDial = false;
+                    } 
+                    else {
+                        this.$q.notify({ color: 'negative', message: 'Error while updating password.' });
+                        }
+                    });    
+                    
+                } 
+            else {
+                    this.$q.notify({ color: 'negative', message: 'Passwords do not match' });
+                    this.editedItem.password = '';
+                    this.editedItem.confirmPassword = '';
+             }
+            },
         validateEmail(email) {
             const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
             const isValidEmail = emailRegex.test(email);
@@ -415,8 +446,8 @@ export default {
             }
 
             return isValidPassword
-        },
-},
+        }, 
+    },
     computed: {
       ...mapGetters('auth', ['userRole']),
 

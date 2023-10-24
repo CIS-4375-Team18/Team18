@@ -115,7 +115,7 @@ const updateEndUser = async (END_USER_ID, data) => {
         " [USER_ROLE_ID] = @USER_ROLE_ID, "+
         " [ACTIVE_STATUS_ID] = @ACTIVE_STATUS_ID, "+
         " [SUPPORT_ROLE_ID] = @SUPPORT_ROLE_ID, "+
-        " [END_USER_PERIOD] = @END_USER_PERIOD  WHERE END_USER_ID = @END_USER_ID"
+        " [END_USER_PERIOD] = @END_USER_PERIOD WHERE END_USER_ID = @END_USER_ID"
         const update = await pool.request()
             .input('END_USER_ID', sql.Int, END_USER_ID)
             .input('END_USER_FIRST_NAME', sql.NVarChar(40), data.END_USER_FIRST_NAME)
@@ -125,6 +125,21 @@ const updateEndUser = async (END_USER_ID, data) => {
             .input('ACTIVE_STATUS_ID', sql.Int, data.ACTIVE_STATUS_ID)
             .input('SUPPORT_ROLE_ID', sql.Int, data.SUPPORT_ROLE_ID)
             .input('END_USER_PERIOD', sql.Int, data.END_USER_PERIOD)
+            .query(updateQuery);
+        return update.recordset;
+    } catch (error) {
+        return error.message;
+    }
+}
+
+const updateEndUserPass = async (data) => {
+    try {
+        let pool = await sql.connect(config.sql);
+        const updateQuery = 'UPDATE [dbo].[END_USER] SET [END_USER_PASSWORD] = @END_USER_PASSWORD '+
+        'WHERE END_USER_ID = @END_USER_ID'
+        const update = await pool.request()
+            .input('END_USER_ID', sql.Int, data.END_USER_ID)
+            .input('END_USER_PASSWORD', sql.NVarChar(255), data.END_USER_PASSWORD)
             .query(updateQuery);
         return update.recordset;
     } catch (error) {
@@ -153,6 +168,6 @@ module.exports = {
     endUserLogin,
     getHashedPassword,
     updateEndUser,
-   
+    updateEndUserPass,
     deleteEndUser
 }
