@@ -42,12 +42,6 @@
                                 dense class="text-weight-bolder" square>{{ props.row.prioritystatus }}</q-chip>
                         </q-td>
                     </template>
-                    <template v-slot:body-cell-actions="props">
-                        <q-td :props="props">
-                            <q-btn dense round flat @click="editRow(props)" icon="edit"
-                                style="color: #ad0000;"></q-btn>
-                        </q-td>
-                    </template>
                 </q-table>
             </div>
         </q-card>
@@ -153,8 +147,8 @@ export default {
         },
         setTicketColumns() {
             const supportticketsColumns = [
-                { name: "status", align: "center", label: "Status", field: "SUPPORT_TICKET_STATUS_DESC", sortable: true },
                 { name: 'subject', label: 'Subject', field: 'SUPPORT_TICKET_SUBJECT', align: 'left', sortable: true  },
+                { name: "status", align: "center", label: "Status", field: "SUPPORT_TICKET_STATUS_DESC", sortable: true },
                 { name: "creationDate", align: "left", label: "Creation Date", field: "SUPPORT_TICKET_DATE_CREATED", sortable: true, format: (val) => {
                     const date = new Date(val);
                     const month = (date.getMonth() + 1).toString().padStart(2, '0');
@@ -185,10 +179,6 @@ export default {
 
             supportticketsColumns.push({ name: "priority", align: "center", label: "Priority", field: "TICKET_PRIORITY_ID", sortable: true });
             supportticketsColumns.push({ name: "supportAgent", align: "center", label: "Support Agent Email", field: "SUPPORT_AGENT_EMAIL", sortable: true });
-
-            if (this.userRole !== 'Technician') {
-                supportticketsColumns.push({ name: 'actions', label: 'Edit', field: '', align: 'left' });
-            }
 
             this.supportticketsColumns = supportticketsColumns;
         },
