@@ -11,10 +11,9 @@ const getEndUsers = async () => {
         let pool = await sql.connect(config.sql);
         const getAllQuery = 'SELECT [END_USER_ID], [END_USER_FIRST_NAME], [END_USER_LAST_NAME], ' + //Keep in single ' quotes, SQL will
         ' [END_USER_EMAIL], [END_USER_PERIOD], eu.[USER_ROLE_ID], [USER_ROLE_NAME], [ACTIVE_STATUS_DESC],' + //not find some tables if in
-        ' eu.[SUPPORT_ROLE_ID], [SUPPORT_ROLE_DESC], eu.[ACTIVE_STATUS_ID] FROM [dbo].[END_USER] AS eu' + //" quotes
+        ' eu.[ACTIVE_STATUS_ID] FROM [dbo].[END_USER] AS eu' + //" quotes
         ' JOIN [dbo].[USER_ROLE] AS ur ON eu.[USER_ROLE_ID] = ur.[USER_ROLE_ID] ' +
         ' JOIN [dbo].[ACTIVE_STATUS] AS acs ON eu.[ACTIVE_STATUS_ID] = acs.[ACTIVE_STATUS_ID]' +
-        ' FULL OUTER JOIN [dbo].[SUPPORT_ROLE] AS sr ON eu.[SUPPORT_ROLE_ID] = sr.[SUPPORT_ROLE_ID]' +
         ' WHERE [END_USER_ID] IS NOT NULL' ;
         const endUsersList = await pool.request().query(getAllQuery);
         return endUsersList.recordset;
@@ -114,7 +113,6 @@ const updateEndUser = async (END_USER_ID, data) => {
         " [END_USER_EMAIL] = @END_USER_EMAIL, "+
         " [USER_ROLE_ID] = @USER_ROLE_ID, "+
         " [ACTIVE_STATUS_ID] = @ACTIVE_STATUS_ID, "+
-        " [SUPPORT_ROLE_ID] = @SUPPORT_ROLE_ID, "+
         " [END_USER_PERIOD] = @END_USER_PERIOD WHERE END_USER_ID = @END_USER_ID"
         const update = await pool.request()
             .input('END_USER_ID', sql.Int, END_USER_ID)
@@ -123,7 +121,6 @@ const updateEndUser = async (END_USER_ID, data) => {
             .input('END_USER_EMAIL', sql.NVarChar(40), data.END_USER_EMAIL)
             .input('USER_ROLE_ID', sql.Int, data.USER_ROLE_ID)
             .input('ACTIVE_STATUS_ID', sql.Int, data.ACTIVE_STATUS_ID)
-            .input('SUPPORT_ROLE_ID', sql.Int, data.SUPPORT_ROLE_ID)
             .input('END_USER_PERIOD', sql.Int, data.END_USER_PERIOD)
             .query(updateQuery);
         return update.recordset;

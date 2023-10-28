@@ -72,20 +72,6 @@
                         </q-select>
                         </q-card-section>
 
-                        <q-card-section> <!-- Toggle support authorization-->
-                            <q-toggle label="Support?"
-                                v-model="editedItem.SUPPORT_ROLE_DESC"
-                                checked-icon="check"
-                                color="green"
-                                unchecked-icon="clear"
-                                left-label
-                                false-value="NOT-SUPPORT"
-                                true-value="SUPPORT"
-                                toggle-order="fT"
-                            />
-                            {{ editedItem.SUPPORT_ROLE_DESC }}
-                        </q-card-section>
-
                         
                         <q-card-section> <!-- Toggle active and inactive Status of User-->
                             <q-toggle label="Status"
@@ -207,8 +193,6 @@ export default {
                 END_USER_EMAIL:"",
                 USER_ROLE_ID:"",
                 USER_ROLE_NAME:"",
-                SUPPORT_ROLE_DESC:"",
-                SUPPORT_ROLE_ID: "",
                 ACTIVE_STATUS_DESC:"",
                 ACTIVE_STATUS_ID: "",
                 END_USER_PERIOD: "",
@@ -221,7 +205,6 @@ export default {
             pre_changeUser_Period: "",
             pre_changeUser_Role:"",
             pre_changeUser_Status:"",
-            pre_ChangeSupport_Role:"",
             period_options: [//Manual, but will hold user periods
                 {label: '1', value: 1},
                 {label: '2', value: 2},
@@ -263,6 +246,7 @@ export default {
         },
         rerenderTable(){//rerenders page
             this.tableKey +=1;
+            document.location.reload(true)
             console.log("rendered table");
         },
         editUserDialog(item){ //Puts values into appropriate fields in dialog box
@@ -277,25 +261,11 @@ export default {
             this.editedItem.USER_ROLE_NAME = item.row.USER_ROLE_NAME;
             this.editedItem.ACTIVE_STATUS_DESC = item.row.ACTIVE_STATUS_DESC;
             this.editedItem.ACTIVE_STATUS_ID = item.row.ACTIVE_STATUS_ID;
-            this.editedItem.SUPPORT_ROLE_DESC = item.row.SUPPORT_ROLE_DESC;
-            this.editedItem.SUPPORT_ROLE_ID = item.row.SUPPORT_ROLE_ID;
             this.editedItem.END_USER_PERIOD = item.row.END_USER_PERIOD;
 
             this.pre_changeUser_Role = item.row.USER_ROLE_NAME; //Will be user for a comparison
             this.pre_changeUser_Status = item.row.ACTIVE_STATUS_DESC; //Will be user for a comparison
-            this.pre_ChangeSupport_Role = item.row.SUPPORT_ROLE_DESC;
             this.pre_changeUser_Period = item.row.END_USER_PERIOD;//Used for comparison
-
-            if(this.editedItem.SUPPORT_ROLE_DESC == null || this.editedItem.SUPPORT_ROLE_DESC=="Staff"){
-                this.editedItem.SUPPORT_ROLE_DESC = "NOT-SUPPORT";
-                this.editedItem.SUPPORT_ROLE_ID = 2;
-                this.pre_ChangeSupport_Role = "NOT-SUPPORT";
-            }
-            else{
-                this.editedItem.SUPPORT_ROLE_DESC = "SUPPORT";
-                this.editedItem.SUPPORT_ROLE_ID = 1;
-                this.pre_ChangeSupport_Role = "SUPPORT";
-            }
             
             this.getRoles();
         },
@@ -305,13 +275,6 @@ export default {
             }
             else if(this.editedItem.ACTIVE_STATUS_DESC == "INACTIVE"){
                 this.editedItem.ACTIVE_STATUS_ID = 2;
-            }
-
-            if(this.editedItem.SUPPORT_ROLE_DESC == "SUPPORT"){ //Ony two values, placed into code
-                this.editedItem.SUPPORT_ROLE_ID = 1;
-            }
-            else if(this.editedItem.SUPPORT_ROLE_DESC == "NOT-SUPPORT"){
-                this.editedItem.SUPPORT_ROLE_ID = 2;
             }
             
  
@@ -334,8 +297,6 @@ export default {
                     END_USER_EMAIL: this.editedItem.END_USER_EMAIL,
                     USER_ROLE_ID: this.editedItem.USER_ROLE_ID,
                     USER_ROLE_NAME: this.editedItem.USER_ROLE_NAME,
-                    SUPPORT_ROLE_DESC: this.editedItem.SUPPORT_ROLE_DESC,
-                    SUPPORT_ROLE_ID: this.editedItem.SUPPORT_ROLE_ID,
                     ACTIVE_STATUS_DESC: this.editedItem.ACTIVE_STATUS_DESC,
                     ACTIVE_STATUS_ID: this.editedItem.ACTIVE_STATUS_ID,
                     END_USER_PERIOD: this.editedItem.END_USER_PERIOD,
