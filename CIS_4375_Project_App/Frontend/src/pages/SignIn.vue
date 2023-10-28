@@ -166,8 +166,6 @@ export default {
 .signin-form {
   width:350px;
   padding: 20px;
-  border: 1px solid #ccc;
-  border-radius: 10px;
   background-color: #fff;
 }
 
