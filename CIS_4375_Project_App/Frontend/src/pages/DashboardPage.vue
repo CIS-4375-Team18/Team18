@@ -91,7 +91,7 @@
         <div class="col-md-12">
           <q-card>
             <q-table title="Most Recent Tickets" color="secondary" :align="left" :loading="loading"
-              :rows="recentTickets" :columns="ticketColums" style="width: 95%; margin: auto;" hide-bottom>
+              :rows="recentTickets" :columns="ticketColums" style="width: 95%; margin: auto;" hide-pagination>
 
             </q-table>
           </q-card>
@@ -103,7 +103,7 @@
   </template>
   
   <script>
-  import { defineAsyncComponent } from 'vue';
+  import { defineAsyncComponent, ref } from 'vue';
   import axios from 'axios';
   import { mapGetters } from 'vuex';
   const apiURL = import.meta.env.VITE_API_URL;
@@ -224,6 +224,7 @@
         }
       },
       async getRecentTicketsPerUser() {
+        this.loading = true;
         try {
           const userID = this.userID;
 
@@ -231,6 +232,8 @@
           this.recentTickets = res.data
         } catch(err) {
           console.log(err);
+        } finally {
+          this.loading = false;
         }
       }
   
@@ -251,6 +254,12 @@
           return this.userPieSeries.some(value => value !== 0);
         }
       },
+    },
+
+    setup () {
+      return {
+        loading: ref(true),
+      }
     }
   
   }
