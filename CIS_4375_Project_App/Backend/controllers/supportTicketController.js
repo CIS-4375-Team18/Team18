@@ -69,6 +69,17 @@ const supportTicketByCatPerUser = async (req, res, next) => {
     }
 }
 
+const recentTicketsPerUser = async (req, res, next) => {
+    try {
+        const END_USER_ID = req.params.id;
+        const recentTickets = await supportTicketData.getTop5TicketPerUser(END_USER_ID)
+        res.send(recentTickets);
+        console.log(recentTickets);
+    } catch (error) {
+        res.status(400).send(error.message);
+    }
+}
+
 const supportTicketPerSupport = async (req, res, next) => {
     try {
         const ticketsPerSupport = await supportTicketData.getTicketCountPerSupport();
@@ -127,6 +138,7 @@ module.exports = {
    GetAllTicketsDisplay,
    getSingleTicket,
    supportTicketByCat,
+   recentTicketsPerUser,
    supportTicketByCatPerUser,
    supportTicketPerSupport,
    ticketsClosedCount,
