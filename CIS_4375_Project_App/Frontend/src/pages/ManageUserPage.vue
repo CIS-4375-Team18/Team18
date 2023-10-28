@@ -6,9 +6,15 @@
             </q-card-section>
             <q-separator />
 
+            <q-btn v-if="userRole==='System Administrator' || userRole==='IT Teacher'" 
+                    @click="createNewUser" outline icon="person_add" text-color="primary" label="Create New User" 
+                    style="margin-top: 20px ; min-width: 140px; margin-left: 3%;"
+                />
+
             <div style="margin-left: 2%;">
                 <div class="q-pa-md" style="margin: 0 auto;">
                     <!-- Users Table -->
+
                     <q-table title="Users" v-if="userRole==='System Administrator' || userRole==='IT Teacher'" :key="tableKey" color="secondary" :align="left" :loading="loading "
                         :rows="userData" :columns="userColumns" style="width: 98%;"> <!-- Puts table with user data -->
                         <template #body-cell-status="props">
@@ -39,10 +45,6 @@
                     </q-table>
 
                     <!-- Only valid users are able to select this role-->
-                    <q-btn v-if="userRole==='System Administrator' || userRole==='IT Teacher'" 
-                        @click="createNewUser" outline icon="person_add" text-color="primary" label="Create New User" 
-                        style="margin-top: 30px ; min-width: 140px; background-color: #03521c;"
-                    />
                 </div>
                 <template> <!-- Edit user dialog box, except password-->
                     <q-dialog v-model="editItemDial" persistent>
@@ -169,6 +171,7 @@
 import { mapGetters } from 'vuex';
 import axios from 'axios';
 import { ref } from 'vue';
+
 const apiURL = import.meta.env.VITE_API_URL
 
 export default {
@@ -412,6 +415,12 @@ export default {
     computed: {
       ...mapGetters('auth', ['userRole']),
 
+    },
+
+    setup() {
+        return {
+            loading: ref(true)
+        }
     },
 }
 </script>

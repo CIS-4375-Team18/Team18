@@ -39,12 +39,16 @@
                 option-label="TICKET_CATEGORY_DESC"
               />
             </div>
-            <div class="col-4">
+            <div class="col-4" v-if="categoryModel === hardwCatId.TICKET_CATEGORY_ID">
               <q-select
                 transition-show="scale"
                 transition-hide="scale"
                 class="ticket-select"
                 color="secondary"
+                v-model="subCatList"
+                :options="subCategoryData"
+                option-value="TICKET_SUB_CATEGORY_ID"
+                option-label="TICKET_SUB_CATEGORY_DESC"
                 emit-value
                 map-options
                 label="Select Subcategory"
@@ -53,9 +57,10 @@
           </div>
 
           <!-- Hide entire row if any category besides hardware is selected -->
-          <div class="row-inline flex-direction-down row q-mt-md row-custom">
+          <div v-if="categoryModel === hardwCatId.TICKET_CATEGORY_ID && subCatList !== null" class="row-inline flex-direction-down row q-mt-md row-custom">
             <div class="col-4">
               <q-input
+                v-model="assetTagModel"
                 class="new-request-input"
                 label="Asset Tag"
                 color="secondary"
@@ -65,7 +70,7 @@
                     :align="top"
                     size="xs"
                     class="q-mb-sm"
-                    name="help"
+                    name="fa-regular fa-circle-question"
                     color="secondary"
                   >
                     <q-tooltip>
@@ -78,6 +83,7 @@
             <div class="col">
               <div>
                 <q-input
+                  v-model="assetMake"
                   class="new-request-input"
                   label="Asset Make"
                   color="secondary"
@@ -87,7 +93,7 @@
                       :align="top"
                       size="xs"
                       class="q-mb-sm"
-                      name="help"
+                      name="fa-regular fa-circle-question"
                       color="secondary"
                     >
                       <q-tooltip> i.e., DELL, Acer, Lenovo, etc. </q-tooltip>
@@ -98,6 +104,7 @@
             </div>
             <div class="col-4">
               <q-input
+                v-model="assetModel"
                 class="new-request-input"
                 label="Asset Model"
                 color="secondary"
@@ -107,7 +114,7 @@
                     :align="top"
                     size="xs"
                     class="q-mb-sm"
-                    name="help"
+                    name="fa-regular fa-circle-question"
                     color="secondary"
                   >
                     <q-tooltip> i.e., G7-700 </q-tooltip>
@@ -134,7 +141,7 @@
                     :align="top"
                     size="xs"
                     class="q-mb-sm"
-                    name="help"
+                    name="fa-regular fa-circle-question"
                     color="secondary"
                   >
                     <q-tooltip> Select period to indicate availbe time </q-tooltip>
@@ -147,6 +154,7 @@
           <div class="row-inline flex-direction-down row q-mt-lg">
             <div class="col">
               <q-input
+                v-model="subjectModel"
                 class="new-request-subject"
                 label="Subject"
                 color="secondary"
@@ -156,7 +164,7 @@
                     :align="top"
                     size="xs"
                     class="q-mb-sm"
-                    name="help"
+                    name="fa-regular fa-circle-question"
                     color="secondary"
                   >
                     <q-tooltip>
@@ -175,7 +183,7 @@
                   :align="top"
                   size="xs"
                   class="q-mb-sm"
-                  name="help"
+                  name="fa-regular fa-circle-question"
                   color="secondary"
                 >
                   <q-tooltip>
@@ -183,7 +191,13 @@
                   </q-tooltip>
                 </q-icon>
               </q-item-label>
-              <q-input clearable outlined type="textarea" color="secondary" />
+              <q-input
+                v-model="textareaModel"
+                clearable
+                outlined
+                type="textarea"
+                color="secondary"
+              />
             </div>
           </div>
           <div class="row-inline flex-direction-down row q-mt-lg">
@@ -225,6 +239,7 @@
               @click="confirmCancel"
             />
             <q-btn
+              @click="saveRequest(userID)"
               class="q-ml-xl"
               color="secondary"
               no-caps
@@ -239,9 +254,12 @@
 </template>
 
 <script>
-import { ref } from "vue";
+import { ref } from 'vue'
+import { mapGetters } from 'vuex'
+import { Dialog } from 'quasar'
 import axios from "axios";
-import { Dialog } from "quasar";
+
+const apiURL = import.meta.env.VITE_API_URL;
 
 export default {
   data() {
@@ -250,19 +268,32 @@ export default {
       priorityData: [],
       subCategoryData: [],
       hardwCatId: [],
-    };
+      openTicketStatusId: null
+    }
   },
 
   created() {
-    axios.get(`http://localhost:8001/api/activecategories`).then((res) => {
-      this.categoryData = res.data;
-      this.findHardwareId();
-    });
-    axios.get(`http://localhost:8001/api/activepriorities`).then((res) => {
-      this.priorityData = res.data;
-    });
-    axios.get(`http://localhost:8001/api/activesubcategories`).then((res) => {
-      this.subCategoryData = res.data;
+    axios.get(`${apiURL}/activecategories`).then((res) => {
+      this.categoryData = res.data
+      this.findHardwareId()
+    })
+    axios.get(`${apiURL}/activepriorities`).then((res) => {
+      this.priorityData = res.data
+    })
+    axios.get(`${apiURL}/activesubcategories`).then((res) => {
+      this.subCategoryData = res.data
+    })
+    axios.get(`${apiURL}/activeticketstatuses`).then((res) => {
+      // query for all the active ticket statuses
+      for(let i = 0; i < res.data.length; i++) {
+        const currentStatus = res.data[i];
+        // find the `OPEN` ticket status
+        if (currentStatus.SUPPORT_TICKET_STATUS_DESC === 'OPEN') {
+          // get the id of the open ticket status and save that in a variable for us to use in the save api later
+          this.openTicketStatusId = currentStatus.SUPPORT_TICKET_STATUS_ID;
+          break;
+        }
+      }
     });
   },
   setup() {
@@ -272,22 +303,89 @@ export default {
       textareaModel: ref(null),
       subjectModel: ref(null),
       assetTagModel: ref(null),
+      assetMake: ref(null),
+      assetModel: ref(null),
       subCatList: ref(null),
       dense: ref(true),
       denseOpts: ref(true),
       model: ref(null),
     };
   },
-
   methods: {
     //Get ID of category Type Hardware
     findHardwareId() {
-      this.hardwCatId = this.categoryData.find(
-        (o) => o.TICKET_CATEGORY_DESC === "HARDWARE"
-      );
-      console.log(hardwCatId);
+      this.hardwCatId = this.categoryData.find(o => o.TICKET_CATEGORY_DESC === 'HARDWARE');
     },
+    async saveRequest(userID) {
+      try {
+        const hardwareCategoryId = this.hardwCatId.TICKET_CATEGORY_ID;
+        // if the category is hardware and if we have a subcategory, store it into this variable
+        // otherwise subcategory will be null
+        let subCategory = null;
+        if (this.categoryModel == hardwareCategoryId && this.subCatList !== null) {
+          subCategory = this.subCatList;
+        }
 
+        // if the category is hardware and if we have a device make, store it into this variable
+        // otherwise device make will be null
+        let assetMake = null;
+        if (this.categoryModel == hardwareCategoryId && this.assetMake !== null) {
+          assetMake = this.assetMake;
+        }
+
+
+        // if the category is hardware and if we have a device model, store it into this variable
+        // otherwise device model will be null
+        let assetModel = null;
+        if (this.categoryModel == hardwareCategoryId && this.assetModel !== null) {
+          assetModel = this.assetModel;
+        }
+
+        // today's date in ISO format - which is the same format we will save in the database
+        const dateCreated = new Date().toISOString();
+
+        // create the support ticket to be saved in the database
+        const supportticket = {
+          SUPPORT_TICKET_SUBJECT: this.subjectModel, // subject
+          SUPPORT_TICKET_NOTE: this.textareaModel, // description
+          DEVICE_MAKE: assetMake,
+          DEVICE_MODEL: assetModel, 
+          SUPPORT_TICKET_TIMELINE: null,
+          SUPPORT_TICKET_DATE_CREATED: dateCreated,
+          SUPPORT_TICKET_RESOLUTION_TIME: null,
+          SUPPORT_TICKET_STATUS_ID: this.openTicketStatusId, // open ticket status
+          TICKET_CATEGORY_ID: this.categoryModel, // category
+          TICKET_SUB_CATEGORY_ID: subCategory, // sub category
+          TICKET_PRIORITY_ID: this.PriorityList, // priority
+          SUPPORT_AGENT_ID: null,
+          RESOLUTION_DATE: null,
+          END_USER_ID: userID,
+          SUPPORT_TICKET_ASSET_TAG: this.assetTagModel // asset tag
+        };
+
+        // call the save api for support ticket
+        const response = await axios.post(`${apiURL}/supportticket`, supportticket);
+        // if the save is successful for the support ticket
+        if(response.status === 200) {
+          // then we will redirect to the list of requests
+          this.$router.push({ path: '/requests' });
+        } else {
+          // if an error happens, we don't redirect the user to the list of requests and show them an error dialog
+          Dialog.create({
+            title: 'An error occurred',
+            message: 'Please try again later.',
+          });
+          console.error('Failed to save request.')
+        };
+      } catch (error) {
+        // if an error happens, we don't redirect the user to the list of requests and show them an error dialog
+        Dialog.create({
+          title: 'An error occurred',
+          message: 'Please try again later.',
+        });
+        console.error('Save API request failed:', error);
+      }
+    },
     confirmCancel() {
       Dialog.create({
         title: "Cancel Ticket Creation",
@@ -300,9 +398,12 @@ export default {
         })
         .onCancel(() => {
           // Do nothing
-        });
-    },
+        })
+    }
   },
+  computed: {
+    ...mapGetters('auth', ['userID']),
+  }
 };
 </script>
 <style scoped>

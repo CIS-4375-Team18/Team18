@@ -15,3 +15,7 @@ export function userRole (state) {
     return state.userRole
 }
 
+export function userID (state) {
+    return state.userID
+}
+
