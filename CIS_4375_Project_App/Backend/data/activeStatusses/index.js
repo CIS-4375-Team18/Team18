@@ -31,6 +31,19 @@ const getById = async(ACTIVE_STATUS_ID) => {
     }
 }
 
+const getByStatus = async(ACTIVE_STATUS_DESC) => {
+    try {
+        let pool = await sql.connect(config.sql);
+        const getByStatus ="SELECT [ACTIVE_STATUS_ID]  ,[ACTIVE_STATUS_DESC] FROM [dbo].[ACTIVE_STATUS] WHERE ACTIVE_STATUS_DESC = @ACTIVE_STATUS_DESC";
+        const ticketStatus = await pool.request()
+                            .input('ACTIVE_STATUS_DESC', ACTIVE_STATUS_DESC)
+                            .query(getByStatus);
+        return ticketStatus.recordset;
+    } catch (error) {
+        return error.message;
+    }
+}
+
 
 
 
@@ -39,4 +52,5 @@ const getById = async(ACTIVE_STATUS_ID) => {
 module.exports = {
     getAll,
     getById,
+    getByStatus
 }
