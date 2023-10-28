@@ -47,7 +47,7 @@
                     <!-- Only valid users are able to select this role-->
                 </div>
                 <template> <!-- Edit user dialog box, except password-->
-                    <q-dialog v-model="editItemDial" persistent>
+                    <q-dialog v-model="this.editItemDial" persistent>
                         <q-card style="min-width: 350px;">
                         <q-card-section class="row items-center" style="background-color: #af0000">
                             <div class="text-h6" style="color: white;">Edit User</div>
@@ -106,7 +106,7 @@
                         <q-card-section>
                         <q-avatar icon="warning" color="white" text-color="warning" size="" />
                         <span class="text-body2 q-mt-lg">You are about to delete user: 
-                            {{ this.editedItem.END_USER_FIRST_NAME + " " + this.editedItem.END_USER_LAST_NAME}}</span>
+                            {{ this.END_USER_FIRST_NAME + " " + this.END_USER_LAST_NAME}}</span>
                         </q-card-section>
 
                         <q-card-actions align="right">
@@ -122,7 +122,7 @@
                     <q-dialog v-model="changePassDial" persistent>
                         <q-card style="min-width: 450px;">
                         <q-card-section class="row items-center" style="background-color: #af0000">
-                            <div class="text-h6" style="color: white;">Change Password</div>
+                            <div class="text-h6" style="color: white">Change Password</div>
                         </q-card-section>
                         <q-card-section>
                         <q-avatar icon="warning" color="white" text-color="warning" size="" />
@@ -181,6 +181,7 @@ export default {
             deleteItemDial: ref(false),
             changePassDial:ref(false),
             isPwd: ref(true),
+            loading: ref(true),
         }
     },
     beforeMount() {
@@ -249,11 +250,12 @@ export default {
         },
         rerenderTable(){//rerenders page
             this.tableKey +=1;
-            document.location.reload(true)
+            //document.location.reload(true);
             console.log("rendered table");
         },
         editUserDialog(item){ //Puts values into appropriate fields in dialog box
             this.editItemDial = true;
+            console.log("access here");
 
             //Puts all current values into dialogue box
             this.editedItem.END_USER_ID = item.row.END_USER_ID;
@@ -278,8 +280,7 @@ export default {
             }
             else if(this.editedItem.ACTIVE_STATUS_DESC == "INACTIVE"){
                 this.editedItem.ACTIVE_STATUS_ID = 2;
-            }
-            
+            }  
  
             if(this.editedItem.END_USER_PERIOD != this.pre_changeUser_Period){//Updates changes correctly
                 this.editedItem.END_USER_PERIOD = this.editedItem.END_USER_PERIOD.value;
@@ -331,9 +332,10 @@ export default {
             this.END_USER_FIRST_NAME = item.row.END_USER_FIRST_NAME;
             this.END_USER_LAST_NAME = item.row.END_USER_LAST_NAME;
         },
-        async deleteUser(userID){ //executes delete
+        deleteUser(userID){ //executes delete
             try{
             axios.delete(`${apiURL}/enduser/${userID}`).then((res) => { //deletes from database
+                console.log(userID);
                 const index = this.userData.findIndex(userData => userData.END_USER_ID === userID) 
                     if (~index){
                         this.userData.splice(index, 1)//finds in local table and deletes
@@ -363,15 +365,21 @@ export default {
             this.editedItem.END_USER_LAST_NAME = item.row.END_USER_LAST_NAME;
         },
         changePassword(){//After confirm button is pressed, updates password
-            const isPasswordValid = this.validatePassword(this.editedItem.password);
+            const isPasswordValid = this.validatePassword(this.editedItem.password); //validates password
             console.log(isPasswordValid)
+            
+            if (isPasswordValid === false) { //is invalid, will return to dialog box and blank out both input boxes
+                    this.editedItem.password = "";
+                    this.editedItem.confirmPassword = "";
+                    return;
+            }
 
-            if (this.editedItem.password === this.editedItem.confirmPassword) {
+
+            if (this.editedItem.password === this.editedItem.confirmPassword) {//if valid will skip over above and run the put request
                     const updatePass = {
                         END_USER_PASSWORD: this.editedItem.password,
                         END_USER_ID: this.editedItem.END_USER_ID,
                     };
-                    console.log(updatePass);
 
                     axios.put(`${apiURL}/updatePassword/${this.editedItem.END_USER_ID}`, updatePass).then((res) => {
                     
@@ -390,7 +398,7 @@ export default {
                     this.$q.notify({ color: 'negative', message: 'Passwords do not match' });
                     this.editedItem.password = '';
                     this.editedItem.confirmPassword = '';
-             }
+                }
             },
         validateEmail(email) {
             const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -415,12 +423,6 @@ export default {
     computed: {
       ...mapGetters('auth', ['userRole']),
 
-    },
-
-    setup() {
-        return {
-            loading: ref(true)
-        }
     },
 }
 </script>
