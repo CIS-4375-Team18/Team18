@@ -202,11 +202,12 @@ const getTicketCountPerSupport = async () => {
         let pool = await sql.connect(config.sql);
         const countPerSupport = "SELECT CONCAT(END_USER_FIRST_NAME, ' ', END_USER_LAST_NAME) AS SUPPORT_AGENT, "+
             "COUNT(SUPPORT_TICKET_ID) AS NUMBER_OF_ASSIGNED_TICKETS "+
-            "FROM [dbo].[END_USER] AS ES "+   
-            "LEFT JOIN [dbo].[SUPPORT_TICKET] AS ST "+
-            "ON ES.END_USER_ID = ST.SUPPORT_AGENT_ID "+
-            "WHERE ES.SUPPORT_ROLE_ID = 1 "+
-            "GROUP BY ES.END_USER_FIRST_NAME, ES.END_USER_LAST_NAME"
+            "FROM dbo.SUPPORT_TICKET AS ST "+   
+            "JOIN dbo.SUPPORT_AGENT_USER AS SAU "+
+            "ON ST.SUPPORT_AGENT_ID = SAU.SUPPORT_AGENT_USER_ID "+
+            "JOIN dbo.END_USER as EU "+
+            "ON SAU.END_USER_ID = EU.END_USER_ID "+
+            "GROUP BY EU.END_USER_FIRST_NAME, EU.END_USER_LAST_NAME"
         const numberPerSupport = await pool.request().query(countPerSupport)
         return numberPerSupport.recordset
     } catch(error) {
