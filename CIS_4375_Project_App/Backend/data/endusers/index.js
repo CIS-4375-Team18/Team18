@@ -6,20 +6,15 @@ const bcrypt = require('bcrypt');
 
 
 const getEndUsers = async () => {
-
+    
     try {
         let pool = await sql.connect(config.sql);
-        const getAllQuery = "SELECT [END_USER_ID] " +
-        " ,[END_USER_FIRST_NAME] " +
-        " ,[END_USER_LAST_NAME] "+
-        " ,[END_USER_EMAIL] " + 
-        " ,[USER_ROLE_NAME] " + 
-        " ,[ACTIVE_STATUS_DESC] " +
-        " ,eu.[ACTIVE_STATUS_ID] "+
-        " FROM [dbo].[END_USER] AS eu" +
-        " JOIN [dbo].[USER_ROLE] AS ur ON eu.[USER_ROLE_ID] = ur.[USER_ROLE_ID] " +
-        " JOIN [dbo].[ACTIVE_STATUS] AS acs ON eu.[ACTIVE_STATUS_ID] = acs.[ACTIVE_STATUS_ID] " +
-        " ORDER BY [END_USER_FIRST_NAME], [END_USER_LAST_NAME]" ;
+        const getAllQuery = 'SELECT [END_USER_ID], [END_USER_FIRST_NAME], [END_USER_LAST_NAME], ' + //Keep in single ' quotes, SQL will
+        ' [END_USER_EMAIL], [END_USER_PERIOD], eu.[USER_ROLE_ID], [USER_ROLE_NAME], [ACTIVE_STATUS_DESC],' + //not find some tables if in
+        ' eu.[ACTIVE_STATUS_ID] FROM [dbo].[END_USER] AS eu' + //" quotes
+        ' JOIN [dbo].[USER_ROLE] AS ur ON eu.[USER_ROLE_ID] = ur.[USER_ROLE_ID] ' +
+        ' JOIN [dbo].[ACTIVE_STATUS] AS acs ON eu.[ACTIVE_STATUS_ID] = acs.[ACTIVE_STATUS_ID]' +
+        ' WHERE [END_USER_ID] IS NOT NULL' ;
         const endUsersList = await pool.request().query(getAllQuery);
         return endUsersList.recordset;
     } catch (error) {
@@ -113,18 +108,35 @@ const getHashedPassword = async (END_USER_EMAIL) => {
 const updateEndUser = async (END_USER_ID, data) => {
     try {
         let pool = await sql.connect(config.sql);
-        const updateQuery = "UPDATE [dbo].[END_USER] SET [END_USER_FIRST_NAME] = @END_USER_FIRST_NAME, "+
+        const updateQuery = 'UPDATE [dbo].[END_USER] SET [END_USER_FIRST_NAME] = @END_USER_FIRST_NAME, '+
         " [END_USER_LAST_NAME] = @END_USER_LAST_NAME, "+
         " [END_USER_EMAIL] = @END_USER_EMAIL, "+
-        " [END_USER_PRIMARY_PHONE] = @END_USER_PRIMARY_PHONE, "+
-        " [END_USER_CLASS] = @END_USER_CLASS  WHERE END_USER_ID = @END_USER_ID"
+        " [USER_ROLE_ID] = @USER_ROLE_ID, "+
+        " [ACTIVE_STATUS_ID] = @ACTIVE_STATUS_ID, "+
+        " [END_USER_PERIOD] = @END_USER_PERIOD WHERE END_USER_ID = @END_USER_ID"
         const update = await pool.request()
             .input('END_USER_ID', sql.Int, END_USER_ID)
             .input('END_USER_FIRST_NAME', sql.NVarChar(40), data.END_USER_FIRST_NAME)
             .input('END_USER_LAST_NAME', sql.NVarChar(40), data.END_USER_LAST_NAME)
             .input('END_USER_EMAIL', sql.NVarChar(40), data.END_USER_EMAIL)
-            .input('END_USER_PRIMARY_PHONE', sql.NVarChar(40), data.END_USER_PRIMARY_PHONE)
-            .input('END_USER_CLASS', sql.NVarChar(40), data.END_USER_CLASS)
+            .input('USER_ROLE_ID', sql.Int, data.USER_ROLE_ID)
+            .input('ACTIVE_STATUS_ID', sql.Int, data.ACTIVE_STATUS_ID)
+            .input('END_USER_PERIOD', sql.Int, data.END_USER_PERIOD)
+            .query(updateQuery);
+        return update.recordset;
+    } catch (error) {
+        return error.message;
+    }
+}
+
+const updateEndUserPass = async (data) => {
+    try {
+        let pool = await sql.connect(config.sql);
+        const updateQuery = 'UPDATE [dbo].[END_USER] SET [END_USER_PASSWORD] = @END_USER_PASSWORD '+
+        'WHERE END_USER_ID = @END_USER_ID'
+        const update = await pool.request()
+            .input('END_USER_ID', sql.Int, data.END_USER_ID)
+            .input('END_USER_PASSWORD', sql.NVarChar(255), data.END_USER_PASSWORD)
             .query(updateQuery);
         return update.recordset;
     } catch (error) {
@@ -153,6 +165,6 @@ module.exports = {
     endUserLogin,
     getHashedPassword,
     updateEndUser,
-   
+    updateEndUserPass,
     deleteEndUser
 }

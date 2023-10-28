@@ -8,6 +8,7 @@ router.get('/enduser/:id', endUserCont.getEndUser);
 router.post('/enduser', endUserCont.addEndUser);
 router.post('/login', endUserCont.loginEndUser);
 router.put('/enduser/:id', endUserCont.updateEndUser);
+router.put('/updatePassword/:id', endUserCont.updateEndUserPassword);
 router.delete('/enduser/:id', endUserCont.deleteEndUser);
 
 

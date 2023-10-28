@@ -24,10 +24,20 @@ const getSingleActiveStatus = async (req, res, next) => {
         res.status(400).send(error.message);
     }
 }
+const getSingleActiveStatusByStatus = async (req, res, next) => {
+    try {
+        const ACTIVE_STATUS_DESC = req.params.status;
+        const activestatus = await activeStatusData.getByStatus(ACTIVE_STATUS_DESC);
+        res.send(activestatus);
+    } catch (error) {
+        res.status(400).send(error.message);
+    }
+}
 
 
 
 module.exports = {
   getAllActiveStatusses,
-  getSingleActiveStatus
+  getSingleActiveStatus,
+  getSingleActiveStatusByStatus
 }

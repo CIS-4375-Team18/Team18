@@ -44,6 +44,21 @@ const getById = async(SUPPORT_ROLE_ID) => {
     }
 }
 
+const getByStatus = async(SUPPORT_ROLE_DESC) => {
+    try {
+        let pool = await sql.connect(config.sql);
+        const supportRoleByStatusQuery = "SELECT [SUPPORT_ROLE_ID] " +
+        " ,[SUPPORT_ROLE_DESC] FROM [dbo].[SUPPORT_ROLE] WHERE SUPPORT_ROLE_DESC=@SUPPORT_ROLE_DESC"
+      
+        const supportRole = await pool.request()
+                            .input('SUPPORT_ROLE_DESC', SUPPORT_ROLE_DESC)
+                            .query(supportRoleByStatusQuery);
+        return supportRole.recordset;
+    } catch (error) {
+        return error.message;
+    }
+}
+
 const createSupportRole = async (supporRoleData) => {
     try {
         let pool = await sql.connect(config.sql);
@@ -99,6 +114,7 @@ module.exports = {
     getSupportRoles,
     getActiveSuppRoles,
     getById,
+    getByStatus,
     createSupportRole,
     updateSupportRole,
     deleteSupportRole
