@@ -10,6 +10,7 @@ router.get('/ticketbycat/:id', supportTicketCntr.supportTicketByCatPerUser);
 router.get('/supportticket/:id', supportTicketCntr.getSingleTicket);
 router.get('/ticketpersupport', supportTicketCntr.supportTicketPerSupport);
 router.get('/ticketsclosedcountmonthly', supportTicketCntr.ticketsClosedCount);
+router.get('/recentticketsperuser/:id', supportTicketCntr.recentTicketsPerUser);
 router.post('/supportticket', supportTicketCntr.insertSupportTicket);
 router.put('/supportticket/:id', supportTicketCntr.updateSupportTicket);
 router.delete('/supportticket/:id', supportTicketCntr.delSupportTicket);

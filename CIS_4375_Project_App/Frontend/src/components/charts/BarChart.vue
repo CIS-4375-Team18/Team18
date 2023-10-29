@@ -87,12 +87,12 @@ export default {
                         show: false,
                     },
                     labels: {
-                        show: false,
+                        show: true,
                     }
             
                 },
                 title: {
-                    text: 'Tickets Closed Per Month, 2023',
+                    text: 'Tickets Closed For the Past Year',
                     align: 'center',
                     style: {
                         color: '#444'

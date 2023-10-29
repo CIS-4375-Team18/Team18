@@ -1,9 +1,18 @@
 <template>
   
     <q-page v-if="isAuthenticated" padding> 
+      <div v-if="userRole === 'Staff'">
+        <div class="row q-mt-md text-h5 q-ml-md">
+          Welcome {{ userFirstName }},
+        </div>
+        <div class="row q-mb-lg text-subtitle2 q-ml-md" style="color: #626262;">
+          All systems are running smoothly!
+        </div>
+      </div>
+
       <div class="row q-col-gutter-lg">
         <div class="col-md-4">
-          <q-card class="shadow-up-10" style="height: 130px;">
+          <q-card style="height: 130px;">
             <q-card-section class="q-ml-xl">
                 <div v-if="userRole != 'Staff'" class="text-h3 text-bold q-mt-md">{{ totalTicketCount }}</div>
                 <div v-else class="text-h3 text-bold q-mt-md">{{ userTicketCount }}</div>
@@ -12,7 +21,7 @@
           </q-card>
         </div>
         <div class="col-md-4">
-          <q-card class="shadow-up-10" style="height: 130px;">
+          <q-card style="height: 130px;">
             <q-card-section class="q-ml-xl">
                 <div v-if="userRole != 'Staff'" class="text-h3 text-bold q-mt-md">{{ totalOpenTickets }}</div>
                 <div v-else class="text-h3 text-bold q-mt-md">{{ userOpenTickets }}</div>
@@ -21,7 +30,7 @@
           </q-card>
         </div>
         <div class="col-md-4">
-          <q-card class="shadow-up-10" style="height: 130px;">
+          <q-card style="height: 130px;">
             <q-card-section class="q-ml-xl">
                 <div v-if="userRole != 'Staff'" class="text-h3 text-bold q-mt-md">{{ totalClosedTickets }}</div>
                 <div v-else class="text-h3 text-bold q-mt-md">{{ userClosedTickets }}</div>
@@ -33,23 +42,26 @@
   
       <div v-if="userRole !== 'Staff'" class="row q-col-gutter-md" style="margin-top: 10px;">
         <div class="col-md-6 col-xs-12">
-          <q-card class="shadow-up-9">
+          <q-card>
             <barChart> </barChart>
           </q-card>
         </div>
         <div class="col-md-6 col-xs-12">
-          <q-card class="fit shadow-up-9">
-            <div v-if="!isPieLoading">
-              <q-inner-loading :showing="isVisible" size="100px" color="primary" label="Please Wait..."></q-inner-loading>
-            </div>
-            <div v-else>
+          <q-card class="fit">
+            <div>
+              <q-inner-loading 
+                :showing="isPieLoading" 
+                size="100px" 
+                color="primary" 
+                label="Please Wait...">
+              </q-inner-loading>
               <pieChart
-                v-if="showPieChart"
-                :series="userRole !== 'Staff' ? pieSeries : userPieSeries"
-                :options="userRole !== 'Staff' ? chartOptions : userChartOptions"
+                v-if="!isPieLoading"
+                :series="pieSeries"
+                :options="chartOptions"
               >
               </pieChart>
-              <div v-else class="q-pa-md">
+              <!-- <div v-else class="q-pa-md">
                 <div class="q-mb-md text-center">
                   <q-flex justify="center">
                     <q-space />
@@ -58,7 +70,7 @@
                     <q-space />
                   </q-flex>
                 </div>
-              </div>
+              </div> -->
             </div>
           </q-card>
         </div>
@@ -66,11 +78,22 @@
   
       <div class="row" style="margin-top: 20px;">
         <div class="col-md-12">
-          <q-card class="shadow-up-9">
+          <q-card>
             <lineChart
               v-if="userRole != 'Staff'"
             >
             </lineChart>
+          </q-card>
+        </div>
+      </div>
+
+      <div v-if="userRole === 'Staff'" class="row" style="margin-top: 10px;">
+        <div class="col-md-12">
+          <q-card>
+            <q-table title="Most Recent Tickets" color="secondary" :align="left" :loading="loading"
+              :rows="recentTickets" :columns="ticketColums" style="width: 95%; margin: auto;" hide-pagination>
+
+            </q-table>
           </q-card>
         </div>
       </div>
@@ -80,9 +103,10 @@
   </template>
   
   <script>
-  import { defineAsyncComponent } from 'vue';
+  import { defineAsyncComponent, ref } from 'vue';
   import axios from 'axios';
   import { mapGetters } from 'vuex';
+  const apiURL = import.meta.env.VITE_API_URL;
   
   const barChart = defineAsyncComponent(() =>
     import('components/charts/BarChart.vue')
@@ -113,15 +137,9 @@
             text: ''
           },
         },
-        userPieSeries: [],
-        userChartOptions: {
-          labels: [],
-          title: {
-            text: ''
-          },
-        },
-  
-        isPieLoading: false,
+        
+        recentTickets: [],
+        isPieLoading: true,
         isVisible: true,
         totalTicketCount: '',
         userTicketCount: '',
@@ -129,6 +147,12 @@
         userOpenTickets: '',
         totalClosedTickets: '',
         userClosedTickets: '',
+        ticketColums: [
+          {name: 'Date Created', label: 'Date Created', field: 'DATE_CREATED', align: 'left'},
+          {name: 'Ticket Subject', required: true, label: 'Ticket Subject', field: 'SUPPORT_TICKET_SUBJECT', align: 'left'}, 
+          {name: 'Status', label: 'Status', field: 'SUPPORT_TICKET_STATUS_DESC', align: 'left'},
+          {name: 'Priority', label: 'Priority', field: 'TICKET_PRIORITY_DESC', align: 'left'},
+        ],
       }
     },
   
@@ -150,12 +174,15 @@
         this.userOpenTickets = openTicketsByUser.length;
         this.totalClosedTickets = closedTickets.length;
         this.userClosedTickets = closedTicketsByUser.length;
-      })
+      });
+
+      
   
     },
   
     methods: {
       async getTicketCountByCat() {
+        this.isPieLoading = true
         try {
           const res = await axios.get(`http://localhost:8001/api/ticketbycat`)
   
@@ -164,16 +191,11 @@
             this.pieSeries = filterData.map((sub) => sub.NUMBER_OF_TICKETS_BY_CAT)
             this.chartOptions.labels = filterData.map((sub) => sub.TICKET_CATEGORY_DESC)
             this.chartOptions.title.text = 'Tickets By Categories'
-            this.isPieLoading = true
-  
-            setTimeout(() => {
-              this.isVisible = false;
-            }, 4000);
-          } else {
-            this.isVisible = true;
-          }
+          } 
         } catch(err) {
           console.log(err)
+        } finally {
+          this.isPieLoading = false;
         }
       },
       async getTicketCountByCatByUSER() {
@@ -201,16 +223,30 @@
           console.log(err)
         }
       },
+      async getRecentTicketsPerUser() {
+        this.loading = true;
+        try {
+          const userID = this.userID;
+
+          const res = await axios.get(`${apiURL}/recentticketsperuser/${userID}`)
+          this.recentTickets = res.data
+        } catch(err) {
+          console.log(err);
+        } finally {
+          this.loading = false;
+        }
+      }
   
     },
   
     mounted() {
       this.getTicketCountByCat();
       this.getTicketCountByCatByUSER();
+      this.getRecentTicketsPerUser();
     },
   
     computed: {
-      ...mapGetters('auth', ['userID', 'userRole', 'isAuthenticated']),
+      ...mapGetters('auth', ['userID', 'userRole', 'isAuthenticated', 'userFirstName']),
       showPieChart() {
         if (this.userRole !== 'Staff') {
           return this.pieSeries.length > 0;
@@ -218,6 +254,12 @@
           return this.userPieSeries.some(value => value !== 0);
         }
       },
+    },
+
+    setup () {
+      return {
+        loading: ref(true),
+      }
     }
   
   }

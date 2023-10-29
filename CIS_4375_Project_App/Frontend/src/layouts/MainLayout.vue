@@ -2,7 +2,7 @@
   <q-layout view="hHh lpR fFf" class="">
     <q-header class=" q-py-xs shadow-2 rounded-borders" height-hint="58" style="background-color: #666262;">
       <q-toolbar>
-        <q-btn flat roundcccccbenfrdj @click="drawer = !drawer" aria-label="Menu" icon="menu" />
+        <q-btn v-if="isAuthenticated" flat roundcccccbenfrdj @click="drawer = !drawer" aria-label="Menu" icon="menu" />
         <q-btn flat no-caps no-wrap class="q-ml-xs" v-if="$q.screen.gt.xs">
           <img src="src/assets/CISD_Logo.png" style="margin-left: 8px; height:70px;">
         </q-btn>
@@ -60,6 +60,7 @@
     </q-header>
 
     <q-drawer
+        v-if="isAuthenticated"
         v-model="drawer"
         show-if-above
         :mini="!drawer || miniState"
@@ -82,7 +83,7 @@
             </q-item>
 
 
-          <q-list v-if="isAuthenticated">
+          <q-list>
             <q-expansion-item
             expand-separator
             icon="support_agent"
@@ -115,7 +116,7 @@
 
           </q-list>
 
-            <q-item clickable v-ripple style="margin-top: 10px;"
+            <!-- <q-item clickable v-ripple style="margin-top: 10px;"
             @click="$router.push('/reports')" >
               <q-item-section avatar>
                 <q-icon name="equalizer" />
@@ -124,9 +125,9 @@
               <q-item-section>
                 Reports
               </q-item-section>
-            </q-item>
+            </q-item> -->
 
-            <q-item clickable v-ripple style="margin-top: 10px;"
+            <!-- <q-item clickable v-ripple style="margin-top: 10px;"
             @click="$router.push('/knowledge')" >
               <q-item-section avatar>
                 <q-icon name="storage" />
@@ -135,7 +136,7 @@
               <q-item-section>
                 Knowledge Base
               </q-item-section>
-            </q-item>
+            </q-item> -->
             <q-separator  style="margin-top: 10px;"/>
 
             <q-item clickable v-ripple style="margin-top: 10px;"
@@ -182,6 +183,17 @@
    
     <q-page-container>
       <router-view />
+      <div class="q-pa-lg q-mt-md" v-if="!isAuthenticated">
+        <q-page>
+          <div class="row justify-center" style="height: 100px;">
+            <img src="src/assets/CISD_Logo.png" style="height: 100%;"/>
+            <span class="text-h2 text-weight-medium" style="color: #666262;">Cleveland ISD Work Order System</span>
+          </div>
+          <div class="row justify-center">
+            Hello
+          </div>
+        </q-page>
+      </div>
     </q-page-container>
   </q-layout>
 </template>
