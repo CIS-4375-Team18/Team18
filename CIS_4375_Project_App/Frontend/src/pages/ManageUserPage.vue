@@ -30,12 +30,6 @@
                                             style="color: #ad0000;"></q-btn>
                                     </q-td>
                                 </template>
-                                <template v-if="userRole==='System Administrator' || userRole==='IT Teacher'" v-slot:body-cell-delactions="props" > <!-- On click will bring out dialog box to confirm deletion-->
-                                    <q-td :props="props">
-                                        <q-btn dense round flat @click=deleteUserDialog(props) icon="delete"
-                                            style="color: #ad0000;"></q-btn>
-                                    </q-td>
-                                </template>
                                 <template v-if="userRole==='System Administrator' || userRole==='IT Teacher'" v-slot:body-cell-changePass="props" > <!-- On click will bring out dialog box change password-->
                                     <q-td :props="props">
                                         <q-btn dense round flat @click=changePasswordDialog(props) icon="lock"
@@ -92,27 +86,6 @@
                         <q-btn flat label="Cancel" color="primary" v-close-popup />
                         <!-- On confirmation will execute deletion-->
                         <q-btn flat label="Confirm" color="primary" @click="editUser()" v-close-popup />
-                        </q-card-actions>
-                    </q-card>
-                    </q-dialog>
-                </template>
-
-                <template> <!-- Delete User Dialog-->
-                    <q-dialog v-model="deleteItemDial" persistent>
-                        <q-card style="min-width: 350px;">
-                        <q-card-section class="row items-center" style="background-color: #af0000">
-                            <div class="text-h6" style="color: white;">Confirm to Delete User</div>
-                        </q-card-section>
-                        <q-card-section>
-                        <q-avatar icon="warning" color="white" text-color="warning" size="" />
-                        <span class="text-body2 q-mt-lg">You are about to delete user: 
-                            {{ this.END_USER_FIRST_NAME + " " + this.END_USER_LAST_NAME}}</span>
-                        </q-card-section>
-
-                        <q-card-actions align="right">
-                        <q-btn flat label="Cancel" color="primary" v-close-popup />
-                        <!-- On confirmation will execute deletion-->
-                        <q-btn flat label="Confirm" color="primary" @click="deleteUser(this.END_USER_ID)" v-close-popup />
                         </q-card-actions>
                     </q-card>
                     </q-dialog>
@@ -178,7 +151,6 @@ export default {
     setup(){
         return{
             editItemDial:ref(false),
-            deleteItemDial: ref(false),
             changePassDial:ref(false),
             isPwd: ref(true),
             loading: ref(true),
@@ -227,7 +199,6 @@ export default {
             {name: 'User Role', label: 'Role', field: 'USER_ROLE_NAME', align: 'left'},
             {name: "status", align: "center", label: "Status", field: "ACTIVE_STATUS_DESC", sortable: true},
             {name: 'actions', label: 'Edit', field: '', align: 'left' },
-            {name: 'delactions', label: 'Delete', field: '', align: 'left' },
             {name: 'changePass', label: 'Change Password', field: '', align: 'center' },            
             ],
 
@@ -311,6 +282,7 @@ export default {
                     
                         if (res.status === 200) {
                             this.$q.notify({ color: 'positive', message: 'User updated successfully.' });
+                            window.location.reload();
                             this.$router.push('/users');
                         } 
                         else {
@@ -325,36 +297,6 @@ export default {
                 }            
 
                 this.rerenderTable();
-        },
-        deleteUserDialog(item){ //saves needed information into variables
-            this.deleteItemDial = true;
-            this.END_USER_ID = item.row.END_USER_ID;
-            this.END_USER_FIRST_NAME = item.row.END_USER_FIRST_NAME;
-            this.END_USER_LAST_NAME = item.row.END_USER_LAST_NAME;
-        },
-        deleteUser(userID){ //executes delete
-            try{
-            axios.delete(`${apiURL}/enduser/${userID}`).then((res) => { //deletes from database
-                console.log(userID);
-                const index = this.userData.findIndex(userData => userData.END_USER_ID === userID) 
-                    if (~index){
-                        this.userData.splice(index, 1)//finds in local table and deletes
-                    }
-
-                    if (res.status === 200) {
-                        this.$q.notify({ color: 'positive', message: 'User deleted successfully.' });
-                        this.$router.push('/users');
-                    } 
-                    else {
-                        this.$q.notify({ color: 'negative', message: 'Error while deleting.' });
-                        }
-                });
-                this.rerenderTable();//rerenders table     
-            }
-            catch(error){
-                console.error('API request failed:', error);
-                this.$q.notify({ color: 'negative', message: 'An error occurred during deletion.' });
-            }
         },
         changePasswordDialog(item){
             this.changePassDial = true;
