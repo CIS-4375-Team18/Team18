@@ -183,12 +183,13 @@
    
     <q-page-container>
       <router-view />
-      <div class="q-pa-lg">
+      <div class="q-pa-lg q-mt-md" v-if="!isAuthenticated">
         <q-page>
-          <div class="row" style="height: 500px;">
-            Hello
+          <div class="row justify-center" style="height: 100px;">
+            <img src="src/assets/CISD_Logo.png" style="height: 100%;"/>
+            <span class="text-h2 text-weight-medium" style="color: #666262;">Cleveland ISD Work Order System</span>
           </div>
-          <div class="row">
+          <div class="row justify-center">
             Hello
           </div>
         </q-page>
