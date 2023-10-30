@@ -191,13 +191,13 @@ export default {
       updateCatData: {
         TICKET_SUB_CATEGORY_ID: "",
         TICKET_SUB_CATEGORY_DESC: "",
-        TICKET_CATEGORY_ID: 1,
+        TICKET_CATEGORY_ID: "",
         ACTIVE_STATUS_ID: "",
       },
       newCatDescrData: {
         TICKET_SUB_CATEGORY_DESC: "",
         ACTIVE_STATUS_ID: "1",
-        TICKET_CATEGORY_ID: "1",
+        TICKET_CATEGORY_ID: "",
       },
       catEmptyInput: false, // holds the value for the empty category input
       deleteItem: {
@@ -286,13 +286,14 @@ export default {
       this.tableKey += 1; // Increment table key to re-render q-table
       this.getsubcategories(); // Call GET API for categories
       this.newCatDescrData.TICKET_SUB_CATEGORY_DESC = ""; // Clear new category description
+      this.newCatDescrData.TICKET_CATEGORY_ID = this.softwareCategoryTypeID;
     },
 
     // Function to add new category
     // Wait for data to be fetched before re rendering the table
     addNewCategoryPromise() {
       return new Promise((resolve, reject) => {
-        console.log(this.newCatDescrData);
+        this.newCatDescrData.TICKET_CATEGORY_ID = this.hardwareCategoryTypeID.TICKET_CATEGORY_ID;
         axios.post(`${apiURL}/subcategory`, this.newCatDescrData).then(() => {
           this.addCatCard = false;
           this.tableKey += 1;
