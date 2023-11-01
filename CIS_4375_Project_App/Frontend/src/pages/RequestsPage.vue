@@ -19,22 +19,24 @@
                             style="min-width: 120px; margin-right:10px;"
                             @update:model-value="getSupportTickets"
                         />
-                        <q-select
+                        <q-input
                             v-if="userRole ==='System Administrator' || userRole ==='IT Teacher'"
-                            use-input
-                            hide-selected
-                            fill-input
-                            v-model="userModel"
-                            :options="endUsersOptions"
-                            option-value="END_USER_ID" 
-                            option-label="END_USER_FULL_NAME"
-                            label="Filter By User"
-                            style="min-width: 120px;"
+                            v-model="searchTerm"
+                            label="Search"
                             @update:model-value="getSupportTickets"
-                            @filter="filterFn"
-                        />
+                        >
+                            <template v-slot:prepend>
+                                <q-icon name="search" />
+                            </template>
+                        </q-input>
                     </template>
                      <template #body-cell-status="props">
+                        <q-td :props="props">
+                            <q-chip :color="props.row.SUPPORT_TICKET_STATUS_DESC === 'CLOSED' ? 'green' : (props.row.SUPPORT_TICKET_STATUS_DESC === 'OPEN' ? 'grey' :  'blue')" text-color="white"
+                                dense class="text-weight-bolder" square>{{ props.row.SUPPORT_TICKET_STATUS_DESC }}</q-chip>
+                        </q-td>
+                    </template>
+                     <template #body-cell-priority="props">
                         <q-td :props="props">
                             <q-chip :color="props.row.prioritystatus === 'Critical' ? 'red' : (props.row.prioritystatus === 'High' ? 'black' :  (props.row.prioritystatus === 'Medium' ? 'blue' : 'green'))" text-color="white"
                                 dense class="text-weight-bolder" square>{{ props.row.prioritystatus }}</q-chip>
@@ -57,22 +59,21 @@ export default {
         return {
             supporttickets: [],
             priorities: {},
+            supportAgents: {},
             filterByOptions: [],
             endUsers: [],
             endUsersOptions: [],
-            allUser: { END_USER_ID: null, END_USER_FULL_NAME: 'All Users' }
+            allStatus: { SUPPORT_TICKET_STATUS_ID: null, SUPPORT_TICKET_STATUS_DESC: 'ALL' },
+            allUser: { END_USER_ID: null, END_USER_FULL_NAME: 'All Users' },
+            searchTerm: ''
         }
     },
     async created() {
-        // call active prioties api to get the list of all apis
-        const activePriorities = await axios.get(`${apiURL}/activepriorities`)
-        // map the id and priority description
-        activePriorities.data.forEach((priority) => {
-          this.priorities[priority.TICKET_PRIORITY_ID] = priority.TICKET_PRIORITY_DESC;
-        });
+        await this.getPriorities();
+        await this.getSupportAgents();
 
         axios.get(`${apiURL}/activeticketstatuses`).then((res) => {
-            this.filterByOptions = res.data;
+            this.filterByOptions = [this.allStatus, ...res.data];
             this.filterByModel = this.filterByOptions[0]; 
             
             this.setTicketColumns();
@@ -96,6 +97,22 @@ export default {
         });
     },
     methods: {
+        async getPriorities() {
+            // call active priorities api to get the list of all apis
+            const activePriorities = await axios.get(`${apiURL}/activepriorities`)
+            // map the id and priority description
+            activePriorities.data.forEach((priority) => {
+                this.priorities[priority.TICKET_PRIORITY_ID] = priority.TICKET_PRIORITY_DESC;
+            });
+        },
+        async getSupportAgents() {
+            // call support agent api to get the list of technicians
+            const supportAgents = await axios.get(`${apiURL}/supportAgents`)
+            // map the supportAgent id to their email email
+            supportAgents.data.forEach((supportAgent) => {
+                this.supportAgents[supportAgent.END_USER_ID] = supportAgent.END_USER_EMAIL;
+            });
+        },
         getSupportTickets() {
             this.loading = true;
             this.supporttickets = [];
@@ -103,7 +120,8 @@ export default {
                 userId: this.userID,
                 userRole: this.userRole,
                 status: this.filterByModel.SUPPORT_TICKET_STATUS_ID,
-                createdByUserId: this.userModel?.END_USER_ID || null
+                createdByUserId: this.userModel?.END_USER_ID || null,
+                searchTerm: this.searchTerm
             }).then((res) => {
                 if (res.data) {
                     this.setSupportTickets(res.data);
@@ -118,8 +136,10 @@ export default {
                 this.supporttickets = supporttickets.map((supportticket) => {
                     // add a new property called priority status to supportticket
                     // set it to the status from priorities based on the current ticket priority id
+                    const email = this.supportAgents[supportticket.SUPPORT_AGENT_ID] || 'Unassigned';
                     return {
                         prioritystatus: this.priorities[supportticket.TICKET_PRIORITY_ID],
+                        SUPPORT_AGENT_EMAIL: email,
                         ...supportticket
                     }
                 });
@@ -128,6 +148,7 @@ export default {
         setTicketColumns() {
             const supportticketsColumns = [
                 { name: 'subject', label: 'Subject', field: 'SUPPORT_TICKET_SUBJECT', align: 'left', sortable: true  },
+                { name: "status", align: "center", label: "Status", field: "SUPPORT_TICKET_STATUS_DESC", sortable: true },
                 { name: "creationDate", align: "left", label: "Creation Date", field: "SUPPORT_TICKET_DATE_CREATED", sortable: true, format: (val) => {
                     const date = new Date(val);
                     const month = (date.getMonth() + 1).toString().padStart(2, '0');
@@ -153,13 +174,11 @@ export default {
             }];
 
             if (this.userRole !== 'Staff') {
-                
-                supportticketsColumns.push({ name: "firstName", align: "center", label: "First Name", field: "END_USER_FIRST_NAME", sortable: true });
-                supportticketsColumns.push({ name: "lastName", align: "center", label: "Last Name", field: "END_USER_LAST_NAME", sortable: true });
-                supportticketsColumns.push({ name: "email", align: "center", label: "Email", field: "END_USER_EMAIL", sortable: true });
+                supportticketsColumns.push({ name: "email", align: "center", label: "Ticket Creator Email", field: "END_USER_EMAIL", sortable: true });
             }
 
-            supportticketsColumns.push({ name: "status", align: "center", label: "Priority", field: "TICKET_PRIORITY_ID", sortable: true });
+            supportticketsColumns.push({ name: "priority", align: "center", label: "Priority", field: "TICKET_PRIORITY_ID", sortable: true });
+            supportticketsColumns.push({ name: "supportAgent", align: "center", label: "Support Agent Email", field: "SUPPORT_AGENT_EMAIL", sortable: true });
 
             this.supportticketsColumns = supportticketsColumns;
         },
@@ -173,6 +192,9 @@ export default {
                     this.endUsersOptions = [this.allUser, ...results.slice(0, 9)];
                 }
             });
+        },
+        editRow(props) {
+            
         }
     },
     setup() {

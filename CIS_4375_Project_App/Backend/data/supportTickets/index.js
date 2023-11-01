@@ -4,7 +4,7 @@ const config = require('../../config');
 const sql = require('mssql');
 
 
-const GetAllJoin = async (USER_ID, SUPPORT_TICKET_STATUS) => {
+const GetAllJoin = async ({ USER_ID, SUPPORT_TICKET_STATUS, SEARCH_TERM }) => {
     try {
         let pool = await sql.connect(config.sql);
         let selectAllTicketsQ = "SELECT ST.SUPPORT_TICKET_ID "+
@@ -16,6 +16,7 @@ const GetAllJoin = async (USER_ID, SUPPORT_TICKET_STATUS) => {
         " ,ST.SUPPORT_TICKET_DATE_CREATED "+
         " ,ST.SUPPORT_TICKET_RESOLUTION_TIME "+
         " ,ST.SUPPORT_TICKET_STATUS_ID "+
+        " ,STS.SUPPORT_TICKET_STATUS_DESC "+
         " ,ST.TICKET_CATEGORY_ID "+
         " ,ST.TICKET_SUB_CATEGORY_ID "+
         " ,ST.TICKET_PRIORITY_ID "+
@@ -27,12 +28,38 @@ const GetAllJoin = async (USER_ID, SUPPORT_TICKET_STATUS) => {
         " ,EU.END_USER_LAST_NAME "+
         " ,EU.END_USER_EMAIL "+
         " FROM dbo.SUPPORT_TICKET as ST "+
-        " JOIN dbo.END_USER as EU ON ST.END_USER_ID = EU.END_USER_ID " +
-        " WHERE ST.SUPPORT_TICKET_STATUS_ID = @SUPPORT_TICKET_STATUS";
+        " JOIN dbo.SUPPORT_TICKET_STATUS as STS ON ST.SUPPORT_TICKET_STATUS_ID = STS.SUPPORT_TICKET_STATUS_ID " +
+        " JOIN dbo.END_USER as EU ON ST.END_USER_ID = EU.END_USER_ID "
+        " JOIN dbo.END_USER as SA ON ST.SUPPORT_AGENT_ID = SA.END_USER_ID ";
+
+        if (SUPPORT_TICKET_STATUS || USER_ID || SEARCH_TERM) {
+            selectAllTicketsQ += " WHERE"
+        }
+
+        const whereClauses = [];
+
+        if (SUPPORT_TICKET_STATUS) {
+            whereClauses.push(" ST.SUPPORT_TICKET_STATUS_ID = @SUPPORT_TICKET_STATUS");
+        }
 
         if (USER_ID) {
-            selectAllTicketsQ += " AND ST.END_USER_ID = @USER_ID";
+            whereClauses.push("  ST.END_USER_ID = @USER_ID");
         }
+
+        if (SEARCH_TERM.trim().length > 0) {
+            const searchTermWhere = [];
+            const searchTerms = SEARCH_TERM.split(' ');
+            searchTerms.forEach((searchTerm) => {
+                searchTermWhere.push(` (ST.SUPPORT_TICKET_SUBJECT LIKE '%${searchTerm}%' OR EU.END_USER_EMAIL LIKE '%${searchTerm}%')`);
+            })
+
+            whereClauses.push('(' + searchTermWhere.join(' OR ') + ')');
+        }
+
+        // if there's more than 1, put together the clauses with AND
+        selectAllTicketsQ += whereClauses.join(" AND ");
+
+        console.log('query', selectAllTicketsQ);
         const supportTicketsList = await pool.request()
                             .input('SUPPORT_TICKET_STATUS', sql.Int, SUPPORT_TICKET_STATUS)
                             .input('USER_ID', sql.Int, USER_ID)
