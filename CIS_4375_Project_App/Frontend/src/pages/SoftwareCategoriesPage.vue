@@ -174,7 +174,7 @@ import axios from "axios";
 import { mapGetters } from "vuex";
 import EditCategoriesDialog from "../components/EditCategoriesDialog.vue";
 import DeleteSettingsDialog from "../components/DeleteSettingsDialog.vue";
-const apiURL = import.meta.env.VITE_ROOT_API;
+const apiURL = import.meta.env.VITE_API_URL;
 
 export default {
   components: {

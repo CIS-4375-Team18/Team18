@@ -1,4 +1,3 @@
-
 const routes = [
   {
     path: '/',
@@ -23,9 +22,12 @@ const routes = [
   },
   {
     path: '/login',
-    component: () => import('pages/SignIn.vue'),
+    component: () => import('layouts/MainLayout.vue'),
+    children: [
+      { path: '', component: () => import('pages/SignIn.vue') }
+    ]
   },
-  {
+{
     path: '/dashboard',
     component: () => import('layouts/MainLayout.vue'),
     children: [
@@ -50,7 +52,7 @@ const routes = [
     path: '/users',
     component: () => import('layouts/MainLayout.vue'),
     children: [
-      { path: '', component: () => import('pages/ManageUserPage.vue') } 
+      { path: '', component: () => import('pages/ManageUserPage.vue') }
     ]
   },
   {
@@ -67,12 +69,38 @@ const routes = [
       { path: '', component: () => import('pages/SettingsPage.vue') }
     ]
   },
-
-
-  // Always leave this as last one,
+  {
+    path: '/priorities',
+    component: () => import('layouts/MainLayout.vue'),
+    children: [
+      { path: '', component: () => import('pages/TicketPrioritiesPage.vue') }
+    ]
+  },
+  {
+    path: '/maincategories',
+    component: () => import('layouts/MainLayout.vue'),
+    children: [
+      { path: '', component: () => import('pages/MainCategoriesPage.vue') }
+    ]
+  },
+  {
+    path: '/hardwarecategories',
+    component: () => import('layouts/MainLayout.vue'),
+    children: [
+      { path: '', component: () => import('pages/HardwCategories.vue') }
+    ]
+  },
+  {
+    path: '/softwarecategories',
+    component: () => import('layouts/MainLayout.vue'),
+    children: [
+      { path: '', component: () => import('pages/SoftwareCategoriesPage.vue') }
+    ]
+  },
+// Always leave this as last one,
   // but you can also remove it
   {
-    path: '/:catchAll(.*)*',
+    path: '/:catchAll(.)',
     component: () => import('pages/ErrorNotFound.vue')
   }
 ]
