@@ -14,6 +14,13 @@ const routes = [
     ]
   },
   {
+    path: '/request',
+    component: () => import('layouts/MainLayout.vue'),
+    children: [
+      { path: ':requestId', component: () => import('pages/EditRequestPage.vue') }
+    ]
+  },
+  {
     path: '/newrequest',
     component: () => import('layouts/MainLayout.vue'),
     children: [

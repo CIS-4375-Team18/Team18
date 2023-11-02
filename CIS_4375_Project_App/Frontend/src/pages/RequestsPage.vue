@@ -7,8 +7,16 @@
             <q-separator />
 
             <div class="q-pa-md" style="margin: 0 auto;">
-                <q-table title="Requests" color="secondary" :align="left" :loading="loading"
-                    :rows="supporttickets" :columns="supportticketsColumns" style="width: 95%; margin: auto">
+                <q-table 
+                    title="Requests"
+                    color="secondary"
+                    :align="left"
+                    :loading="loading"
+                    :rows="supporttickets"
+                    :columns="supportticketsColumns"
+                    style="width: 95%; margin: auto"
+                    @row-click="editRow"
+                >
                     <template v-slot:top>
                         <q-select
                             v-model="filterByModel"
@@ -193,8 +201,8 @@ export default {
                 }
             });
         },
-        editRow(props) {
-            
+        editRow(evt, row) {
+            this.$router.push(`/request/${row.SUPPORT_TICKET_ID}`);
         }
     },
     setup() {

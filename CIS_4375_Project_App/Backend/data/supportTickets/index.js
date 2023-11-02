@@ -164,22 +164,32 @@ const getByIdJoin = async(SUPPORT_TICKET_ID) => {
 const getById = async(SUPPORT_TICKET_ID) => {
     try {
         let pool = await sql.connect(config.sql);
-        const selectAllTicketsQ = "SELECT  [SUPPORT_TICKET_ID] "+
-        " ,[SUPPORT_TICKET_SUBJECT]  "+
-        " ,[SUPPORT_TICKET_NOTE] "+
-        " ,[DEVICE_MAKE] "+
-        " ,[DEVICE_MODEL] "+
-        " ,[SUPPORT_TICKET_TIMELINE] "+
-        " ,[SUPPORT_TICKET_DATE_CREATED] "+
-        " ,[SUPPORT_TICKET_RESOLUTION_TIME] "+
-        " ,[SUPPORT_TICKET_STATUS_ID] "+
-        " ,[TICKET_CATEGORY_ID] "+
-        " ,[TICKET_SUB_CATEGORY_ID] "+
-        " ,[TICKET_PRIORITY_ID] "+
-        " ,[SUPPORT_AGENT_ID] "+
-        " ,[RESOLUTION_DATE] "+
-        " ,[END_USER_ID] "
-        " FROM [dbo].[SUPPORT_TICKET] WHERE SUPPORT_TICKET_ID=@SUPPORT_TICKET_ID  "
+        const selectAllTicketsQ = "SELECT " +
+        " ST.DEVICE_MAKE, " +
+        " ST.DEVICE_MODEL, " +
+        " ST.END_USER_ID, " +
+        " ST.RESOLUTION_DATE, " +
+        " ST.ROOM_NUMBER, " +
+        " ST.SUPPORT_AGENT_ID, " +
+        " ST.SUPPORT_TICKET_ASSET_TAG, " +
+        " ST.SUPPORT_TICKET_DATE_CREATED, " +
+        " ST.SUPPORT_TICKET_ID, " +
+        " ST.SUPPORT_TICKET_NOTE, " +
+        " ST.SUPPORT_TICKET_RESOLUTION_TIME, " +
+        " ST.SUPPORT_TICKET_STATUS_ID, " +
+        " STS.SUPPORT_TICKET_STATUS_DESC, "+
+        " ST.SUPPORT_TICKET_SUBJECT, " +
+        " ST.SUPPORT_TICKET_TIMELINE, " +
+        " ST.TICKET_CATEGORY_ID, " +
+        " TC.TICKET_CATEGORY_DESC, " +
+        " ST.TICKET_PRIORITY_ID, " +
+        " ST.TICKET_SUB_CATEGORY_ID, " +
+        " EU.END_USER_EMAIL "+
+        " FROM [dbo].[SUPPORT_TICKET] ST " +
+        " JOIN dbo.TICKET_CATEGORY TC ON TC.TICKET_CATEGORY_ID = ST.TICKET_CATEGORY_ID" + 
+        " JOIN dbo.SUPPORT_TICKET_STATUS as STS ON ST.SUPPORT_TICKET_STATUS_ID = STS.SUPPORT_TICKET_STATUS_ID " +
+        " JOIN dbo.END_USER as EU ON ST.END_USER_ID = EU.END_USER_ID " +
+        " WHERE ST.SUPPORT_TICKET_ID=@SUPPORT_TICKET_ID "
         const supportTicket = await pool.request()
                             .input('SUPPORT_TICKET_ID', sql.Int, SUPPORT_TICKET_ID)
                             .query(selectAllTicketsQ);
