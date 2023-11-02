@@ -110,7 +110,7 @@ export default {
             const supportAgents = await axios.get(`${apiURL}/supportAgents`)
             // map the supportAgent id to their email email
             supportAgents.data.forEach((supportAgent) => {
-                this.supportAgents[supportAgent.END_USER_ID] = supportAgent.END_USER_EMAIL;
+                this.supportAgents[supportAgent.SUPPORT_AGENT_USER_ID] = supportAgent.END_USER_EMAIL;
             });
         },
         getSupportTickets() {
