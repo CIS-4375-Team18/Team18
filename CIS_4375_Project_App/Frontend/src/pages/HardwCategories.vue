@@ -118,10 +118,7 @@
               autofocus
               type="text"
               :rules="[(val) => !!val || 'Field is required']"
-
             />
-
-
           </q-card-section>
           <q-card-actions align="right">
             <q-btn
@@ -166,8 +163,6 @@
       @delete-dialog="handleDeleteDialog"
     />
   </template>
-
-
 </template>
 
 <script>
@@ -293,7 +288,8 @@ export default {
     // Wait for data to be fetched before re rendering the table
     addNewCategoryPromise() {
       return new Promise((resolve, reject) => {
-        this.newCatDescrData.TICKET_CATEGORY_ID = this.hardwareCategoryTypeID.TICKET_CATEGORY_ID;
+        this.newCatDescrData.TICKET_CATEGORY_ID =
+          this.hardwareCategoryTypeID.TICKET_CATEGORY_ID;
         axios.post(`${apiURL}/subcategory`, this.newCatDescrData).then(() => {
           this.addCatCard = false;
           this.tableKey += 1;
@@ -366,6 +362,9 @@ export default {
       // show dialog
       this.deleteItem.showDialog = true;
     },
+    handleCloseDialog() {
+      this.editedItem.showDialog = false;
+    },
 
     // Hide delete column is user role is not 'IT Teacher'
     hideColums() {
@@ -381,7 +380,6 @@ export default {
     getCategories() {
       axios.get(`${apiURL}/categories`).then((res) => {
         this.mainCategoryData = res.data;
-        console.log(this.mainCategoryData);
       });
     },
   },

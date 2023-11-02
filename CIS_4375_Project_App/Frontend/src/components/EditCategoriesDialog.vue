@@ -56,9 +56,9 @@ export default {
       title: "",
       nameLabel: "",
       showDialog: true,
-      itemId: 0,
+      itemId: null,
       itemName: "",
-      isItemActive: true,
+      isItemActive: null,
       idPropertyName: "",
       descPriortyName: "",
       headerDesc: "",
@@ -76,10 +76,10 @@ export default {
   },
   created() {
     // dynamically create title name based on what type it is
-    if (this.type == 'TICKET_SUB_CATEGORY'){
-      this.headerDesc = 'Edit Sub Category';
-    }  else{
-      this.headerDesc = 'Edit Main Category';
+    if (this.type == "TICKET_SUB_CATEGORY") {
+      this.headerDesc = "Edit Sub Category";
+    } else {
+      this.headerDesc = "Edit Main Category";
     }
     this.title = `${this.headerDesc}`;
     // set variables used for save api later
@@ -89,10 +89,8 @@ export default {
   },
   methods: {
     closeDialog() {
-      // hide dialog
-      this.showDialog = false;
-      // notify parent component to close dialog
       this.$emit("close-dialog", false);
+      this.showDialog = false;
     },
     saveChanges() {
       let idPropertyName = "";
@@ -112,7 +110,6 @@ export default {
         },
         idPropertyName,
       });
-
     },
   },
   computed: {
