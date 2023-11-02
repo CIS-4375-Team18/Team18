@@ -254,7 +254,7 @@ const getTop5TicketPerUser = async (END_USER_ID) => {
             "JOIN dbo.TICKET_PRIORITY AS TP "+
             "ON ST.TICKET_PRIORITY_ID = TP.TICKET_PRIORITY_ID "+
             "WHERE ST.END_USER_ID = @END_USER_ID "+
-            "ORDER BY DATE_CREATED DESC"
+            "ORDER BY ST.SUPPORT_TICKET_DATE_CREATED DESC"
         const res = await pool.request()
             .input('END_USER_ID', sql.SmallInt, END_USER_ID)
             .query(top5Tickets);

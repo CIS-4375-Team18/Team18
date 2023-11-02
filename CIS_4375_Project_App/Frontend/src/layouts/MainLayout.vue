@@ -138,18 +138,6 @@
               </q-item-section>
             </q-item> -->
             <q-separator  style="margin-top: 10px;"/>
-
-            <q-item clickable v-ripple style="margin-top: 10px;"
-            @click="$router.push('/users')"  v-if="isAuthenticated 
-            && userRole != 'Staff'">
-              <q-item-section avatar>
-                <q-icon name="people_alt" />
-              </q-item-section>
-
-              <q-item-section>
-                Manage Users
-              </q-item-section>
-            </q-item>
             
             <q-item clickable v-ripple style="margin-top: 10px;"
             @click="$router.push('/settings')"  v-if="isAuthenticated 

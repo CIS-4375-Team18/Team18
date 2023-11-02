@@ -45,6 +45,7 @@
             >
               <template v-slot:top-right>
                 <q-btn
+                  v-if="userRole==='IT Teacher' || userRole==='System Administrator'"
                   size="1rem"
                   flat
                   color="secondary"

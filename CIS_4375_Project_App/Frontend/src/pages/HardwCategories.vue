@@ -42,13 +42,14 @@
             >
               <template v-slot:top-right>
                 <q-btn
+                  v-if="userRole==='IT Teacher' || userRole==='System Administrator'"
                   size="1rem"
                   flat
                   color="secondary"
                   class="q-mt-sm"
                   no-caps
                   icon-right="add"
-                  label="Add New Main Category"
+                  label="Add New Hardware Subcategory"
                   @click="addCategoryDialog()"
                 />
               </template>
