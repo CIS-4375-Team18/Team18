@@ -368,7 +368,7 @@ const update = async (SUPPORT_TICKET_ID, data) => {
         " [TICKET_PRIORITY_ID] = @TICKET_PRIORITY_ID, "+
         " [SUPPORT_AGENT_ID] = @SUPPORT_AGENT_ID,  "+
         " [RESOLUTION_DATE] = @RESOLUTION_DATE, "+
-        " [END_USER_ID] = @END_USER_ID, "
+        " [END_USER_ID] = @END_USER_ID " +
         " WHERE SUPPORT_TICKET_ID=@SUPPORT_TICKET_ID"
      
         const update = await pool.request()
