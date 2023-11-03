@@ -363,6 +363,7 @@ const update = async (SUPPORT_TICKET_ID, data) => {
         " [SUPPORT_TICKET_DATE_CREATED] = @SUPPORT_TICKET_DATE_CREATED, "+
         " [SUPPORT_TICKET_RESOLUTION_TIME] = @SUPPORT_TICKET_RESOLUTION_TIME, "+
         " [SUPPORT_TICKET_STATUS_ID] = @SUPPORT_TICKET_STATUS_ID, "+
+        " [SUPPORT_TICKET_ASSET_TAG] = @SUPPORT_TICKET_ASSET_TAG, "+
         " [TICKET_CATEGORY_ID] = @TICKET_CATEGORY_ID, "+
         " [TICKET_SUB_CATEGORY_ID] = @TICKET_SUB_CATEGORY_ID,  "+
         " [TICKET_PRIORITY_ID] = @TICKET_PRIORITY_ID, "+
@@ -381,6 +382,7 @@ const update = async (SUPPORT_TICKET_ID, data) => {
             .input('SUPPORT_TICKET_DATE_CREATED', sql.Date, data.SUPPORT_TICKET_DATE_CREATED)
             .input('SUPPORT_TICKET_RESOLUTION_TIME', sql.Int, data.SUPPORT_TICKET_RESOLUTION_TIME)
             .input('SUPPORT_TICKET_STATUS_ID', sql.SmallInt, data.SUPPORT_TICKET_STATUS_ID)
+            .input('SUPPORT_TICKET_ASSET_TAG', sql.NVarChar(40), data.SUPPORT_TICKET_ASSET_TAG)      
             .input('TICKET_CATEGORY_ID', sql.SmallInt, data.TICKET_CATEGORY_ID)
             .input('TICKET_SUB_CATEGORY_ID', sql.SmallInt, data.TICKET_SUB_CATEGORY_ID)        
             .input('TICKET_PRIORITY_ID', sql.SmallInt, data.TICKET_PRIORITY_ID)        

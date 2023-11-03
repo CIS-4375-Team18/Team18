@@ -109,7 +109,7 @@
                 emit-value
                 map-options
                 label="Category"
-                v-model="categoryDesc"
+                v-model="categoryModel"
                 :options="categoryData"
                 option-value="TICKET_CATEGORY_ID"
                 option-label="TICKET_CATEGORY_DESC"
@@ -298,8 +298,9 @@ export default {
       this.createdDateModel = formattedDate;
       this.subjectModel = ticket.SUPPORT_TICKET_SUBJECT;
       this.textareaModel = ticket.SUPPORT_TICKET_NOTE;
-      this.assetTagModel = ticket.DEVICE_MODEL;
+      this.assetTagModel = ticket.SUPPORT_TICKET_ASSET_TAG;
       this.assetMake = ticket.DEVICE_MAKE;
+      this.assetModel = ticket.DEVICE_MODEL;
       this.categoryModel = ticket.TICKET_CATEGORY_ID;
       this.categoryDesc = ticket.TICKET_CATEGORY_DESC;
       this.subCatList = ticket.TICKET_SUB_CATEGORY_ID;
