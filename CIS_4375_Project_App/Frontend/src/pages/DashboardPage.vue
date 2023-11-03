@@ -161,7 +161,7 @@
         const allTickets = res.data;
   
         const userTickets = allTickets.filter(ticket => ticket.END_USER_ID === this.userID);
-        const openTickets = allTickets.filter(ticket => ticket.SUPPORT_TICKET_STATUS_ID === 1);
+        const openTickets = allTickets.filter(ticket => ticket.SUPPORT_TICKET_STATUS_ID === 1 || ticket.SUPPORT_TICKET_STATUS_ID === 2);
         const openTicketsByUser = allTickets.filter(ticket => ticket.SUPPORT_TICKET_STATUS_ID === 1 
           && ticket.END_USER_ID === this.userID);
         const closedTickets = allTickets.filter(ticket => ticket.SUPPORT_TICKET_STATUS_ID === 3);
