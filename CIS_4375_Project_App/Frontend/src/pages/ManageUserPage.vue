@@ -26,13 +26,13 @@
                                 </template>
                                 <template v-if="userRole==='System Administrator' || userRole==='IT Teacher'" v-slot:body-cell-actions="props">
                                     <q-td :props="props">
-                                        <q-btn dense round flat @click=editUserDialog(props) icon="edit"
+                                        <q-btn dense round flat @click=editUserDialog(props) icon="fa-regular fa-pen-to-square"
                                             style="color: #ad0000;"></q-btn>
                                     </q-td>
                                 </template>
                                 <template v-if="userRole==='System Administrator' || userRole==='IT Teacher'" v-slot:body-cell-changePass="props" > <!-- On click will bring out dialog box change password-->
                                     <q-td :props="props">
-                                        <q-btn dense round flat @click=changePasswordDialog(props) icon="lock"
+                                        <q-btn dense round flat @click=changePasswordDialog(props) icon="fa-solid fa-lock"
                                             style="color: #ad0000;"></q-btn>
                                     </q-td>
                                 </template>
