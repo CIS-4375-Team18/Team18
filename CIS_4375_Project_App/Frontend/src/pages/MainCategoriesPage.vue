@@ -25,7 +25,6 @@
           <div class="q-pa-lg">
             <!-- Categries Table -->
             <q-table
-
               class="cat-sticky-virtscroll-table"
               title="Category Types"
               :key="tableKey"
@@ -35,11 +34,9 @@
               :rows="categoryData"
               :columns="catColumns"
               virtual-scroll
-
               :virtual-scroll-sticky-size-start="48"
               :pagination="pagination"
               :rows-per-page-options="[0]"
-
               :hide-pagination="hidePagination"
               :visible-columns="visibleCategoryColumns"
             >
@@ -69,7 +66,7 @@
                   </q-chip>
                 </q-td>
               </template>
-                         <template v-slot:body-cell-actions="props">
+              <template v-slot:body-cell-actions="props">
                 <q-td :props="props">
                   <q-btn
                     dense
@@ -144,9 +141,12 @@
               autofocus
             />
 
-
             <div v-if="catEmptyInput" class="cat-input-validation">
-              <q-icon class="q-mr-xs" name="priority_high" size="1rem"/>Category field is required!
+              <q-icon
+                class="q-mr-xs"
+                name="priority_high"
+                size="1rem"
+              />Category field is required!
             </div>
           </q-card-section>
           <q-card-actions align="right">
@@ -227,7 +227,6 @@ export default {
   created() {
     this.getCategories(); // Method which calls the GET API for Categories
     this.hideColums(); // handles the visibility of the delete columns based on user role
-
   },
   methods: {
     /**
@@ -253,8 +252,7 @@ export default {
     },
 
     handleCloseDialog() {
-      // close dialog
-      this.showAddDialog = false;
+      this.editedItem.showDialog = false;
     },
 
     closeAddDialog() {
@@ -318,9 +316,7 @@ export default {
     deleteCategoryAsync() {
       return new Promise((resolve, reject) => {
         axios
-          .delete(
-            `${apiURL}/category/${this.deleteItem.itemId}`
-          )
+          .delete(`${apiURL}/category/${this.deleteItem.itemId}`)
           .then(() => {
             this.tableKey += 1; //re-render table
             this.getCategories();
@@ -330,8 +326,8 @@ export default {
     },
 
     // Hide delete column is user role is not 'Administrator'
-     // Hide delete column is user role is not 'IT Teacher'
-     hideColums() {
+    // Hide delete column is user role is not 'IT Teacher'
+    hideColums() {
       if (this.userRole != "System Administrator") {
         this.visibleCategoryColumns = ["category_type", "status", "actions"];
       }
@@ -354,14 +350,12 @@ export default {
     // Wait for data to be fetched before re rendering the table
     addNewCategoryPromise() {
       return new Promise((resolve, reject) => {
-        axios
-          .post(`${apiURL}/category`, this.newCatDescrData)
-          .then(() => {
-            this.addCatCard = false;
-            this.tableKey += 1;
-            this.getCategories();
-            resolve();
-          });
+        axios.post(`${apiURL}/category`, this.newCatDescrData).then(() => {
+          this.addCatCard = false;
+          this.tableKey += 1;
+          this.getCategories();
+          resolve();
+        });
       });
     },
 
@@ -410,7 +404,6 @@ export default {
       { name: "delactions", label: "Delete", field: "", align: "left" },
     ];
 
-
     const statuses = ["Active", "Inactive"];
     return {
       tab: ref("categories"),
@@ -425,9 +418,8 @@ export default {
     };
   },
   computed: {
-      ...mapGetters('auth', ['userID','userRole']),
-
-    }
+    ...mapGetters("auth", ["userID", "userRole"]),
+  },
 };
 </script>
 
@@ -443,7 +435,7 @@ export default {
   background-color: #666262;
   border-bottom: 0.2rem solid #a62626;
 }
-.cat-input-validation{
+.cat-input-validation {
   color: red;
   font-size: 0.8rem;
   margin-top: 10px;

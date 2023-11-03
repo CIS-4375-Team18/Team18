@@ -119,10 +119,8 @@
               autofocus
               type="text"
               :rules="[(val) => !!val || 'Field is required']"
-              >
+            >
             </q-input>
-
-
           </q-card-section>
           <q-card-actions align="right">
             <q-btn
@@ -285,14 +283,14 @@ export default {
       this.tableKey += 1; // Increment table key to re-render q-table
       this.getsubcategories(); // Call GET API for categories
       this.newCatDescrData.TICKET_SUB_CATEGORY_DESC = ""; // Clear new category description
-
     },
 
     // Function to add new category
     // Wait for data to be fetched before re rendering the table
     addNewCategoryPromise() {
       return new Promise((resolve, reject) => {
-        this.newCatDescrData.TICKET_CATEGORY_ID = this.softwareCategoryTypeID.TICKET_CATEGORY_ID;
+        this.newCatDescrData.TICKET_CATEGORY_ID =
+          this.softwareCategoryTypeID.TICKET_CATEGORY_ID;
         axios.post(`${apiURL}/subcategory`, this.newCatDescrData).then(() => {
           this.addCatCard = false;
           this.tableKey += 1;
@@ -301,7 +299,9 @@ export default {
         });
       });
     },
-
+    handleCloseDialog() {
+      this.editedItem.showDialog = false;
+    },
     updateCategoryAsync() {
       return new Promise((resolve, reject) => {
         axios
@@ -383,8 +383,6 @@ export default {
     getCategories() {
       axios.get(`${apiURL}/categories`).then((res) => {
         this.mainCategoryData = res.data;
-
-        console.log(this.mainCategoryData);
       });
     },
   },
