@@ -1,7 +1,7 @@
 <template>
   <div
     class="q-pa-md q-gutter-sm"
-    style="margin-left: 15px; margin-right: 15px"
+    style="margin-left: 15px; margin-right: 15px;"
   >
     <div class="row">
       <div class="col-flex">

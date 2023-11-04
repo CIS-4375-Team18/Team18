@@ -12,7 +12,7 @@
 
       <div class="row q-col-gutter-lg">
         <div class="col-md-4">
-          <q-card style="height: 130px;">
+          <q-card style="height: 130px;" class="bg-grey-3">
             <q-card-section class="q-ml-xl">
                 <div v-if="userRole != 'Staff'" class="text-h3 text-bold q-mt-md">{{ totalTicketCount }}</div>
                 <div v-else class="text-h3 text-bold q-mt-md">{{ userTicketCount }}</div>
@@ -21,7 +21,7 @@
           </q-card>
         </div>
         <div class="col-md-4">
-          <q-card style="height: 130px;">
+          <q-card style="height: 130px;" class="bg-grey-3">
             <q-card-section class="q-ml-xl">
                 <div v-if="userRole != 'Staff'" class="text-h3 text-bold q-mt-md">{{ totalOpenTickets }}</div>
                 <div v-else class="text-h3 text-bold q-mt-md">{{ userOpenTickets }}</div>
@@ -30,7 +30,7 @@
           </q-card>
         </div>
         <div class="col-md-4">
-          <q-card style="height: 130px;">
+          <q-card style="height: 130px;" class="bg-grey-3">
             <q-card-section class="q-ml-xl">
                 <div v-if="userRole != 'Staff'" class="text-h3 text-bold q-mt-md">{{ totalClosedTickets }}</div>
                 <div v-else class="text-h3 text-bold q-mt-md">{{ userClosedTickets }}</div>
@@ -42,12 +42,12 @@
   
       <div v-if="userRole !== 'Staff'" class="row q-col-gutter-md" style="margin-top: 10px;">
         <div class="col-md-6 col-xs-12">
-          <q-card>
+          <q-card class="bg-grey-3">
             <barChart> </barChart>
           </q-card>
         </div>
         <div class="col-md-6 col-xs-12">
-          <q-card class="fit">
+          <q-card class="fit bg-grey-3">
             <div>
               <q-inner-loading 
                 :showing="isPieLoading" 
@@ -78,7 +78,7 @@
   
       <div class="row" style="margin-top: 20px;">
         <div class="col-md-12">
-          <q-card>
+          <q-card class="bg-grey-3">
             <lineChart
               v-if="userRole != 'Staff'"
             >
@@ -92,9 +92,25 @@
           <q-card>
             <q-table title="Most Recent Tickets" color="secondary" :align="left" :loading="loading"
               :rows="recentTickets" :columns="ticketColums" style="width: 95%; margin: auto;" hide-pagination>
-
+              <template #body-cell-Status="props">
+                <q-td :props="props">
+                    <q-chip :color="props.row.SUPPORT_TICKET_STATUS_DESC === 'CLOSED' ? 'green' : (props.row.SUPPORT_TICKET_STATUS_DESC === 'OPEN' ? 'grey' :  'blue')" text-color="white"
+                        dense class="text-weight-bolder" square>{{ props.row.SUPPORT_TICKET_STATUS_DESC }}</q-chip>
+                </q-td>
+              </template>
+              <template #body-cell-Priority="props">
+                <q-td :props="props">
+                    <q-chip :color="props.row.TICKET_PRIORITY_DESC === 'Critical' ? 'red' : (props.row.TICKET_PRIORITY_DESC === 'High' ? 'black' :  (props.row.TICKET_PRIORITY_DESC === 'Medium' ? 'blue' : 'green'))" text-color="white"
+                        dense class="text-weight-bolder" square>{{ props.row.TICKET_PRIORITY_DESC }}</q-chip>
+                </q-td>
+              </template>
             </q-table>
           </q-card>
+        </div>
+        <div class="row q-mt-sm">
+          <div class="col-md-12">
+            <q-btn flat label="Show All" to="/requests"></q-btn>
+          </div> 
         </div>
       </div>
   
@@ -157,7 +173,7 @@
     },
   
     created() {
-      axios.get(`http://localhost:8001/api/supporttickets`).then((res) => {
+      axios.get(`${apiURL}/supporttickets`).then((res) => {
         const allTickets = res.data;
   
         const userTickets = allTickets.filter(ticket => ticket.END_USER_ID === this.userID);
@@ -184,7 +200,7 @@
       async getTicketCountByCat() {
         this.isPieLoading = true
         try {
-          const res = await axios.get(`http://localhost:8001/api/ticketbycat`)
+          const res = await axios.get(`${apiURL}/ticketbycat`)
   
           const filterData = res.data.filter(sub => sub.NUMBER_OF_TICKETS_BY_CAT >= 0)
           if (filterData.length > 0) {
@@ -202,7 +218,7 @@
         try {
           const userID = this.userID;
   
-          const res = await axios.get(`http://localhost:8001/api/ticketbycat/${userID}`)
+          const res = await axios.get(`${apiURL}/ticketbycat/${userID}`)
   
           const filterData = res.data.filter(sub => sub.NUMBER_OF_TICKETS_BY_CAT >= 0)
           if (filterData.length > 0) {
@@ -265,7 +281,7 @@
   }
   </script>
   
-  <style>
+  <style scoped>
   
   .text-container {
     margin-left: 30px;

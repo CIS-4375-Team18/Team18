@@ -1,15 +1,18 @@
 <template>
 
-    <apexchart type="bar" 
+    <apexchart 
+    type="bar" 
     height="300" 
     :options="chartOptions" 
     :series="series">
     </apexchart>
 
+
 </template>
 
 <script>
 import axios from 'axios';
+const apiURL = import.meta.env.VITE_API_URL;
 
 export default {
     data() {
@@ -112,7 +115,7 @@ export default {
                 'Oct' : '10',
                 'Nov' : '11',
                 'Dec' : '12',
-            }
+            },
         }
     },
 
@@ -146,7 +149,7 @@ export default {
         },
 
         fetchAndPopulateBarchart() {
-            axios.get(`http://localhost:8001/api/ticketsclosedcountmonthly`)
+            axios.get(`${apiURL}/ticketsclosedcountmonthly`)
             .then(res => {
                 const apiData = res.data;
                 const monthsData = this.createMonthsAndYear();

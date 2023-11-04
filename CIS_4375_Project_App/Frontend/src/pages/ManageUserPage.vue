@@ -6,10 +6,10 @@
             </q-card-section>
             <q-separator />
 
-            <q-btn v-if="userRole==='System Administrator' || userRole==='IT Teacher'" 
-                    @click="createNewUser" outline icon="person_add" text-color="primary" label="Create New User" 
-                    style="margin-top: 20px ; min-width: 140px; margin-left: 3%;"
-                />
+            <q-btn
+                @click="$router.push('/settings')" outline icon="arrow_back_ios" text-color="secondary" label="Back" 
+                style="margin-top: 30px ; margin-left: 20px; margin-bottom: 15px;"
+            />
 
             <div style="margin-left: 2%;">
                 <div class="q-pa-md" style="margin: 0 auto;">
@@ -17,6 +17,19 @@
 
                     <q-table title="Users" v-if="userRole==='System Administrator' || userRole==='IT Teacher'" :key="tableKey" color="secondary" :align="left" :loading="loading "
                         :rows="userData" :columns="userColumns" style="width: 98%;"> <!-- Puts table with user data -->
+                        <template v-slot:top-right>
+                            <q-btn
+                            v-if="userRole==='IT Teacher' || userRole==='System Administrator'"
+                            size="1rem"
+                            flat
+                            color="secondary"
+                            class="q-mt-sm q-mr-md"
+                            no-caps
+                            icon="person_add"
+                            label="Create New User"
+                            @click="createNewUser()"
+                            />
+                        </template>
                         <template #body-cell-status="props">
                                     <q-td :props="props">
                                         <q-chip :color="props.row.ACTIVE_STATUS_ID === 1 ? 'green' : 'red'"
@@ -371,4 +384,7 @@ export default {
 
 <style scoped>
 
+</style>
+
+<style lang="sass">
 </style>

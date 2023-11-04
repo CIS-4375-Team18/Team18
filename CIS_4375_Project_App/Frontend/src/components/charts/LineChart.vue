@@ -1,6 +1,6 @@
 <template>
 
-    <apexchart type="line" 
+    <apexchart type="line"
         height="300"
         :options="chartOptions" 
         :series="series">
@@ -10,6 +10,7 @@
 
 <script>
 import axios from 'axios'
+const apiURL = import.meta.env.VITE_API_URL;
 
 export default {
     data() {
@@ -61,7 +62,7 @@ export default {
 
     async mounted() {
       try {
-        await axios.get(`http://localhost:8001/api/ticketpersupport`)
+        await axios.get(`${apiURL}/ticketpersupport`)
         .then((res) => {
           const filterData = res.data.filter(sup => sup.NUMBER_OF_ASSIGNED_TICKETS >= 0)
           if (filterData.length > 0) {
