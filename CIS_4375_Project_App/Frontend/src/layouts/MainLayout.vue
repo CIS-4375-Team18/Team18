@@ -177,8 +177,27 @@
             <img src="src/assets/CISD_Logo.png" style="height: 100%;"/>
             <span class="text-h2 text-weight-medium" style="color: #666262;">Cleveland ISD Work Order System</span>
           </div>
-          <div class="row justify-center">
-            Hello
+          <div class="row">
+            <div class="col-md-5 q-pa-xl q-ml-xl">
+              <q-card flat class="q-mt-xl">
+                <q-card-section>
+                  <div class="text-h3 q-ml-xl q-mt-xl">
+                    Create and manage your work oders
+                  </div>
+                  <div class="text-h6 q-mt-lg q-ml-xl text-weight-light">
+                    Create and submit work orders with a couple clicks.
+                  </div>
+                  <div class="text-h6 q-ml-xl text-weight-light">
+                    Manage them with a user friendly UI.
+                  </div>
+                </q-card-section>
+              </q-card>
+            </div>
+            <div class="col-md-6 q-pa-xl">
+              <q-card>
+                <img src="src/assets/Quasar-App.png" />
+              </q-card>
+            </div>
           </div>
         </q-page>
       </div>

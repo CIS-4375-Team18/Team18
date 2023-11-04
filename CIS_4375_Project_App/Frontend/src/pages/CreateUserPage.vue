@@ -54,7 +54,7 @@
                 </q-select>
             </div>
             <div style="padding-top: 30px;">
-                <q-select v-model="user.period" label="Class Period"
+                <q-select v-model="user.period" label="Conference Period"
                 :options="period_options" option-value="value" 
                 option-label="label"
                 :rules="[val => !!val || 'Field is required']">
