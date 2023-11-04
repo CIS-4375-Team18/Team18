@@ -12,7 +12,7 @@
 
       <div class="row q-col-gutter-lg">
         <div class="col-md-4">
-          <q-card style="height: 130px;">
+          <q-card style="height: 130px;" class="bg-grey-3">
             <q-card-section class="q-ml-xl">
                 <div v-if="userRole != 'Staff'" class="text-h3 text-bold q-mt-md">{{ totalTicketCount }}</div>
                 <div v-else class="text-h3 text-bold q-mt-md">{{ userTicketCount }}</div>
@@ -21,7 +21,7 @@
           </q-card>
         </div>
         <div class="col-md-4">
-          <q-card style="height: 130px;">
+          <q-card style="height: 130px;" class="bg-grey-3">
             <q-card-section class="q-ml-xl">
                 <div v-if="userRole != 'Staff'" class="text-h3 text-bold q-mt-md">{{ totalOpenTickets }}</div>
                 <div v-else class="text-h3 text-bold q-mt-md">{{ userOpenTickets }}</div>
@@ -30,7 +30,7 @@
           </q-card>
         </div>
         <div class="col-md-4">
-          <q-card style="height: 130px;">
+          <q-card style="height: 130px;" class="bg-grey-3">
             <q-card-section class="q-ml-xl">
                 <div v-if="userRole != 'Staff'" class="text-h3 text-bold q-mt-md">{{ totalClosedTickets }}</div>
                 <div v-else class="text-h3 text-bold q-mt-md">{{ userClosedTickets }}</div>
@@ -42,12 +42,12 @@
   
       <div v-if="userRole !== 'Staff'" class="row q-col-gutter-md" style="margin-top: 10px;">
         <div class="col-md-6 col-xs-12">
-          <q-card>
+          <q-card class="bg-grey-3">
             <barChart> </barChart>
           </q-card>
         </div>
         <div class="col-md-6 col-xs-12">
-          <q-card class="fit">
+          <q-card class="fit bg-grey-3">
             <div>
               <q-inner-loading 
                 :showing="isPieLoading" 
@@ -78,7 +78,7 @@
   
       <div class="row" style="margin-top: 20px;">
         <div class="col-md-12">
-          <q-card>
+          <q-card class="bg-grey-3">
             <lineChart
               v-if="userRole != 'Staff'"
             >

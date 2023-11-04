@@ -3,7 +3,7 @@
     <q-header class=" q-py-xs shadow-2 rounded-borders" height-hint="58" style="background-color: #666262;">
       <q-toolbar>
         <q-btn v-if="isAuthenticated" flat roundcccccbenfrdj @click="drawer = !drawer" aria-label="Menu" icon="menu" />
-        <q-btn flat no-caps no-wrap class="q-ml-xs" v-if="$q.screen.gt.xs">
+        <q-btn flat no-caps no-wrap class="q-ml-xs" v-if="$q.screen.gt.xs" to="/">
           <img src="src/assets/CISD_Logo.png" style="margin-left: 8px; height:70px;">
         </q-btn>
         <q-space />
@@ -45,9 +45,12 @@
                     </q-item-section>
                   </q-item>
                   <q-separator />
-                  <q-item clickable @click="performLogout">
+                  <q-item class="bg-grey-3" clickable @click="performLogout">
                     <q-item-section >
-                      Logout
+                      <div>
+                        <q-icon size="xs" name="power_settings_new" /> 
+                        <span class="q-ml-sm">Logout</span>
+                      </div>
                     </q-item-section>
                   </q-item>
                 </q-list>
@@ -188,7 +191,7 @@
                     Create and submit work orders with a couple clicks.
                   </div>
                   <div class="text-h6 q-ml-xl text-weight-light">
-                    Manage them with a user friendly UI.
+                    Manage your work orders with a user friendly UI.
                   </div>
                 </q-card-section>
               </q-card>
