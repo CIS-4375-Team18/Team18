@@ -7,8 +7,16 @@
             <q-separator />
 
             <div class="q-pa-md" style="margin: 0 auto;">
-                <q-table title="Requests" color="secondary" :align="left" :loading="loading"
-                    :rows="supporttickets" :columns="supportticketsColumns" style="width: 95%; margin: auto">
+                <q-table 
+                    title="Requests"
+                    color="secondary"
+                    :align="left"
+                    :loading="loading"
+                    :rows="supporttickets"
+                    :columns="supportticketsColumns"
+                    style="width: 95%; margin: auto"
+                    @row-click="editRow"
+                >
                     <template v-slot:top>
                         <q-select
                             v-model="filterByModel"
@@ -110,7 +118,7 @@ export default {
             const supportAgents = await axios.get(`${apiURL}/supportAgents`)
             // map the supportAgent id to their email email
             supportAgents.data.forEach((supportAgent) => {
-                this.supportAgents[supportAgent.END_USER_ID] = supportAgent.END_USER_EMAIL;
+                this.supportAgents[supportAgent.SUPPORT_AGENT_USER_ID] = supportAgent.END_USER_EMAIL;
             });
         },
         getSupportTickets() {
@@ -193,8 +201,8 @@ export default {
                 }
             });
         },
-        editRow(props) {
-            
+        editRow(evt, row) {
+            this.$router.push(`/request/${row.SUPPORT_TICKET_ID}`);
         }
     },
     setup() {
