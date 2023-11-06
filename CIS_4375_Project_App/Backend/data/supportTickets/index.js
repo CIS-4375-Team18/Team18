@@ -22,6 +22,7 @@ const GetAllJoin = async ({ USER_ID, SUPPORT_TICKET_STATUS, SEARCH_TERM }) => {
         " ,ST.TICKET_PRIORITY_ID "+
         " ,ST.SUPPORT_AGENT_ID "+
         " ,ST.RESOLUTION_DATE "+
+        " ,ST.ROOM_NUMBER "+
         " ,ST.END_USER_ID "+
         " ,ST.SUPPORT_TICKET_ASSET_TAG "+
         " ,EU.END_USER_FIRST_NAME "+
@@ -98,10 +99,10 @@ const GetAll = async () => {
     }
 }
 
-const GetAssignedByUserId = async (USER_ID) => {
+const GetAssignedByUserId = async ({ USER_ID, SUPPORT_TICKET_STATUS }) => {
     try {
         let pool = await sql.connect(config.sql);
-        const selectAllTicketsQ = "SELECT ST.SUPPORT_TICKET_ID "+
+        let selectAllTicketsQ = "SELECT ST.SUPPORT_TICKET_ID "+
         " ,ST.SUPPORT_TICKET_SUBJECT  "+
         " ,ST.SUPPORT_TICKET_NOTE "+
         " ,ST.DEVICE_MAKE "+
@@ -110,6 +111,7 @@ const GetAssignedByUserId = async (USER_ID) => {
         " ,ST.SUPPORT_TICKET_DATE_CREATED "+
         " ,ST.SUPPORT_TICKET_RESOLUTION_TIME "+
         " ,ST.SUPPORT_TICKET_STATUS_ID "+
+        " ,STS.SUPPORT_TICKET_STATUS_DESC "+
         " ,ST.TICKET_CATEGORY_ID "+
         " ,ST.TICKET_SUB_CATEGORY_ID "+
         " ,ST.TICKET_PRIORITY_ID "+
@@ -120,12 +122,16 @@ const GetAssignedByUserId = async (USER_ID) => {
         " ,EU.END_USER_FIRST_NAME "+
         " ,EU.END_USER_LAST_NAME "+
         " ,EU.END_USER_EMAIL "+
-        " FROM [dbo].[SUPPORT_TICKET] as ST "+
-        " JOIN dbo.END_USER as EU ON ST.END_USER_ID = EU.END_USER_ID"
-        " WHERE ST.SUPPORT_TICKET_STATUS_ID = @SUPPORT_TICKET_STATUS";
-        " AND ST.SUPPORT_AGENT_ID = @USER_ID";
+        " FROM dbo.SUPPORT_TICKET as ST "+
+        " JOIN dbo.SUPPORT_TICKET_STATUS as STS ON ST.SUPPORT_TICKET_STATUS_ID = STS.SUPPORT_TICKET_STATUS_ID " +
+        " JOIN dbo.END_USER as EU ON ST.END_USER_ID = EU.END_USER_ID " +
+        " JOIN dbo.SUPPORT_AGENT_USER as SAU ON SAU.SUPPORT_AGENT_USER_ID = ST.SUPPORT_AGENT_ID " +
+        " WHERE SAU.END_USER_ID = @END_USER_ID";
+        if (SUPPORT_TICKET_STATUS) {
+            selectAllTicketsQ += " AND ST.SUPPORT_TICKET_STATUS_ID = @SUPPORT_TICKET_STATUS ";
+        }
         const supportTicketsList = await pool.request()
-                            .input('USER_ID', sql.Int, USER_ID)
+                            .input('END_USER_ID', sql.Int, USER_ID)
                             .input('SUPPORT_TICKET_STATUS', sql.Int, SUPPORT_TICKET_STATUS)
                             .query(selectAllTicketsQ);
         return supportTicketsList.recordset;
@@ -177,6 +183,7 @@ const getById = async(SUPPORT_TICKET_ID) => {
         " ST.SUPPORT_TICKET_NOTE, " +
         " ST.SUPPORT_TICKET_RESOLUTION_TIME, " +
         " ST.SUPPORT_TICKET_STATUS_ID, " +
+        " ST.ROOM_NUMBER, " +
         " STS.SUPPORT_TICKET_STATUS_DESC, "+
         " ST.SUPPORT_TICKET_SUBJECT, " +
         " ST.SUPPORT_TICKET_TIMELINE, " +
@@ -293,62 +300,61 @@ const getResolvedTicketCountPerMonth = async () => {
 }
 
 const insertNew = async (supportTicketData) => {
-    try {
-        let pool = await sql.connect(config.sql);
-        const createSupportTicket = "INSERT INTO [dbo].[SUPPORT_TICKET] "+
-       " ([SUPPORT_TICKET_SUBJECT] "+
-       " ,[SUPPORT_TICKET_NOTE] "+
-       " ,[DEVICE_MAKE] "+
-       " ,[DEVICE_MODEL] "+
-       " ,[SUPPORT_TICKET_TIMELINE] "+
-       " ,[SUPPORT_TICKET_DATE_CREATED] "+
-       " ,[SUPPORT_TICKET_RESOLUTION_TIME] "+
-       " ,[SUPPORT_TICKET_STATUS_ID] "+
-       " ,[TICKET_CATEGORY_ID] "+
-       " ,[TICKET_SUB_CATEGORY_ID] "+
-       " ,[TICKET_PRIORITY_ID] "+
-       " ,[SUPPORT_AGENT_ID] "+
-       " ,[RESOLUTION_DATE] "+
-       " ,[END_USER_ID] "+
-       " ,[SUPPORT_TICKET_ASSET_TAG]) "+
-       " VALUES "+
-       " (@SUPPORT_TICKET_SUBJECT, "+
-       " @SUPPORT_TICKET_NOTE, "+
-       " @DEVICE_MAKE, "+
-       " @DEVICE_MODEL, "+
-       " @SUPPORT_TICKET_TIMELINE, "+
-       " @SUPPORT_TICKET_DATE_CREATED, "+
-       " @SUPPORT_TICKET_RESOLUTION_TIME, "+
-       " @SUPPORT_TICKET_STATUS_ID, "+
-       " @TICKET_CATEGORY_ID, "+
-       " @TICKET_SUB_CATEGORY_ID, "+
-       " @TICKET_PRIORITY_ID, "+
-       " @SUPPORT_AGENT_ID, "+
-       " @RESOLUTION_DATE, "+
-       " @END_USER_ID, "+
-       " @SUPPORT_TICKET_ASSET_TAG)"
+    let pool = await sql.connect(config.sql);
+    const createSupportTicket = "INSERT INTO [dbo].[SUPPORT_TICKET] "+
+    " ([SUPPORT_TICKET_SUBJECT] "+
+    " ,[SUPPORT_TICKET_NOTE] "+
+    " ,[DEVICE_MAKE] "+
+    " ,[DEVICE_MODEL] "+
+    " ,[SUPPORT_TICKET_TIMELINE] "+
+    " ,[SUPPORT_TICKET_DATE_CREATED] "+
+    " ,[SUPPORT_TICKET_RESOLUTION_TIME] "+
+    " ,[SUPPORT_TICKET_STATUS_ID] "+
+    " ,[TICKET_CATEGORY_ID] "+
+    " ,[TICKET_SUB_CATEGORY_ID] "+
+    " ,[TICKET_PRIORITY_ID] "+
+    " ,[SUPPORT_AGENT_ID] "+
+    " ,[RESOLUTION_DATE] "+
+    " ,[END_USER_ID] "+
+    " ,[SUPPORT_TICKET_ASSET_TAG] "+
+    " ,[ROOM_NUMBER]) "+
+    " VALUES "+
+    " (@SUPPORT_TICKET_SUBJECT, "+
+    " @SUPPORT_TICKET_NOTE, "+
+    " @DEVICE_MAKE, "+
+    " @DEVICE_MODEL, "+
+    " @SUPPORT_TICKET_TIMELINE, "+
+    " @SUPPORT_TICKET_DATE_CREATED, "+
+    " @SUPPORT_TICKET_RESOLUTION_TIME, "+
+    " @SUPPORT_TICKET_STATUS_ID, "+
+    " @TICKET_CATEGORY_ID, "+
+    " @TICKET_SUB_CATEGORY_ID, "+
+    " @TICKET_PRIORITY_ID, "+
+    " @SUPPORT_AGENT_ID, "+
+    " @RESOLUTION_DATE, "+
+    " @END_USER_ID, "+
+    " @SUPPORT_TICKET_ASSET_TAG," +
+    " @ROOM_NUMBER)"
 
-        const insertSuppTicket = await pool.request()
-                            .input('SUPPORT_TICKET_SUBJECT', sql.NVarChar(500), supportTicketData.SUPPORT_TICKET_SUBJECT)
-                            .input('SUPPORT_TICKET_NOTE', sql.NVarChar('max'), supportTicketData.SUPPORT_TICKET_NOTE)
-                            .input('DEVICE_MAKE', sql.NVarChar(20), supportTicketData.DEVICE_MAKE)
-                            .input('DEVICE_MODEL', sql.NVarChar(20), supportTicketData.DEVICE_MODEL)
-                            .input('SUPPORT_TICKET_TIMELINE', sql.NVarChar(20), supportTicketData.SUPPORT_TICKET_TIMELINE)
-                            .input('SUPPORT_TICKET_DATE_CREATED', sql.DateTime, supportTicketData.SUPPORT_TICKET_DATE_CREATED)
-                            .input('SUPPORT_TICKET_RESOLUTION_TIME', sql.Int, supportTicketData.SUPPORT_TICKET_RESOLUTION_TIME)
-                            .input('SUPPORT_TICKET_STATUS_ID', sql.SmallInt, supportTicketData.SUPPORT_TICKET_STATUS_ID)
-                            .input('TICKET_CATEGORY_ID', sql.SmallInt, supportTicketData.TICKET_CATEGORY_ID)
-                            .input('TICKET_SUB_CATEGORY_ID', sql.SmallInt, supportTicketData.TICKET_SUB_CATEGORY_ID)        
-                            .input('TICKET_PRIORITY_ID', sql.SmallInt, supportTicketData.TICKET_PRIORITY_ID)        
-                            .input('SUPPORT_AGENT_ID', sql.SmallInt, supportTicketData.SUPPORT_AGENT_ID)        
-                            .input('RESOLUTION_DATE', sql.DateTime, supportTicketData.RESOLUTION_DATE)  
-                            .input('END_USER_ID', sql.SmallInt, supportTicketData.END_USER_ID)
-                            .input('SUPPORT_TICKET_ASSET_TAG', sql.NVarChar(40), supportTicketData.SUPPORT_TICKET_ASSET_TAG)      
-                            .query(createSupportTicket);                            
-        return insertSuppTicket.recordset;
-    } catch (error) {
-        return error.message;
-    }
+    const insertSuppTicket = await pool.request()
+                        .input('SUPPORT_TICKET_SUBJECT', sql.NVarChar(500), supportTicketData.SUPPORT_TICKET_SUBJECT)
+                        .input('SUPPORT_TICKET_NOTE', sql.NVarChar('max'), supportTicketData.SUPPORT_TICKET_NOTE)
+                        .input('DEVICE_MAKE', sql.NVarChar(20), supportTicketData.DEVICE_MAKE)
+                        .input('DEVICE_MODEL', sql.NVarChar(20), supportTicketData.DEVICE_MODEL)
+                        .input('SUPPORT_TICKET_TIMELINE', sql.NVarChar(20), supportTicketData.SUPPORT_TICKET_TIMELINE)
+                        .input('SUPPORT_TICKET_DATE_CREATED', sql.DateTime, supportTicketData.SUPPORT_TICKET_DATE_CREATED)
+                        .input('SUPPORT_TICKET_RESOLUTION_TIME', sql.Int, supportTicketData.SUPPORT_TICKET_RESOLUTION_TIME)
+                        .input('SUPPORT_TICKET_STATUS_ID', sql.SmallInt, supportTicketData.SUPPORT_TICKET_STATUS_ID)
+                        .input('TICKET_CATEGORY_ID', sql.SmallInt, supportTicketData.TICKET_CATEGORY_ID)
+                        .input('TICKET_SUB_CATEGORY_ID', sql.SmallInt, supportTicketData.TICKET_SUB_CATEGORY_ID)        
+                        .input('TICKET_PRIORITY_ID', sql.SmallInt, supportTicketData.TICKET_PRIORITY_ID)        
+                        .input('SUPPORT_AGENT_ID', sql.SmallInt, supportTicketData.SUPPORT_AGENT_ID)        
+                        .input('RESOLUTION_DATE', sql.DateTime, supportTicketData.RESOLUTION_DATE)  
+                        .input('END_USER_ID', sql.SmallInt, supportTicketData.END_USER_ID)
+                        .input('SUPPORT_TICKET_ASSET_TAG', sql.NVarChar(40), supportTicketData.SUPPORT_TICKET_ASSET_TAG)      
+                        .input('ROOM_NUMBER', sql.NVarChar(40), supportTicketData.ROOM_NUMBER)      
+                        .query(createSupportTicket);                            
+    return insertSuppTicket.recordset;
 }
 
 const update = async (SUPPORT_TICKET_ID, data) => {
@@ -360,7 +366,6 @@ const update = async (SUPPORT_TICKET_ID, data) => {
         " [DEVICE_MAKE] = @DEVICE_MAKE,  "+
         " [DEVICE_MODEL] = @DEVICE_MODEL, "+
         " [SUPPORT_TICKET_TIMELINE] = @SUPPORT_TICKET_TIMELINE, "+
-        " [SUPPORT_TICKET_DATE_CREATED] = @SUPPORT_TICKET_DATE_CREATED, "+
         " [SUPPORT_TICKET_RESOLUTION_TIME] = @SUPPORT_TICKET_RESOLUTION_TIME, "+
         " [SUPPORT_TICKET_STATUS_ID] = @SUPPORT_TICKET_STATUS_ID, "+
         " [SUPPORT_TICKET_ASSET_TAG] = @SUPPORT_TICKET_ASSET_TAG, "+
@@ -369,6 +374,7 @@ const update = async (SUPPORT_TICKET_ID, data) => {
         " [TICKET_PRIORITY_ID] = @TICKET_PRIORITY_ID, "+
         " [SUPPORT_AGENT_ID] = @SUPPORT_AGENT_ID,  "+
         " [RESOLUTION_DATE] = @RESOLUTION_DATE, "+
+        " [ROOM_NUMBER] = @ROOM_NUMBER, "+
         " [END_USER_ID] = @END_USER_ID " +
         " WHERE SUPPORT_TICKET_ID=@SUPPORT_TICKET_ID"
      
@@ -379,7 +385,6 @@ const update = async (SUPPORT_TICKET_ID, data) => {
             .input('DEVICE_MAKE', sql.NVarChar(20), data.DEVICE_MAKE)
             .input('DEVICE_MODEL', sql.NVarChar(20), data.DEVICE_MODEL)
             .input('SUPPORT_TICKET_TIMELINE', sql.NVarChar(20), data.SUPPORT_TICKET_TIMELINE)
-            .input('SUPPORT_TICKET_DATE_CREATED', sql.Date, data.SUPPORT_TICKET_DATE_CREATED)
             .input('SUPPORT_TICKET_RESOLUTION_TIME', sql.Int, data.SUPPORT_TICKET_RESOLUTION_TIME)
             .input('SUPPORT_TICKET_STATUS_ID', sql.SmallInt, data.SUPPORT_TICKET_STATUS_ID)
             .input('SUPPORT_TICKET_ASSET_TAG', sql.NVarChar(40), data.SUPPORT_TICKET_ASSET_TAG)      
@@ -388,6 +393,7 @@ const update = async (SUPPORT_TICKET_ID, data) => {
             .input('TICKET_PRIORITY_ID', sql.SmallInt, data.TICKET_PRIORITY_ID)        
             .input('SUPPORT_AGENT_ID', sql.SmallInt, data.SUPPORT_AGENT_ID)        
             .input('RESOLUTION_DATE', sql.Date, data.RESOLUTION_DATE)
+            .input('ROOM_NUMBER', sql.NVarChar(40), data.ROOM_NUMBER)
             .input('END_USER_ID', sql.SmallInt, data.END_USER_ID)        
                                 
             .query(updateSubCatQ);

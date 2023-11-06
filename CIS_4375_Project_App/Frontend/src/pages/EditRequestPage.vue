@@ -115,7 +115,7 @@
                 option-label="TICKET_CATEGORY_DESC"
               />
             </div>
-            <div class="col-4" v-if="subCatList">
+            <div class="col-4">
               <q-select
                 disable
                 readonly
@@ -172,6 +172,25 @@
               </q-input>
             </div>
           </div>
+          <div class="row-inline flex-direction-down row q-mt-md row-custom">
+            <div class="col-4">
+              <div class="col-4">
+              <q-select
+                transition-show="scale"
+                transition-hide="scale"
+                class="ticket-select"
+                color="secondary"
+                v-model="roomModel"
+                :options="roomsData"
+                emit-value
+                label="Select Room"
+                disable
+                readonly
+              >
+            </q-select>
+            </div>
+            </div>
+            </div>
           <div class="row-inline row q-mt-md">
             <div class="col-4">
               <q-input
@@ -261,6 +280,7 @@ export default {
     return {
       categoryData: [],
       priorityData: [],
+      roomsData: [],
       supportAgentData: [],
       supportTicketStatusData: [],
       subCategoryData: [],
@@ -308,6 +328,9 @@ export default {
       this.SupportTicketStatusModel = ticket.SUPPORT_TICKET_STATUS_ID;
       this.SupportAgentModel = ticket.SUPPORT_AGENT_ID;
       this.emailModel = ticket.END_USER_EMAIL;
+      this.roomModel = ticket.ROOM_NUMBER[0];
+
+      this.getSubcategoryByCategory();
     });
 
     axios.get(`${apiURL}/activecategories`).then((res) => {
@@ -316,9 +339,6 @@ export default {
     })
     axios.get(`${apiURL}/activepriorities`).then((res) => {
       this.priorityData = res.data
-    })
-    axios.get(`${apiURL}/activesubcategories`).then((res) => {
-      this.subCategoryData = res.data
     })
     axios.get(`${apiURL}/activeticketstatuses`).then((res) => {
       // query for all the active ticket statuses
@@ -338,6 +358,11 @@ export default {
     axios.get(`${apiURL}/supportAgents`).then((res) => {
       this.supportAgentData = res.data;
     });
+
+    
+    axios.get(`${apiURL}/room`).then((res) => {
+      this.roomsData = res.data.map((room) => room.ROOM_NUMBER);
+    });
   },
   setup() {
     return {
@@ -352,6 +377,7 @@ export default {
       assetMake: ref(null),
       assetModel: ref(null),
       subCatList: ref(null),
+      roomModel: ref(null),
       dense: ref(true),
       denseOpts: ref(true),
       model: ref(null),
@@ -366,6 +392,12 @@ export default {
     findHardwareId() {
       this.hardwCatId = this.categoryData.find(o => o.TICKET_CATEGORY_DESC === 'HARDWARE');
     },
+    getSubcategoryByCategory() {
+      // get subcategories based on the current selected category
+      axios.get(`${apiURL}/subcattype/${this.categoryModel}`).then((res) => {
+        this.subCategoryData = res.data || [];
+      })
+    },
     async saveRequest() {
       try {
         const requestId = this.$route.params.requestId;
@@ -374,7 +406,8 @@ export default {
           SUPPORT_TICKET_ID: parseInt(requestId),
           TICKET_PRIORITY_ID: this.PriorityList,
           SUPPORT_TICKET_STATUS_ID: this.SupportTicketStatusModel,
-          SUPPORT_AGENT_ID: this.SupportAgentModel
+          SUPPORT_AGENT_ID: this.SupportAgentModel,
+          ROOM_NUMBER: this.roomModel
         }
 
         // if its closed, set resolution date and time

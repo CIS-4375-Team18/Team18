@@ -37,9 +37,10 @@
                 :options="categoryData"
                 option-value="TICKET_CATEGORY_ID"
                 option-label="TICKET_CATEGORY_DESC"
+                @update:model-value="getSubcategoryByCategory()" 
               />
             </div>
-            <div class="col-4" v-if="categoryModel === hardwCatId.TICKET_CATEGORY_ID">
+            <div class="col-4" v-if="subCategoryData.length > 0">
               <q-select
                 transition-show="scale"
                 transition-hide="scale"
@@ -127,26 +128,19 @@
             <div class="col-4">
               <div class="col-4">
               <q-select
+                v-model="roomModel"
+                use-input
+                hide-selected
+                fill-input
+                input-debounce="0"
+                :options="roomsData"
+                @filter="filterRoomFn"
+                label="Select Room"
                 transition-show="scale"
                 transition-hide="scale"
-                class=" ticket-select"
+                class="ticket-select"
                 color="secondary"
-                emit-value
-                map-options
-                label="Select Availability"
-
               >
-              <template v-slot:append>
-                  <q-icon
-                    :align="top"
-                    size="xs"
-                    class="q-mb-sm"
-                    name="fa-regular fa-circle-question"
-                    color="secondary"
-                  >
-                    <q-tooltip> Select period to indicate availbe time </q-tooltip>
-                  </q-icon>
-                </template>
             </q-select>
             </div>
             </div>
@@ -239,7 +233,7 @@
               @click="confirmCancel"
             />
             <q-btn
-              @click="saveRequest(userID)"
+              @click="saveRequest()"
               class="q-ml-xl"
               color="secondary"
               no-caps
@@ -266,6 +260,8 @@ export default {
     return {
       categoryData: [],
       priorityData: [],
+      roomsData: [],
+      roomsList: [],
       subCategoryData: [],
       hardwCatId: [],
       openTicketStatusId: null
@@ -280,9 +276,6 @@ export default {
     axios.get(`${apiURL}/activepriorities`).then((res) => {
       this.priorityData = res.data
     })
-    axios.get(`${apiURL}/activesubcategories`).then((res) => {
-      this.subCategoryData = res.data
-    })
     axios.get(`${apiURL}/activeticketstatuses`).then((res) => {
       // query for all the active ticket statuses
       for(let i = 0; i < res.data.length; i++) {
@@ -295,6 +288,10 @@ export default {
         }
       }
     });
+    axios.get(`${apiURL}/room`).then((res) => {
+      this.roomsData = res.data.map((room) => room.ROOM_NUMBER);
+      this.roomsList = res.data.map((room) => room.ROOM_NUMBER);
+    });
   },
   setup() {
     return {
@@ -303,6 +300,7 @@ export default {
       textareaModel: ref(null),
       subjectModel: ref(null),
       assetTagModel: ref(null),
+      roomModel: ref(null),
       assetMake: ref(null),
       assetModel: ref(null),
       subCatList: ref(null),
@@ -316,15 +314,25 @@ export default {
     findHardwareId() {
       this.hardwCatId = this.categoryData.find(o => o.TICKET_CATEGORY_DESC === 'HARDWARE');
     },
-    async saveRequest(userID) {
+    getSubcategoryByCategory() {
+      // reset sub category because we changed categories
+      this.subCatList = null;
+      // get subcategories based on the current selected category
+      axios.get(`${apiURL}/subcattype/${this.categoryModel}`).then((res) => {
+        this.subCategoryData = res.data || [];
+      })
+    },
+    dateToLocalISO(date) {
+        const off = date.getTimezoneOffset()
+        const absoff = Math.abs(off)
+        return (new Date(date.getTime() - off*60*1000).toISOString().substr(0,23) +
+                (off > 0 ? '-' : '+') + 
+                Math.floor(absoff / 60).toFixed(0).padStart(2,'0') + ':' + 
+                (absoff % 60).toString().padStart(2,'0'))
+    },
+    async saveRequest() {
       try {
         const hardwareCategoryId = this.hardwCatId.TICKET_CATEGORY_ID;
-        // if the category is hardware and if we have a subcategory, store it into this variable
-        // otherwise subcategory will be null
-        let subCategory = null;
-        if (this.categoryModel == hardwareCategoryId && this.subCatList !== null) {
-          subCategory = this.subCatList;
-        }
 
         // if the category is hardware and if we have a device make, store it into this variable
         // otherwise device make will be null
@@ -342,7 +350,7 @@ export default {
         }
 
         // today's date in ISO format - which is the same format we will save in the database
-        const dateCreated = new Date().toISOString();
+        const dateCreated = this.dateToLocalISO(new Date());
 
         // create the support ticket to be saved in the database
         const supportticket = {
@@ -355,12 +363,13 @@ export default {
           SUPPORT_TICKET_RESOLUTION_TIME: null,
           SUPPORT_TICKET_STATUS_ID: this.openTicketStatusId, // open ticket status
           TICKET_CATEGORY_ID: this.categoryModel, // category
-          TICKET_SUB_CATEGORY_ID: subCategory, // sub category
+          TICKET_SUB_CATEGORY_ID: this.subCatList, // sub category
           TICKET_PRIORITY_ID: this.PriorityList, // priority
           SUPPORT_AGENT_ID: null,
           RESOLUTION_DATE: null,
-          END_USER_ID: userID,
-          SUPPORT_TICKET_ASSET_TAG: this.assetTagModel // asset tag
+          END_USER_ID: this.userID,
+          SUPPORT_TICKET_ASSET_TAG: this.assetTagModel, // asset tag
+          ROOM_NUMBER: this.roomModel
         };
 
         // call the save api for support ticket
@@ -399,6 +408,17 @@ export default {
         .onCancel(() => {
           // Do nothing
         })
+    },
+    filterRoomFn (val, update, abort) {
+      update(() => {
+        if (val.length === 0) {
+          this.roomsData = this.roomsList;
+        } else {
+          const searchTerm = val.toLowerCase();
+          const filteredRooms = this.roomsList.filter((room) => room.toLowerCase().indexOf(searchTerm) > -1)
+          this.roomsData = filteredRooms;
+        }
+      })
     }
   },
   computed: {
