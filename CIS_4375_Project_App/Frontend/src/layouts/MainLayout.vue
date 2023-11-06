@@ -185,7 +185,7 @@
               <q-card flat class="q-mt-xl">
                 <q-card-section>
                   <div class="text-h3 q-ml-xl q-mt-xl">
-                    Create and manage your work oders
+                    Create and manage your work orders
                   </div>
                   <div class="text-h6 q-mt-lg q-ml-xl text-weight-light">
                     Create and submit work orders with a couple clicks.
@@ -196,7 +196,7 @@
                 </q-card-section>
               </q-card>
             </div>
-            <div class="col-md-6 q-pa-xl">
+            <div class="col-md-6 q-pa-lg">
               <q-card>
                 <img src="src/assets/Quasar-App.png" />
               </q-card>

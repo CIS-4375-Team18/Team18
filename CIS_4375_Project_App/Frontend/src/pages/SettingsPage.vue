@@ -1,6 +1,3 @@
-<script>
-import { ref } from "vue";
-</script>
 
 <template>
   <div class="q-pa-md">
@@ -58,13 +55,13 @@ import { ref } from "vue";
             </q-card-section>
           </q-card>
         </div>
-        <div class="section-text">Users and Roles</div>
+        <div v-if="userRole!='Technician'" class="section-text">Users and Roles</div>
 
         <!--
             User management section
         -->
         <q-separator inset="item" />
-        <div class="row q-ml-sm">
+        <div v-if="userRole!='Technician'" class="row q-ml-sm">
           <q-card
             class="settings-card text-black cursor-pointer relative-position bg-white shadow-5"
             @click="$router.push('/users')"
@@ -82,6 +79,17 @@ import { ref } from "vue";
     </div>
   </div>
 </template>
+
+<script>
+import { mapGetters } from 'vuex';
+
+export default {
+  computed: {
+      ...mapGetters('auth', ['userRole']),
+    }
+}
+</script>
+
 <style scoped>
 .text-h7 {
   margin: 15px;
