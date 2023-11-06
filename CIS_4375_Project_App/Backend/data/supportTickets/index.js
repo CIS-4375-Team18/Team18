@@ -366,7 +366,6 @@ const update = async (SUPPORT_TICKET_ID, data) => {
         " [DEVICE_MAKE] = @DEVICE_MAKE,  "+
         " [DEVICE_MODEL] = @DEVICE_MODEL, "+
         " [SUPPORT_TICKET_TIMELINE] = @SUPPORT_TICKET_TIMELINE, "+
-        " [SUPPORT_TICKET_DATE_CREATED] = @SUPPORT_TICKET_DATE_CREATED, "+
         " [SUPPORT_TICKET_RESOLUTION_TIME] = @SUPPORT_TICKET_RESOLUTION_TIME, "+
         " [SUPPORT_TICKET_STATUS_ID] = @SUPPORT_TICKET_STATUS_ID, "+
         " [SUPPORT_TICKET_ASSET_TAG] = @SUPPORT_TICKET_ASSET_TAG, "+
@@ -386,7 +385,6 @@ const update = async (SUPPORT_TICKET_ID, data) => {
             .input('DEVICE_MAKE', sql.NVarChar(20), data.DEVICE_MAKE)
             .input('DEVICE_MODEL', sql.NVarChar(20), data.DEVICE_MODEL)
             .input('SUPPORT_TICKET_TIMELINE', sql.NVarChar(20), data.SUPPORT_TICKET_TIMELINE)
-            .input('SUPPORT_TICKET_DATE_CREATED', sql.Date, data.SUPPORT_TICKET_DATE_CREATED)
             .input('SUPPORT_TICKET_RESOLUTION_TIME', sql.Int, data.SUPPORT_TICKET_RESOLUTION_TIME)
             .input('SUPPORT_TICKET_STATUS_ID', sql.SmallInt, data.SUPPORT_TICKET_STATUS_ID)
             .input('SUPPORT_TICKET_ASSET_TAG', sql.NVarChar(40), data.SUPPORT_TICKET_ASSET_TAG)      
