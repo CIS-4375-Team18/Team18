@@ -115,7 +115,7 @@
                 option-label="TICKET_CATEGORY_DESC"
               />
             </div>
-            <div class="col-4" v-if="subCatList">
+            <div class="col-4">
               <q-select
                 disable
                 readonly
@@ -329,6 +329,8 @@ export default {
       this.SupportAgentModel = ticket.SUPPORT_AGENT_ID;
       this.emailModel = ticket.END_USER_EMAIL;
       this.roomModel = ticket.ROOM_NUMBER[0];
+
+      this.getSubcategoryByCategory();
     });
 
     axios.get(`${apiURL}/activecategories`).then((res) => {
@@ -337,9 +339,6 @@ export default {
     })
     axios.get(`${apiURL}/activepriorities`).then((res) => {
       this.priorityData = res.data
-    })
-    axios.get(`${apiURL}/activesubcategories`).then((res) => {
-      this.subCategoryData = res.data
     })
     axios.get(`${apiURL}/activeticketstatuses`).then((res) => {
       // query for all the active ticket statuses
@@ -392,6 +391,12 @@ export default {
     //Get ID of category Type Hardware
     findHardwareId() {
       this.hardwCatId = this.categoryData.find(o => o.TICKET_CATEGORY_DESC === 'HARDWARE');
+    },
+    getSubcategoryByCategory() {
+      // get subcategories based on the current selected category
+      axios.get(`${apiURL}/subcattype/${this.categoryModel}`).then((res) => {
+        this.subCategoryData = res.data || [];
+      })
     },
     async saveRequest() {
       try {

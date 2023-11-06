@@ -37,9 +37,10 @@
                 :options="categoryData"
                 option-value="TICKET_CATEGORY_ID"
                 option-label="TICKET_CATEGORY_DESC"
+                @update:model-value="getSubcategoryByCategory()" 
               />
             </div>
-            <div class="col-4" v-if="categoryModel === hardwCatId.TICKET_CATEGORY_ID">
+            <div class="col-4" v-if="subCategoryData.length > 0">
               <q-select
                 transition-show="scale"
                 transition-hide="scale"
@@ -275,9 +276,6 @@ export default {
     axios.get(`${apiURL}/activepriorities`).then((res) => {
       this.priorityData = res.data
     })
-    axios.get(`${apiURL}/activesubcategories`).then((res) => {
-      this.subCategoryData = res.data
-    })
     axios.get(`${apiURL}/activeticketstatuses`).then((res) => {
       // query for all the active ticket statuses
       for(let i = 0; i < res.data.length; i++) {
@@ -316,15 +314,17 @@ export default {
     findHardwareId() {
       this.hardwCatId = this.categoryData.find(o => o.TICKET_CATEGORY_DESC === 'HARDWARE');
     },
+    getSubcategoryByCategory() {
+      // reset sub category because we changed categories
+      this.subCatList = null;
+      // get subcategories based on the current selected category
+      axios.get(`${apiURL}/subcattype/${this.categoryModel}`).then((res) => {
+        this.subCategoryData = res.data || [];
+      })
+    },
     async saveRequest() {
       try {
         const hardwareCategoryId = this.hardwCatId.TICKET_CATEGORY_ID;
-        // if the category is hardware and if we have a subcategory, store it into this variable
-        // otherwise subcategory will be null
-        let subCategory = null;
-        if (this.categoryModel == hardwareCategoryId && this.subCatList !== null) {
-          subCategory = this.subCatList;
-        }
 
         // if the category is hardware and if we have a device make, store it into this variable
         // otherwise device make will be null
@@ -355,7 +355,7 @@ export default {
           SUPPORT_TICKET_RESOLUTION_TIME: null,
           SUPPORT_TICKET_STATUS_ID: this.openTicketStatusId, // open ticket status
           TICKET_CATEGORY_ID: this.categoryModel, // category
-          TICKET_SUB_CATEGORY_ID: subCategory, // sub category
+          TICKET_SUB_CATEGORY_ID: this.subCatList, // sub category
           TICKET_PRIORITY_ID: this.PriorityList, // priority
           SUPPORT_AGENT_ID: null,
           RESOLUTION_DATE: null,
