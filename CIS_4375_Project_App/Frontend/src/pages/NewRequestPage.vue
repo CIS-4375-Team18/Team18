@@ -127,26 +127,19 @@
             <div class="col-4">
               <div class="col-4">
               <q-select
+                v-model="roomModel"
+                use-input
+                hide-selected
+                fill-input
+                input-debounce="0"
+                :options="roomsData"
+                @filter="filterRoomFn"
+                label="Select Room"
                 transition-show="scale"
                 transition-hide="scale"
-                class=" ticket-select"
+                class="ticket-select"
                 color="secondary"
-                emit-value
-                map-options
-                label="Select Availability"
-
               >
-              <template v-slot:append>
-                  <q-icon
-                    :align="top"
-                    size="xs"
-                    class="q-mb-sm"
-                    name="fa-regular fa-circle-question"
-                    color="secondary"
-                  >
-                    <q-tooltip> Select period to indicate availbe time </q-tooltip>
-                  </q-icon>
-                </template>
             </q-select>
             </div>
             </div>
@@ -239,7 +232,7 @@
               @click="confirmCancel"
             />
             <q-btn
-              @click="saveRequest(userID)"
+              @click="saveRequest()"
               class="q-ml-xl"
               color="secondary"
               no-caps
@@ -266,6 +259,8 @@ export default {
     return {
       categoryData: [],
       priorityData: [],
+      roomsData: [],
+      roomsList: [],
       subCategoryData: [],
       hardwCatId: [],
       openTicketStatusId: null
@@ -295,6 +290,10 @@ export default {
         }
       }
     });
+    axios.get(`${apiURL}/room`).then((res) => {
+      this.roomsData = res.data.map((room) => room.ROOM_NUMBER);
+      this.roomsList = res.data.map((room) => room.ROOM_NUMBER);
+    });
   },
   setup() {
     return {
@@ -303,6 +302,7 @@ export default {
       textareaModel: ref(null),
       subjectModel: ref(null),
       assetTagModel: ref(null),
+      roomModel: ref(null),
       assetMake: ref(null),
       assetModel: ref(null),
       subCatList: ref(null),
@@ -316,7 +316,7 @@ export default {
     findHardwareId() {
       this.hardwCatId = this.categoryData.find(o => o.TICKET_CATEGORY_DESC === 'HARDWARE');
     },
-    async saveRequest(userID) {
+    async saveRequest() {
       try {
         const hardwareCategoryId = this.hardwCatId.TICKET_CATEGORY_ID;
         // if the category is hardware and if we have a subcategory, store it into this variable
@@ -359,8 +359,9 @@ export default {
           TICKET_PRIORITY_ID: this.PriorityList, // priority
           SUPPORT_AGENT_ID: null,
           RESOLUTION_DATE: null,
-          END_USER_ID: userID,
-          SUPPORT_TICKET_ASSET_TAG: this.assetTagModel // asset tag
+          END_USER_ID: this.userID,
+          SUPPORT_TICKET_ASSET_TAG: this.assetTagModel, // asset tag
+          ROOM_NUMBER: this.roomModel
         };
 
         // call the save api for support ticket
@@ -399,6 +400,17 @@ export default {
         .onCancel(() => {
           // Do nothing
         })
+    },
+    filterRoomFn (val, update, abort) {
+      update(() => {
+        if (val.length === 0) {
+          this.roomsData = this.roomsList;
+        } else {
+          const searchTerm = val.toLowerCase();
+          const filteredRooms = this.roomsList.filter((room) => room.toLowerCase().indexOf(searchTerm) > -1)
+          this.roomsData = filteredRooms;
+        }
+      })
     }
   },
   computed: {
