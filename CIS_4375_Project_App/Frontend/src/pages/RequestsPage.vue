@@ -182,6 +182,11 @@ export default {
                         }
                     }
 
+                    // convert 00:00 am to 12:00
+                    if (hours == 0) {
+                        hours = 12;
+                    }
+
                     // Create the formatted date string
                     const formattedDate = `${month}/${day}/${year} ${hours.toString().padStart(2, '0')}:${minutes} ${ampm}`;
 
