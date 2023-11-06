@@ -12,6 +12,7 @@ const activeStatusRoutes = require('./routes/activeStatusRoutes')
 const supportAgentRoutes = require('./routes/suportAgentRoutes')
 const subCatRoutes = require('./routes/subCategoryRoutes')
 const supportTicketRoutes = require('./routes/supportTicketRoutes')
+const roomRoute = require('./routes/roomRoutes')
 const app = express();
 
 app.use(express.json());
@@ -27,6 +28,7 @@ app.use('/api', activeStatusRoutes.routes);
 app.use('/api', supportAgentRoutes.routes)
 app.use('/api', subCatRoutes.routes)
 app.use('/api', supportTicketRoutes.routes)
+app.use('/api', roomRoute.routes)
 
 
 
