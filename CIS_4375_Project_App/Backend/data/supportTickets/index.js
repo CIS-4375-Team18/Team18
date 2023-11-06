@@ -98,10 +98,10 @@ const GetAll = async () => {
     }
 }
 
-const GetAssignedByUserId = async (USER_ID) => {
+const GetAssignedByUserId = async ({ USER_ID, SUPPORT_TICKET_STATUS }) => {
     try {
         let pool = await sql.connect(config.sql);
-        const selectAllTicketsQ = "SELECT ST.SUPPORT_TICKET_ID "+
+        let selectAllTicketsQ = "SELECT ST.SUPPORT_TICKET_ID "+
         " ,ST.SUPPORT_TICKET_SUBJECT  "+
         " ,ST.SUPPORT_TICKET_NOTE "+
         " ,ST.DEVICE_MAKE "+
@@ -110,6 +110,7 @@ const GetAssignedByUserId = async (USER_ID) => {
         " ,ST.SUPPORT_TICKET_DATE_CREATED "+
         " ,ST.SUPPORT_TICKET_RESOLUTION_TIME "+
         " ,ST.SUPPORT_TICKET_STATUS_ID "+
+        " ,STS.SUPPORT_TICKET_STATUS_DESC "+
         " ,ST.TICKET_CATEGORY_ID "+
         " ,ST.TICKET_SUB_CATEGORY_ID "+
         " ,ST.TICKET_PRIORITY_ID "+
@@ -120,12 +121,16 @@ const GetAssignedByUserId = async (USER_ID) => {
         " ,EU.END_USER_FIRST_NAME "+
         " ,EU.END_USER_LAST_NAME "+
         " ,EU.END_USER_EMAIL "+
-        " FROM [dbo].[SUPPORT_TICKET] as ST "+
-        " JOIN dbo.END_USER as EU ON ST.END_USER_ID = EU.END_USER_ID"
-        " WHERE ST.SUPPORT_TICKET_STATUS_ID = @SUPPORT_TICKET_STATUS";
-        " AND ST.SUPPORT_AGENT_ID = @USER_ID";
+        " FROM dbo.SUPPORT_TICKET as ST "+
+        " JOIN dbo.SUPPORT_TICKET_STATUS as STS ON ST.SUPPORT_TICKET_STATUS_ID = STS.SUPPORT_TICKET_STATUS_ID " +
+        " JOIN dbo.END_USER as EU ON ST.END_USER_ID = EU.END_USER_ID " +
+        " JOIN dbo.SUPPORT_AGENT_USER as SAU ON SAU.SUPPORT_AGENT_USER_ID = ST.SUPPORT_AGENT_ID " +
+        " WHERE SAU.END_USER_ID = @END_USER_ID";
+        if (SUPPORT_TICKET_STATUS) {
+            selectAllTicketsQ += " AND ST.SUPPORT_TICKET_STATUS_ID = @SUPPORT_TICKET_STATUS ";
+        }
         const supportTicketsList = await pool.request()
-                            .input('USER_ID', sql.Int, USER_ID)
+                            .input('END_USER_ID', sql.Int, USER_ID)
                             .input('SUPPORT_TICKET_STATUS', sql.Int, SUPPORT_TICKET_STATUS)
                             .query(selectAllTicketsQ);
         return supportTicketsList.recordset;

@@ -16,6 +16,7 @@
                     :columns="supportticketsColumns"
                     style="width: 95%; margin: auto"
                     @row-click="editRow"
+                    v-model:pagination="pagination"
                 >
                     <template v-slot:top>
                         <q-select
@@ -37,6 +38,12 @@
                                 <q-icon name="search" />
                             </template>
                         </q-input>
+                        <q-toggle
+                            v-if="userRole ==='System Administrator' || userRole ==='IT Teacher'"
+                            label="Assigned to me"
+                            v-model="assignedToMeModel"
+                            @update:model-value="getSupportTickets"
+                        />
                     </template>
                      <template #body-cell-status="props">
                         <q-td :props="props">
@@ -129,7 +136,8 @@ export default {
                 userRole: this.userRole,
                 status: this.filterByModel.SUPPORT_TICKET_STATUS_ID,
                 createdByUserId: this.userModel?.END_USER_ID || null,
-                searchTerm: this.searchTerm
+                searchTerm: this.searchTerm,
+                assignedToMe: this.assignedToMeModel
             }).then((res) => {
                 if (res.data) {
                     this.setSupportTickets(res.data);
@@ -213,8 +221,14 @@ export default {
             supportticketsColumns: ref([]),
             selected: ref([]),
             redModel: ref(true),
+            assignedToMeModel: ref(false),
             filterByModel: ref(null),
             userModel: ref(null),
+            pagination: ref({
+                sortBy: 'creationDate',
+                descending: true,
+                page: 1,
+            })
         };
     },
     computed: {
@@ -223,4 +237,10 @@ export default {
     }
 }
 </script>
-  
+
+<style>
+/** override default primary color */
+.q-toggle__inner--truthy {
+    color: #1976d2 !important;
+}
+</style>
