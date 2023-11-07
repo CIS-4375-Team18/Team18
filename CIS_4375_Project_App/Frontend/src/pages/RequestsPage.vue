@@ -39,7 +39,7 @@
                             </template>
                         </q-input>
                         <q-toggle
-                            v-if="userRole ==='System Administrator' || userRole ==='IT Teacher'"
+                            v-if="userRole !== 'Staff'"
                             label="Assigned to me"
                             v-model="assignedToMeModel"
                             @update:model-value="getSupportTickets"
