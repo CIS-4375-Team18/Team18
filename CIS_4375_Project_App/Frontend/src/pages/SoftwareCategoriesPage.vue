@@ -378,6 +378,12 @@ export default {
           "actions",
         ];
       }
+      if(this.userRole === "Technician") {
+        this.visibleCategoryColumns = [
+          "ticket_sub_category",
+          "status",
+        ];
+      } 
     },
 
     getCategories() {

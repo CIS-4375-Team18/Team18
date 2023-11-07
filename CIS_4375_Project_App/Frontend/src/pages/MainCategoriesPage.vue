@@ -331,6 +331,12 @@ export default {
       if (this.userRole != "System Administrator") {
         this.visibleCategoryColumns = ["category_type", "status", "actions"];
       }
+      if(this.userRole === "Technician") {
+        this.visibleCategoryColumns = [
+          "category_type",
+          "status",
+        ];
+      } 
     },
 
     // Add new category
