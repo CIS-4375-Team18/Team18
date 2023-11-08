@@ -25,14 +25,14 @@ const GetAllTicketsDisplay = async (req, res, next) => {
 
         let ticketList = [];
         if ((userRole === 'System Administrator' || userRole === 'IT Teacher') && !assignedToMe) {
+            // get all tickets
             ticketList = await supportTicketData.GetAllJoin({
                 USER_ID: createdByUserId, 
                 SUPPORT_TICKET_STATUS,
                 SEARCH_TERM,
             });
-        } else if (userRole === 'Technician' || assignedToMe) {
-            ticketList = await supportTicketData.GetAssignedByUserId({ USER_ID: userId, SUPPORT_TICKET_STATUS});
         } else {
+            // only get tickets created by the current user
             ticketList = await supportTicketData.GetAllJoin({
                 USER_ID: userId,
                 SUPPORT_TICKET_STATUS,
@@ -46,7 +46,17 @@ const GetAllTicketsDisplay = async (req, res, next) => {
     }
 }
 
+const GetAllAssignedTicketsDisplay = async (req, res, next) => {
+    try {
+        const userId = req.body.userId;
+        const SUPPORT_TICKET_STATUS = req.body.status;
 
+        const ticketList = await supportTicketData.GetAssignedByUserId({ USER_ID: userId, SUPPORT_TICKET_STATUS});
+        res.send(ticketList);         
+    } catch (error) {
+        res.status(400).send(error.message);
+    }
+}
 
 const getSingleTicket = async (req, res, next) => {
     try {
@@ -146,6 +156,7 @@ const delSupportTicket = async (req, res, next) => {
 module.exports = {
    GetAllSupportTickets,
    GetAllTicketsDisplay,
+   GetAllAssignedTicketsDisplay,
    getSingleTicket,
    supportTicketByCat,
    recentTicketsPerUser,

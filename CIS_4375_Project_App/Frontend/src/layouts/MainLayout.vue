@@ -115,6 +115,17 @@
                 View Requests
               </q-item-section>
             </q-item>
+            <q-item v-if="userRole !== 'Staff'" clickable v-ripple style="margin-left: 20px;  color: #666262;"
+            
+            @click="$router.push('/assigned')" >
+              <q-item-section avatar>
+                <q-icon name="people" />
+              </q-item-section>
+
+              <q-item-section>
+                View Assigned Requests
+              </q-item-section>
+            </q-item>
             </q-expansion-item>
 
           </q-list>

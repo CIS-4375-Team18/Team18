@@ -5,6 +5,7 @@ const supportTicketCntr  = require('../controllers/supportTicketController');
 const router = express.Router();
 router.get('/supporttickets', supportTicketCntr.GetAllSupportTickets);
 router.post('/ticketDisplay', supportTicketCntr.GetAllTicketsDisplay);
+router.post('/assignedsupporttickets', supportTicketCntr.GetAllAssignedTicketsDisplay);
 router.get('/ticketbycat', supportTicketCntr.supportTicketByCat);
 router.get('/ticketbycat/:id', supportTicketCntr.supportTicketByCatPerUser);
 router.get('/supportticket/:id', supportTicketCntr.getSingleTicket);

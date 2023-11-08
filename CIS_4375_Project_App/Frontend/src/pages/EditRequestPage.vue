@@ -24,43 +24,22 @@
                 option-label="TICKET_PRIORITY_DESC"
               />
             </div>
-            <template v-if="userRole === 'Staff'">
-              <div class="col-4">
-                <q-select
-                  readonly
-                  disable
-                  class="ticket-select"
-                  transition-show="scale"
-                  transition-hide="scale"
-                  emit-value
-                  label="Status"
-                  map-options
-                  color="secondary"
-                  v-model="SupportTicketStatusModel"
-                  :options="supportTicketStatusData"
-                  option-value="SUPPORT_TICKET_STATUS_ID"
-                  option-label="SUPPORT_TICKET_STATUS_DESC"
-                />
-              </div>
-            </template>
-            <template v-if="userRole !== 'Staff'">
-              <div class="col-4">
-                <q-select
-                  class="ticket-select"
-                  transition-show="scale"
-                  transition-hide="scale"
-                  emit-value
-                  label="Select Status"
-                  map-options
-                  color="secondary"
-                  v-model="SupportTicketStatusModel"
-                  :options="supportTicketStatusData"
-                  option-value="SUPPORT_TICKET_STATUS_ID"
-                  option-label="SUPPORT_TICKET_STATUS_DESC"
-                />
-              </div>
-            </template>
-            <template v-if="userRole === 'System Administrator'">
+            <div class="col-4">
+              <q-select
+                class="ticket-select"
+                transition-show="scale"
+                transition-hide="scale"
+                emit-value
+                label="Select Status"
+                map-options
+                color="secondary"
+                v-model="SupportTicketStatusModel"
+                :options="supportTicketStatusData"
+                option-value="SUPPORT_TICKET_STATUS_ID"
+                option-label="SUPPORT_TICKET_STATUS_DESC"
+              />
+            </div>
+            <template v-if="userRole === 'System Administrator' || userRole === 'IT Teacher'">
               <div class="col-4">
                 <q-select
                   class="ticket-select"
@@ -77,7 +56,7 @@
                 />
               </div>
             </template>
-            <template v-if="userRole !== 'System Administrator'">
+            <template v-if="userRole !== 'System Administrator' && userRole !== 'IT Teacher'">
               <div class="col-4">
                 <q-select
                   readonly
