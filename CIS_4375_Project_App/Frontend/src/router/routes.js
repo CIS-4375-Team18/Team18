@@ -21,6 +21,13 @@ const routes = [
     ]
   },
   {
+    path: '/assigned',
+    component: () => import('layouts/MainLayout.vue'),
+    children: [
+      { path: '', component: () => import('pages/AssignedRequestsPage.vue') }
+    ]
+  },
+  {
     path: '/newrequest',
     component: () => import('layouts/MainLayout.vue'),
     children: [

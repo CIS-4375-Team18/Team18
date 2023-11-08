@@ -2,7 +2,7 @@
     <div class="q-pa-md q-gutter-sm" style="margin-left: 15px; margin-right: 15px;">
         <q-card class="requests-card">
             <q-card-section class="text-white" style="background-color: #af0000;">
-                <div class="text-h6 text-left"> Manage Requests </div>
+                <div class="text-h6 text-left"> Manage Assigned Requests </div>
             </q-card-section>
             <q-separator />
 
@@ -125,7 +125,7 @@ export default {
         getSupportTickets() {
             this.loading = true;
             this.supporttickets = [];
-            axios.post(`${apiURL}/ticketDisplay`, {
+            axios.post(`${apiURL}/assignedsupporttickets`, {
                 userId: this.userID,
                 userRole: this.userRole,
                 status: this.filterByModel.SUPPORT_TICKET_STATUS_ID,
