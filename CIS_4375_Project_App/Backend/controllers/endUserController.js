@@ -34,7 +34,7 @@ const addEndUser = async (req, res, next) => {
         const hashedPassword = await bcrypt.hash(data.END_USER_PASSWORD, saltRounds);
         data.END_USER_PASSWORD = hashedPassword;
         const insert = await endUserData.createEndUser(data);
-        res.send(insert);
+        res.send({END_USER_ID: insert});
     } catch (error) {
         res.status(400).send(error.message);
     }
