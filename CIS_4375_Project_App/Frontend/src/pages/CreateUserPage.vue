@@ -138,7 +138,18 @@ export default {
                     const response = await axios.post(`${apiURL}/enduser`, userData);
 
                     if (response.status === 200) {
+                        const endUserId = response.data;
                         this.$q.notify({ color: 'positive', message: 'User registered successfully' });
+
+                        if([1,2,3].includes(userData.USER_ROLE_ID)){
+                            const res = await axios.post(`${apiURL}/supportagent`, endUserId);
+
+                            if (res.status ===  200) {
+                                console.log(res.data)
+                            } else {
+                                console.error('Support Agent User registration failed: ', res)
+                            }
+                        }
                         this.$router.push('/users');
                     } else {
                         this.$q.notify({ color: 'negative', message: 'Registration failed' });

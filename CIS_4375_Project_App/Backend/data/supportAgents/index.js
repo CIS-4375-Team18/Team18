@@ -42,15 +42,11 @@ const getSingleSupportAgent = async(SUPPORT_AGENT_ID) => {
 const createSupportAgent = async (data) => {
     try {
         let pool = await sql.connect(config.sql);
-        const insertSupportAgentQ = "INSERT INTO [dbo].[SUPPORT_AGENT] ([SUPPORT_AGENT_FIRST_NAME] "+
-        " ,[SUPPORT_AGENT_LAST_NAME] ,[SUPPORT_AGENT_EMAIL] ,[SUPPORT_AGENT_PRIMARY_PHONE]) VALUES "+
-        " (@SUPPORT_AGENT_FIRST_NAME, @SUPPORT_AGENT_LAST_NAME, @SUPPORT_AGENT_EMAIL,  @SUPPORT_AGENT_PRIMARY_PHONE)"
+        const insertSupportAgentQ = "INSERT INTO [dbo].[SUPPORT_AGENT_USER] ([END_USER_ID]) VALUES "+
+        " (@END_USER_ID)"
         
         const insertSupportAgent = await pool.request()
-                            .input('SUPPORT_AGENT_FIRST_NAME', sql.NVarChar(40), data.SUPPORT_AGENT_FIRST_NAME)
-                            .input('SUPPORT_AGENT_LAST_NAME', sql.NVarChar(40), data.SUPPORT_AGENT_LAST_NAME)
-                            .input('SUPPORT_AGENT_EMAIL', sql.NVarChar(40), data.SUPPORT_AGENT_EMAIL)
-                            .input('SUPPORT_AGENT_PRIMARY_PHONE', sql.NVarChar(40), data.SUPPORT_AGENT_PRIMARY_PHONE)
+                            .input('END_USER_ID', sql.SmallInt, data.END_USER_ID)
                             .query(insertSupportAgentQ);                            
         return insertSupportAgent.recordset;
     } catch (error) {

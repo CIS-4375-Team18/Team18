@@ -42,7 +42,7 @@ const createEndUser = async (endUserData) => {
         let pool = await sql.connect(config.sql);
         const createQuery = "INSERT INTO [dbo].[END_USER] ([END_USER_FIRST_NAME] "+
         " ,[END_USER_LAST_NAME]  ,[END_USER_EMAIL] ,[END_USER_PASSWORD] "+
-        ",[END_USER_PERIOD], [USER_ROLE_ID], [ACTIVE_STATUS_ID]) VALUES"+ 
+        ",[END_USER_PERIOD], [USER_ROLE_ID], [ACTIVE_STATUS_ID]) OUTPUT INSERTED.END_USER_ID VALUES"+ 
         "(@END_USER_FIRST_NAME, @END_USER_LAST_NAME "+
         ",@END_USER_EMAIL, @END_USER_PASSWORD, @END_USER_PERIOD, @USER_ROLE_ID, @ACTIVE_STATUS_ID)"
 
@@ -55,7 +55,7 @@ const createEndUser = async (endUserData) => {
             .input('USER_ROLE_ID', sql.Int, endUserData.USER_ROLE_ID)
             .input('ACTIVE_STATUS_ID', sql.Int, endUserData.ACTIVE_STATUS_ID)
             .query(createQuery);
-        return insertEndUser.recordset;
+        return insertEndUser.recordset[0].END_USER_ID;
     } catch (error) {
         return error.message;
     }
