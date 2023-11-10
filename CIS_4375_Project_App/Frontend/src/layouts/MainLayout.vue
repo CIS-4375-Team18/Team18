@@ -4,7 +4,7 @@
       <q-toolbar>
         <q-btn v-if="isAuthenticated" flat roundcccccbenfrdj @click="drawer = !drawer" aria-label="Menu" icon="menu" />
         <q-btn flat no-caps no-wrap class="q-ml-xs" v-if="$q.screen.gt.xs" to="/">
-          <img src="src/assets/CISD_Logo.png" style="margin-left: 8px; height:70px;">
+          <img src="https://i.imgur.com/efL132D.png" style="margin-left: 8px; height:70px;">
         </q-btn>
         <q-space />
 
@@ -188,7 +188,7 @@
       <div class="q-pa-lg q-mt-md" v-if="!isAuthenticated">
         <q-page>
           <div class="row justify-center" style="height: 100px;">
-            <img src="src/assets/CISD_Logo.png" style="height: 100%;"/>
+            <img src="https://i.imgur.com/efL132D.png" style="height: 100%;"/>
             <span class="text-h2 text-weight-medium" style="color: #666262;">Cleveland ISD Work Order System</span>
           </div>
           <div class="row">
@@ -209,7 +209,7 @@
             </div>
             <div class="col-md-6 q-pa-lg">
               <q-card>
-                <img src="src/assets/Quasar-App.png" />
+                <img src="https://i.imgur.com/175D2iA.png" />
               </q-card>
             </div>
           </div>
@@ -299,4 +299,4 @@ export default {
 
     &:hover
       color: #000
-</style>src/pinia/loginStore
+</style>

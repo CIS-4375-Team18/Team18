@@ -4,7 +4,7 @@
             <q-toolbar>
 
                 <q-btn flat no-caps no-wrap class="q-ml-xs" v-if="$q.screen.gt.xs" to="/">
-                    <img src="src/assets/CISD_Logo.png" style="margin-left: 8px; margin-top: 10px; height: 70px;">
+                    <img src="https://i.imgur.com/efL132D.png" style="margin-left: 8px; margin-top: 10px; height: 70px;">
                 </q-btn>
 
                 <q-space />
