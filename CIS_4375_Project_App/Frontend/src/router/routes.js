@@ -81,13 +81,6 @@ const routes = [
     ]
   },
   {
-    path: '/priorities',
-    component: () => import('layouts/MainLayout.vue'),
-    children: [
-      { path: '', component: () => import('pages/TicketPrioritiesPage.vue') }
-    ]
-  },
-  {
     path: '/maincategories',
     component: () => import('layouts/MainLayout.vue'),
     children: [
@@ -108,12 +101,6 @@ const routes = [
       { path: '', component: () => import('pages/SoftwareCategoriesPage.vue') }
     ]
   },
-// Always leave this as last one,
-  // but you can also remove it
-  {
-    path: '/:catchAll(.)',
-    component: () => import('pages/ErrorNotFound.vue')
-  }
 ]
 
 export default routes
