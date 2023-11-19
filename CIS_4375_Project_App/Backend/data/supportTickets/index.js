@@ -99,7 +99,7 @@ const GetAll = async () => {
     }
 }
 
-const GetAssignedByUserId = async ({ USER_ID, SUPPORT_TICKET_STATUS }) => {
+const GetAssignedByUserId = async ({ USER_ID, SUPPORT_TICKET_STATUS, SEARCH_TERM }) => {
     try {
         let pool = await sql.connect(config.sql);
         let selectAllTicketsQ = "SELECT ST.SUPPORT_TICKET_ID "+
@@ -130,6 +130,17 @@ const GetAssignedByUserId = async ({ USER_ID, SUPPORT_TICKET_STATUS }) => {
         if (SUPPORT_TICKET_STATUS) {
             selectAllTicketsQ += " AND ST.SUPPORT_TICKET_STATUS_ID = @SUPPORT_TICKET_STATUS ";
         }
+
+        if (SEARCH_TERM.trim().length > 0) {
+            const searchTermWhere = [];
+            const searchTerms = SEARCH_TERM.split(' ');
+            searchTerms.forEach((searchTerm) => {
+                searchTermWhere.push(` (ST.SUPPORT_TICKET_SUBJECT LIKE '%${searchTerm}%' OR EU.END_USER_EMAIL LIKE '%${searchTerm}%')`);
+            })
+
+            selectAllTicketsQ += ' AND (' + searchTermWhere.join(' OR ') + ')';
+        }
+
         const supportTicketsList = await pool.request()
                             .input('END_USER_ID', sql.Int, USER_ID)
                             .input('SUPPORT_TICKET_STATUS', sql.Int, SUPPORT_TICKET_STATUS)

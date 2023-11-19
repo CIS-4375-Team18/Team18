@@ -50,8 +50,9 @@ const GetAllAssignedTicketsDisplay = async (req, res, next) => {
     try {
         const userId = req.body.userId;
         const SUPPORT_TICKET_STATUS = req.body.status;
+        const SEARCH_TERM = req.body.searchTerm;
 
-        const ticketList = await supportTicketData.GetAssignedByUserId({ USER_ID: userId, SUPPORT_TICKET_STATUS});
+        const ticketList = await supportTicketData.GetAssignedByUserId({ USER_ID: userId, SUPPORT_TICKET_STATUS, SEARCH_TERM });
         res.send(ticketList);         
     } catch (error) {
         res.status(400).send(error.message);
